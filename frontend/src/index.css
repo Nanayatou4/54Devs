@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+@theme {
+  --color-dark-1: #0b1120;
+  --color-dark-2: #111a2e;
+  --color-dark-3: #182848;
+  --color-dark-card: #151f35;
+  --color-dark-border: #1e2d4a;
+  --color-dark-input: #1a2540;
+  --color-accent: #e8612d;
+  --color-accent-hover: #d4551f;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  background-color: #0b1120;
+  color: #ffffff;
+}
