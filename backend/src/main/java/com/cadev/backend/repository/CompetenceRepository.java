@@ -6,5 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface CompetenceRepository extends JpaRepository<Competence, Long> {
-    List<Competence> findByCategorie(String categorie);
+    List<Competence> findByCategorieIgnoreCaseOrderByNomAsc(String categorie);
+
 }

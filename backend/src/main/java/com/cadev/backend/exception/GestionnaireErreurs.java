@@ -1,6 +1,7 @@
 package com.cadev.backend.exception;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -27,5 +28,21 @@ public class GestionnaireErreurs {
                 .map(f -> f.getField() + " : " + f.getDefaultMessage())
                 .collect(Collectors.joining(", "));
         return ResponseEntity.badRequest().body(Map.of("message", msg));
+    }
+
+    @ExceptionHandler(RessourceIntrouvableException.class)
+    ResponseEntity<Map<String, String>> introuvable(RessourceIntrouvableException ex) {
+        return ResponseEntity.status(404).body(Map.of("message", ex.getMessage()));
+    }
+
+    @ExceptionHandler(RequeteInvalideException.class)
+    ResponseEntity<Map<String, String>> requeteInvalide(RequeteInvalideException ex) {
+        return ResponseEntity.badRequest().body(Map.of("message", ex.getMessage()));
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    ResponseEntity<Map<String, String>> corpsIllisible() {
+        return ResponseEntity.badRequest()
+                .body(Map.of("message", "Corps de requête invalide (vérifiez le JSON et les valeurs des énumérations)"));
     }
 }
