@@ -1,0 +1,18 @@
+# Secrets
+.env
+application-local.properties
+
+# Build
+target/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+
+# Logs et système
+*.log
+.DS_Store
