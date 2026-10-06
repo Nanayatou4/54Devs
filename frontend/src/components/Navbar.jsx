@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Menu, X } from 'lucide-react'
 
 export default function Navbar() {
@@ -20,12 +21,12 @@ export default function Navbar() {
             <a href="#ecosystem" className="text-gray-300 hover:text-white transition">Ecosystem</a>
             <a href="#projects" className="text-gray-300 hover:text-white transition">Projects</a>
             <a href="#plans" className="text-gray-300 hover:text-white transition">Review Plans</a>
-            <a
-              href="#join"
+            <Link
+              to="/login"
               className="bg-accent hover:bg-accent-hover text-white px-5 py-2 rounded-lg font-medium transition"
             >
               Join the Community
-            </a>
+            </Link>
           </div>
 
           <button
@@ -41,12 +42,12 @@ export default function Navbar() {
             <a href="#ecosystem" className="block text-gray-300 hover:text-white py-2">Ecosystem</a>
             <a href="#projects" className="block text-gray-300 hover:text-white py-2">Projects</a>
             <a href="#plans" className="block text-gray-300 hover:text-white py-2">Review Plans</a>
-            <a
-              href="#join"
+            <Link
+              to="/login"
               className="block bg-accent hover:bg-accent-hover text-white px-5 py-2 rounded-lg font-medium text-center"
             >
               Join the Community
-            </a>
+            </Link>
           </div>
         )}
       </nav>
