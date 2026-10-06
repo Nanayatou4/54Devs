@@ -10,7 +10,7 @@ export default function CTA() {
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           <a
-            href="#"
+            href="/login"
             className="border-2 border-accent text-accent hover:bg-accent hover:text-white px-8 py-3.5 rounded-lg font-semibold transition text-lg"
           >
             Join 54Devs
