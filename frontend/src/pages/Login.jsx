@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react'
 
+
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false)
   const [staySignedIn, setStaySignedIn] = useState(false)
@@ -144,9 +145,9 @@ export default function Login() {
 
             <p className="text-center text-xs text-gray-500 mt-6">
               New to the community?{' '}
-              <a href="#" className="text-accent font-semibold hover:underline">
+              <Link to="/register" className="text-accent font-semibold hover:underline">
                 Join 54 nations today
-              </a>
+              </Link>
             </p>
           </div>
         </div>

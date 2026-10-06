@@ -17,7 +17,7 @@ export default function Hero() {
             </p>
             <div className="flex flex-wrap gap-4 mt-8">
               <a
-                href="#join"
+                href="/register"
                 className="bg-accent hover:bg-accent-hover text-white px-6 py-3 rounded-lg font-semibold transition"
               >
                 Create Identity
