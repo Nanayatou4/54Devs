@@ -20,8 +20,8 @@ public class UtilisateurDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("Utilisateur introuvable"));
         return User
                 .withUsername(u.getEmail())
-                .password(u.getMotDePasse())
-                .roles(u.getRole().name()) // ROLE_UTILISATEUR ou ROLE_ADMIN
+                .password(u.getMotDePasse() != null ? u.getMotDePasse() : "{noop}__oauth__")
+                .roles(u.getRole().name())
                 .disabled(!u.isActif())
                 .build();
     }

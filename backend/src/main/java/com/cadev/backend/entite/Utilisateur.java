@@ -25,12 +25,17 @@ public class Utilisateur {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
-    private String motDePasse; // hash BCrypt, jamais renvoyé par l'API
+    private String motDePasse;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role = Role.UTILISATEUR;
+
+    @Column(unique = true)
+    private String githubId;
+
+    @Column(unique = true)
+    private String googleId;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime dateInscription;
