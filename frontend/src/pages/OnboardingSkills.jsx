@@ -44,20 +44,50 @@ export default function OnboardingSkills() {
 
     const token = localStorage.getItem('token')
     const profileData = JSON.parse(localStorage.getItem('onboarding_profile') || '{}')
+    const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
 
-    // Save profile + skills to backend when endpoints are ready
-    // For now, store locally and redirect
-    const onboardingData = {
-      ...profileData,
-      skills,
-      experience,
-      smartMatching,
+    try {
+      const niveauMap = { '0-2': 'DEBUTANT', '2-5': 'INTERMEDIAIRE', '5-8': 'AVANCE', '8+': 'AVANCE' }
+
+      await fetch('http://localhost:8087/api/profil/moi', {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({
+          pseudo: profileData.pseudo || JSON.parse(localStorage.getItem('utilisateur') || '{}').prenom || 'dev',
+          bio: profileData.bio || '',
+          pays: profileData.pays || '',
+          ville: profileData.ville || '',
+          niveau: niveauMap[experience] || 'DEBUTANT',
+          disponibilite: '',
+          github: '',
+          linkedin: '',
+          portfolio: '',
+        }),
+      })
+
+      const catalogueRes = await fetch('http://localhost:8087/api/competences', { headers })
+      const catalogue = await catalogueRes.json()
+
+      const competencesBody = skills
+        .map(name => catalogue.find(c => c.nom.toLowerCase() === name.toLowerCase()))
+        .filter(Boolean)
+        .map(c => ({ competenceId: c.id, type: 'MAITRISE', niveau: niveauMap[experience] || 'DEBUTANT' }))
+
+      if (competencesBody.length > 0) {
+        await fetch('http://localhost:8087/api/profil/moi/competences', {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify(competencesBody),
+        })
+      }
+
+      localStorage.removeItem('onboarding_profile')
+      navigate('/dashboard')
+    } catch {
+      navigate('/dashboard')
+    } finally {
+      setLoading(false)
     }
-    localStorage.setItem('onboarding_complete', JSON.stringify(onboardingData))
-    localStorage.removeItem('onboarding_profile')
-
-    setLoading(false)
-    navigate('/')
   }
 
   return (

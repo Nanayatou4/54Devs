@@ -33,7 +33,7 @@ export default function Login() {
       const data = await res.json()
       localStorage.setItem('token', data.token)
       localStorage.setItem('utilisateur', JSON.stringify(data.utilisateur))
-      navigate('/')
+      navigate('/dashboard')
     } catch (err) {
       setErreur(err.message)
     } finally {
