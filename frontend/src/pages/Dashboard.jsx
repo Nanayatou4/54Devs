@@ -309,7 +309,7 @@ export default function Dashboard() {
   function handleLogout() {
     localStorage.removeItem('token')
     localStorage.removeItem('utilisateur')
-    navigate('/login')
+    navigate('/')
   }
 
   function handleProfileUpdate(updatedProfil, updatedCompetences) {
