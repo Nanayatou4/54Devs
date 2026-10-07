@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GestionnaireErreurs {
+
     @ExceptionHandler(EmailDejaUtiliseException.class)
     ResponseEntity<Map<String, String>> emailDejaUtilise() {
         return ResponseEntity.status(409).body(Map.of("message", "Cet email est déjà utilisé"));
@@ -44,5 +45,15 @@ public class GestionnaireErreurs {
     ResponseEntity<Map<String, String>> corpsIllisible() {
         return ResponseEntity.badRequest()
                 .body(Map.of("message", "Corps de requête invalide (vérifiez le JSON et les valeurs des énumérations)"));
+    }
+
+    @ExceptionHandler(ActionInterditeException.class)
+    ResponseEntity<Map<String, String>> interdit(ActionInterditeException ex) {
+        return ResponseEntity.status(403).body(Map.of("message", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ConflitException.class)
+    ResponseEntity<Map<String, String>> conflit(ConflitException ex) {
+        return ResponseEntity.status(409).body(Map.of("message", ex.getMessage()));
     }
 }
