@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Upload, Code, Server, Smartphone, Brain } from 'lucide-react'
+import { Pencil, Code, Server, Smartphone, Brain } from 'lucide-react'
 
 const focusOptions = [
   { key: 'FRONTEND', label: 'Frontend', icon: Code, color: 'text-blue-600 border-blue-600 bg-blue-50' },
@@ -15,6 +15,16 @@ export default function OnboardingProfile() {
   const [ville, setVille] = useState('')
   const [focus, setFocus] = useState('')
   const [bio, setBio] = useState('')
+  const [photoPreview, setPhotoPreview] = useState(null)
+  const fileInputRef = useRef(null)
+
+  function handlePhotoChange(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (ev) => setPhotoPreview(ev.target.result)
+    reader.readAsDataURL(file)
+  }
 
   function handleNext(e) {
     e.preventDefault()
@@ -50,14 +60,34 @@ export default function OnboardingProfile() {
 
         <form onSubmit={handleNext} className="space-y-8">
           {/* Profile Photo */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handlePhotoChange}
+            className="hidden"
+          />
           <div className="flex items-center gap-5">
-            <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center shrink-0 overflow-hidden">
-              <Upload size={20} className="text-gray-400" />
-            </div>
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="relative w-16 h-16 rounded-full bg-gray-100 shrink-0 overflow-visible group"
+            >
+              {photoPreview ? (
+                <img src={photoPreview} alt="Photo de profil" className="w-full h-full rounded-full object-cover" />
+              ) : (
+                <div className="w-full h-full rounded-full bg-gray-100 flex items-center justify-center text-gray-400 text-xl font-bold">
+                  ?
+                </div>
+              )}
+              <span className="absolute -bottom-0.5 -right-0.5 w-6 h-6 bg-accent rounded-full flex items-center justify-center shadow-md border-2 border-white group-hover:scale-110 transition">
+                <Pencil size={12} className="text-white" />
+              </span>
+            </button>
             <div>
               <div className="text-sm font-bold text-gray-900">Profile Photo</div>
               <p className="text-xs text-gray-500 mb-1">A professional photo helps in mentorship and job matching.</p>
-              <button type="button" className="text-xs text-accent font-semibold hover:underline">
+              <button type="button" onClick={() => fileInputRef.current?.click()} className="text-xs text-accent font-semibold hover:underline">
                 Upload custom image
               </button>
             </div>
