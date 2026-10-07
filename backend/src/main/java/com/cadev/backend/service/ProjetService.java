@@ -103,7 +103,6 @@ public class ProjetService {
     }
 
     private void remplacerCompetences(Projet p, List<CompetenceProjetRequete> demandesComp) {
-        // On garde une seule ligne par compétence
         Map<Long, CompetenceProjetRequete> uniques = new LinkedHashMap<>();
         if (demandesComp != null) {
             for (CompetenceProjetRequete d : demandesComp) {
