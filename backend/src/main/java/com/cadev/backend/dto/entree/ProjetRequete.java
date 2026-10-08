@@ -1,4 +1,4 @@
-package com.cadev.backend.dto;
+package com.cadev.backend.dto.entree;
 
 import com.cadev.backend.enumeration.StatutProjet;
 import jakarta.validation.Valid;
@@ -16,6 +16,7 @@ public record ProjetRequete(
         @NotNull StatutProjet statut,
         @NotNull @Min(1) @Max(20) Integer nombrePlacesRecherchees,
         @Size(max = 500) String rolesRecherches,
+        @Size(max = 1000) String conditionsEngagement,
         @Size(max = 15) List<@Valid CompetenceProjetRequete> competencesRecherchees
 ) {
 }

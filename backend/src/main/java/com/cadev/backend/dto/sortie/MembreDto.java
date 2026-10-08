@@ -1,4 +1,4 @@
-package com.cadev.backend.dto;
+package com.cadev.backend.dto.sortie;
 
 import com.cadev.backend.entite.MembreProjet;
 import com.cadev.backend.enumeration.RoleMembre;

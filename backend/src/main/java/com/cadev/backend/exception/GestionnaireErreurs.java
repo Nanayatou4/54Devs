@@ -6,6 +6,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -55,5 +56,11 @@ public class GestionnaireErreurs {
     @ExceptionHandler(ConflitException.class)
     ResponseEntity<Map<String, String>> conflit(ConflitException ex) {
         return ResponseEntity.status(409).body(Map.of("message", ex.getMessage()));
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    ResponseEntity<Map<String, String>> parametreInvalide(MethodArgumentTypeMismatchException ex) {
+        return ResponseEntity.badRequest()
+                .body(Map.of("message", "Valeur invalide pour le paramètre « " + ex.getName() + " »"));
     }
 }

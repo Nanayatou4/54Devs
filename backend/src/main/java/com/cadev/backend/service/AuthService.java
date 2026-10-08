@@ -1,9 +1,9 @@
 package com.cadev.backend.service;
 
-import com.cadev.backend.dto.ConnexionRequete;
-import com.cadev.backend.dto.InscriptionRequete;
+import com.cadev.backend.dto.entree.ConnexionRequete;
+import com.cadev.backend.dto.entree.InscriptionRequete;
 import com.cadev.backend.dto.ReponseAuth;
-import com.cadev.backend.dto.UtilisateurDto;
+import com.cadev.backend.dto.sortie.UtilisateurDto;
 import com.cadev.backend.entite.Profil;
 import com.cadev.backend.entite.Utilisateur;
 import com.cadev.backend.exception.EmailDejaUtiliseException;

@@ -37,6 +37,8 @@ public class DemandeAdhesion {
     @Column(nullable = false, updatable = false)
     private LocalDateTime dateDemande;
 
+    private LocalDateTime engagementAccepteLe;
+
     @PrePersist
     void avantCreation() {
         this.dateDemande = LocalDateTime.now();

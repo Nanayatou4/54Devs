@@ -1,4 +1,4 @@
-package com.cadev.backend.dto;
+package com.cadev.backend.dto.sortie;
 
 import com.cadev.backend.enumeration.StatutProjet;
 
@@ -9,7 +9,7 @@ public record ProjetDetailDto(
         Long id, String nom, String description, String probleme, String solution,
         String categorie, String technologies, StatutProjet statut,
         int nombrePlacesRecherchees, int placesRestantes, boolean ouvertAuxDemandes,
-        String rolesRecherches, LocalDateTime dateCreation,
+        String rolesRecherches,String conditionsEngagement, LocalDateTime dateCreation,
         UtilisateurResumeDto createur,
         List<CompetenceProjetDto> competencesRecherchees,
         List<MembreDto> membres,

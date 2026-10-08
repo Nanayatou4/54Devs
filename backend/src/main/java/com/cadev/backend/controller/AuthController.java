@@ -1,9 +1,9 @@
 package com.cadev.backend.controller;
 
-import com.cadev.backend.dto.ConnexionRequete;
-import com.cadev.backend.dto.InscriptionRequete;
+import com.cadev.backend.dto.entree.ConnexionRequete;
+import com.cadev.backend.dto.entree.InscriptionRequete;
 import com.cadev.backend.dto.ReponseAuth;
-import com.cadev.backend.dto.UtilisateurDto;
+import com.cadev.backend.dto.sortie.UtilisateurDto;
 import com.cadev.backend.repository.UtilisateurRepository;
 import com.cadev.backend.service.AuthService;
 import jakarta.validation.Valid;

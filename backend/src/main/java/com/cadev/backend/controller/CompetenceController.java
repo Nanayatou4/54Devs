@@ -1,6 +1,6 @@
 package com.cadev.backend.controller;
 
-import com.cadev.backend.dto.CompetenceDto;
+import com.cadev.backend.dto.sortie.CompetenceDto;
 import com.cadev.backend.entite.Competence;
 import com.cadev.backend.repository.CompetenceRepository;
 import lombok.RequiredArgsConstructor;

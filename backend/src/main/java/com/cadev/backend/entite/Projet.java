@@ -52,6 +52,9 @@ public class Projet {
     @Column(nullable = false, updatable = false)
     private LocalDateTime dateCreation;
 
+    @Column(length = 1000)
+    private String conditionsEngagement;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "createur_id")
     private Utilisateur createur;

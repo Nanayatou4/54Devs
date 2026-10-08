@@ -1,6 +1,5 @@
-package com.cadev.backend.dto;
+package com.cadev.backend.dto.entree;
 
-import com.cadev.backend.entite.Profil;
 import com.cadev.backend.enumeration.Niveau;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

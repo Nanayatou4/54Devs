@@ -1,9 +1,9 @@
 package com.cadev.backend.service;
 
-import com.cadev.backend.dto.CompetenceUtilisateurDto;
-import com.cadev.backend.dto.CompetenceUtilisateurRequete;
-import com.cadev.backend.dto.ProfilDto;
-import com.cadev.backend.dto.ProfilRequete;
+import com.cadev.backend.dto.sortie.CompetenceUtilisateurDto;
+import com.cadev.backend.dto.entree.CompetenceUtilisateurRequete;
+import com.cadev.backend.dto.sortie.ProfilDto;
+import com.cadev.backend.dto.entree.ProfilRequete;
 import com.cadev.backend.entite.Competence;
 import com.cadev.backend.entite.CompetenceUtilisateur;
 import com.cadev.backend.entite.Profil;

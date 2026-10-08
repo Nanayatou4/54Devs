@@ -1,4 +1,4 @@
-package com.cadev.backend.dto;
+package com.cadev.backend.dto.entree;
 
 import com.cadev.backend.enumeration.Niveau;
 import com.cadev.backend.enumeration.TypeCompetence;

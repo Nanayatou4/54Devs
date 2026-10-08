@@ -1,6 +1,8 @@
 package com.cadev.backend.service;
 
-import com.cadev.backend.dto.*;
+import com.cadev.backend.dto.entree.CompetenceProjetRequete;
+import com.cadev.backend.dto.entree.ProjetRequete;
+import com.cadev.backend.dto.sortie.*;
 import com.cadev.backend.entite.*;
 import com.cadev.backend.enumeration.Niveau;
 import com.cadev.backend.enumeration.RoleMembre;
@@ -27,10 +29,12 @@ public class ProjetService {
     private final CompetenceRepository competences;
     private final MembreProjetRepository membres;
     private final DemandeAdhesionRepository demandes;
+    private final LimiteProjetsService limite;
 
     @Transactional
     public ProjetDetailDto creer(String email, ProjetRequete req) {
         Utilisateur moi = trouverUtilisateur(email);
+        limite.verifier(moi, true);
 
         Projet p = new Projet();
         p.setCreateur(moi);
@@ -99,6 +103,7 @@ public class ProjetService {
         p.setStatut(req.statut());
         p.setNombrePlacesRecherchees(req.nombrePlacesRecherchees());
         p.setRolesRecherches(req.rolesRecherches());
+        p.setConditionsEngagement(req.conditionsEngagement());
         remplacerCompetences(p, req.competencesRecherchees());
     }
 
@@ -145,7 +150,7 @@ public class ProjetService {
                 p.getId(), p.getNom(), p.getDescription(), p.getProbleme(), p.getSolution(),
                 p.getCategorie(), p.getTechnologies(), p.getStatut(),
                 p.getNombrePlacesRecherchees(), placesRestantes, estOuvertAuxDemandes(p, placesRestantes),
-                p.getRolesRecherches(), p.getDateCreation(),
+                p.getRolesRecherches(), p.getConditionsEngagement(),p.getDateCreation(),
                 UtilisateurResumeDto.depuis(p.getCreateur()),
                 p.getCompetencesRecherchees().stream().map(CompetenceProjetDto::depuis).toList(),
                 equipe.stream().map(MembreDto::depuis).toList(),
