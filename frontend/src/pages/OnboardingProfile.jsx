@@ -38,13 +38,12 @@ export default function OnboardingProfile() {
       {/* Header */}
       <div className="border-b border-gray-100 px-8 py-4 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 text-lg font-bold">
-          <span className="text-accent">&lt;/&gt;</span>
-          <span className="text-dark-1">54<span className="text-accent">Devs</span></span>
+          <span className="text-gray-900">54<span className="font-extrabold">Devs</span></span>
         </Link>
         <div className="flex items-center gap-3">
           <div className="flex gap-1.5">
-            <div className="w-8 h-1.5 rounded-full bg-accent" />
-            <div className="w-8 h-1.5 rounded-full bg-accent" />
+            <div className="w-8 h-1.5 rounded-full bg-primary" />
+            <div className="w-8 h-1.5 rounded-full bg-primary" />
             <div className="w-8 h-1.5 rounded-full bg-gray-200" />
           </div>
           <span className="text-xs text-gray-400 font-medium tracking-wide uppercase">Step 2 of 3</span>
@@ -80,14 +79,14 @@ export default function OnboardingProfile() {
                   ?
                 </div>
               )}
-              <span className="absolute -bottom-0.5 -right-0.5 w-6 h-6 bg-accent rounded-full flex items-center justify-center shadow-md border-2 border-white group-hover:scale-110 transition">
+              <span className="absolute -bottom-0.5 -right-0.5 w-6 h-6 bg-primary rounded-full flex items-center justify-center shadow-md border-2 border-white group-hover:scale-110 transition">
                 <Pencil size={12} className="text-white" />
               </span>
             </button>
             <div>
               <div className="text-sm font-bold text-gray-900">Profile Photo</div>
               <p className="text-xs text-gray-500 mb-1">A professional photo helps in mentorship and job matching.</p>
-              <button type="button" onClick={() => fileInputRef.current?.click()} className="text-xs text-accent font-semibold hover:underline">
+              <button type="button" onClick={() => fileInputRef.current?.click()} className="text-xs text-primary font-semibold hover:underline">
                 Upload custom image
               </button>
             </div>
@@ -103,7 +102,7 @@ export default function OnboardingProfile() {
                 value={pays}
                 onChange={(e) => setPays(e.target.value)}
                 required
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition appearance-none"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition appearance-none"
               >
                 <option value="">Select your country</option>
                 <option value="Sénégal">Sénégal</option>
@@ -145,7 +144,7 @@ export default function OnboardingProfile() {
                 value={ville}
                 onChange={(e) => setVille(e.target.value)}
                 placeholder="e.g. Nairobi, Lagos, Cairo"
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
               />
             </div>
           </div>
@@ -189,7 +188,7 @@ export default function OnboardingProfile() {
               placeholder="Briefly describe your journey and what you're passionate about building..."
               maxLength={250}
               rows={4}
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition resize-none"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition resize-none"
             />
             <p className="text-[10px] text-gray-400 text-right mt-1">{bio.length} / 250 characters</p>
           </div>
@@ -205,7 +204,7 @@ export default function OnboardingProfile() {
             </button>
             <button
               type="submit"
-              className="flex-[2] py-2.5 rounded-full bg-dark-1 text-white text-sm font-semibold hover:bg-dark-3 transition flex items-center justify-center gap-2"
+              className="flex-[2] py-2.5 rounded-full bg-dark text-white text-sm font-semibold hover:bg-dark-2 transition flex items-center justify-center gap-2"
             >
               Next: Skills & Experience &rarr;
             </button>
@@ -213,7 +212,7 @@ export default function OnboardingProfile() {
         </form>
 
         <p className="text-center text-[11px] text-gray-400 mt-6">
-          Need help? <a href="#" className="text-accent hover:underline font-medium">Contact onboarding support</a>
+          Need help? <a href="#" className="text-primary hover:underline font-medium">Contact onboarding support</a>
         </p>
       </div>
     </div>

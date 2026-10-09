@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { X, Zap, Check } from 'lucide-react'
+import { competencesApi, profilApi, getToken, getStoredUser } from '../api'
 
 const SUGGESTIONS = ['TypeScript', 'Python', 'Docker', 'PostgreSQL', 'AWS']
 
@@ -42,31 +43,30 @@ export default function OnboardingSkills() {
     e.preventDefault()
     setLoading(true)
 
-    const token = localStorage.getItem('token')
+    const token = getToken()
+    if (!token) {
+      navigate('/login')
+      return
+    }
     const profileData = JSON.parse(localStorage.getItem('onboarding_profile') || '{}')
-    const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+    const utilisateur = getStoredUser()
 
     try {
       const niveauMap = { '0-2': 'DEBUTANT', '2-5': 'INTERMEDIAIRE', '5-8': 'AVANCE', '8+': 'AVANCE' }
 
-      await fetch('http://localhost:8087/api/profil/moi', {
-        method: 'PUT',
-        headers,
-        body: JSON.stringify({
-          pseudo: profileData.pseudo || JSON.parse(localStorage.getItem('utilisateur') || '{}').prenom || 'dev',
-          bio: profileData.bio || '',
-          pays: profileData.pays || '',
-          ville: profileData.ville || '',
-          niveau: niveauMap[experience] || 'DEBUTANT',
-          disponibilite: '',
-          github: '',
-          linkedin: '',
-          portfolio: '',
-        }),
+      await profilApi.updateMonProfil({
+        pseudo: profileData.pseudo || utilisateur?.prenom || 'dev',
+        bio: profileData.bio || '',
+        pays: profileData.pays || '',
+        ville: profileData.ville || '',
+        niveau: niveauMap[experience] || 'DEBUTANT',
+        disponibilite: '',
+        github: '',
+        linkedin: '',
+        portfolio: '',
       })
 
-      const catalogueRes = await fetch('http://localhost:8087/api/competences', { headers })
-      const catalogue = await catalogueRes.json()
+      const catalogue = await competencesApi.lister()
 
       const competencesBody = skills
         .map(name => catalogue.find(c => c.nom.toLowerCase() === name.toLowerCase()))
@@ -74,17 +74,13 @@ export default function OnboardingSkills() {
         .map(c => ({ competenceId: c.id, type: 'MAITRISE', niveau: niveauMap[experience] || 'DEBUTANT' }))
 
       if (competencesBody.length > 0) {
-        await fetch('http://localhost:8087/api/profil/moi/competences', {
-          method: 'PUT',
-          headers,
-          body: JSON.stringify(competencesBody),
-        })
+        await profilApi.replaceMesCompetences(competencesBody)
       }
 
       localStorage.removeItem('onboarding_profile')
-      navigate('/dashboard')
+      navigate('/projects')
     } catch {
-      navigate('/dashboard')
+      navigate('/projects')
     } finally {
       setLoading(false)
     }
@@ -95,14 +91,13 @@ export default function OnboardingSkills() {
       {/* Header */}
       <div className="border-b border-gray-100 px-8 py-4 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 text-lg font-bold">
-          <span className="text-accent">&lt;/&gt;</span>
-          <span className="text-dark-1">54<span className="text-accent">Devs</span></span>
+          <span className="text-gray-900">54<span className="font-extrabold">Devs</span></span>
         </Link>
         <div className="flex items-center gap-3">
           <div className="flex gap-1.5">
-            <div className="w-8 h-1.5 rounded-full bg-accent" />
-            <div className="w-8 h-1.5 rounded-full bg-accent" />
-            <div className="w-8 h-1.5 rounded-full bg-accent" />
+            <div className="w-8 h-1.5 rounded-full bg-primary" />
+            <div className="w-8 h-1.5 rounded-full bg-primary" />
+            <div className="w-8 h-1.5 rounded-full bg-primary" />
           </div>
           <span className="text-xs text-gray-400 font-medium tracking-wide uppercase">Step 3 of 3</span>
         </div>
@@ -117,12 +112,12 @@ export default function OnboardingSkills() {
 
         <form onSubmit={handleComplete} className="space-y-8">
           {/* Sync GitHub */}
-          <div className="bg-dark-1 rounded-2xl p-6 flex items-center justify-between">
+          <div className="bg-dark rounded-2xl p-6 flex items-center justify-between">
             <div>
               <h3 className="text-white font-bold text-sm mb-1">Sync GitHub Profile</h3>
               <p className="text-gray-400 text-xs leading-relaxed">
                 Automatically verify your contributions and earn the<br />
-                <span className="text-accent font-semibold">verified contributor</span> badge immediately.
+                <span className="text-primary font-semibold">verified contributor</span> badge immediately.
               </p>
             </div>
             <button
@@ -196,14 +191,14 @@ export default function OnboardingSkills() {
                     onClick={() => setExperience(level.value)}
                     className={`flex-1 py-4 rounded-xl border-2 text-center transition ${
                       selected
-                        ? 'border-accent bg-orange-50'
+                        ? 'border-primary bg-primary-light'
                         : 'border-gray-200 bg-white hover:border-gray-300'
                     }`}
                   >
-                    <div className={`text-xl font-bold ${selected ? 'text-accent' : 'text-gray-900'}`}>
+                    <div className={`text-xl font-bold ${selected ? 'text-primary' : 'text-gray-900'}`}>
                       {level.label}
                     </div>
-                    <div className={`text-[10px] uppercase tracking-wider font-medium mt-0.5 ${selected ? 'text-accent' : 'text-gray-400'}`}>
+                    <div className={`text-[10px] uppercase tracking-wider font-medium mt-0.5 ${selected ? 'text-primary' : 'text-gray-400'}`}>
                       {level.sub}
                     </div>
                   </button>
@@ -215,8 +210,8 @@ export default function OnboardingSkills() {
           {/* Smart Matching */}
           <div className="bg-gray-50 rounded-2xl p-5 flex items-center justify-between">
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 bg-accent/10 rounded-lg flex items-center justify-center shrink-0 mt-0.5">
-                <Zap size={16} className="text-accent" />
+              <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center shrink-0 mt-0.5">
+                <Zap size={16} className="text-primary" />
               </div>
               <div>
                 <h3 className="text-sm font-bold text-gray-900">Enable Smart Matching</h3>
@@ -229,7 +224,7 @@ export default function OnboardingSkills() {
               type="button"
               onClick={() => setSmartMatching(!smartMatching)}
               className={`w-11 h-6 rounded-full transition-colors shrink-0 ${
-                smartMatching ? 'bg-accent' : 'bg-gray-300'
+                smartMatching ? 'bg-primary' : 'bg-gray-300'
               }`}
             >
               <div
@@ -252,7 +247,7 @@ export default function OnboardingSkills() {
             <button
               type="submit"
               disabled={loading}
-              className="flex-[2] py-2.5 rounded-full bg-accent text-white text-sm font-semibold hover:bg-accent-hover transition flex items-center justify-center gap-2"
+              className="flex-[2] py-2.5 rounded-full bg-primary text-white text-sm font-semibold hover:bg-primary-hover transition flex items-center justify-center gap-2"
             >
               Complete Onboarding <Check size={16} />
             </button>
@@ -260,7 +255,7 @@ export default function OnboardingSkills() {
         </form>
 
         <p className="text-center text-[11px] text-gray-400 mt-6 flex items-center justify-center gap-1">
-          <span className="text-accent">&#9679;</span>
+          <span className="text-primary">&#9679;</span>
           Verified pan-African talent network &bull; 256-bit encrypted identity
         </p>
       </div>

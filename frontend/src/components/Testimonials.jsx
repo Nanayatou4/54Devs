@@ -1,57 +1,29 @@
-const testimonials = [
-  {
-    quote:
-      "54Devs isn't just a site; it's our digital home. I found my team for the CADEV 2026 challenge here, and we're building something that actually matters.",
-    name: 'Amara Diallo',
-    role: 'Frontend Lead',
-    country: 'Senegal',
-    initials: 'AD',
-    color: 'bg-blue-500',
-  },
-  {
-    quote:
-      "The smart matching is a game changer. I was recommended a project in Nairobi that matched my skills 95%. We're now launching our MVP.",
-    name: 'Kwame Mensah',
-    role: 'Backend Expert',
-    country: 'Ghana',
-    initials: 'KM',
-    color: 'bg-accent',
-  },
-]
+import { ArrowRight } from 'lucide-react'
 
 export default function Testimonials() {
   return (
-    <section className="bg-white py-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
-          African Identity, Global Quality
-        </h2>
-        <p className="text-gray-500 text-lg mb-14">
-          Connecting the continent through technical excellence.
-        </p>
-
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          {testimonials.map((t) => (
-            <div
-              key={t.name}
-              className="bg-gray-50 rounded-2xl p-8 border border-gray-200 text-left"
-            >
-              <div className="flex items-start gap-4">
-                <div
-                  className={`w-12 h-12 ${t.color} rounded-full flex items-center justify-center text-white font-bold shrink-0`}
-                >
-                  {t.initials}
-                </div>
-                <p className="text-gray-600 leading-relaxed">"{t.quote}"</p>
-              </div>
-              <div className="mt-5">
-                <div className="text-gray-900 font-semibold">{t.name}</div>
-                <div className="text-accent text-sm font-medium">
-                  {t.role} &bull; {t.country}
-                </div>
-              </div>
+    <section className="bg-white py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-gray-50 rounded-2xl overflow-hidden border border-gray-100">
+          <div className="grid md:grid-cols-2 gap-0">
+            <div className="overflow-hidden">
+              <img
+                src="/landing-photo.png"
+                alt="Developer Spotlight"
+                className="w-full h-full object-cover min-h-[320px]"
+              />
             </div>
-          ))}
+            <div className="p-10 flex flex-col justify-center">
+              <span className="text-primary text-xs font-bold uppercase tracking-wider mb-2">Developer Spotlight</span>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">Meet Amina Diallo</h3>
+              <p className="text-gray-500 leading-relaxed mb-6">
+                Amina leveraged the 54Devs mentorship program to scale her AI startup from idea to a funded product serving thousands. Her story embodies the power of our community.
+              </p>
+              <a href="#" className="inline-flex items-center gap-2 text-gray-900 font-semibold hover:text-primary transition underline underline-offset-4">
+                Read her full story <ArrowRight size={16} />
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </section>

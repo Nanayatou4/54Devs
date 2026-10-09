@@ -5,8 +5,15 @@ import {
   Settings, LogOut, ChevronRight, User, Pencil, Save, X, MapPin, Globe, Plus, ExternalLink
 } from 'lucide-react'
 import ProjectsView from './ProjectsView'
-
-const API = 'http://localhost:8087/api'
+import {
+  authApi,
+  clearAuthSession,
+  competencesApi,
+  getStoredUser,
+  getToken,
+  profilApi,
+  setAuthSession,
+} from '../api'
 
 const navItems = [
   { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -43,9 +50,7 @@ function ProfileView({ profil, competences, utilisateur, token, onUpdate }) {
 
   useEffect(() => {
     if (!token) return
-    fetch(`${API}/competences`, { headers: { Authorization: `Bearer ${token}` } })
-      .then(r => r.ok ? r.json() : [])
-      .then(setCatalogue)
+    competencesApi.lister().then(setCatalogue).catch(() => setCatalogue([]))
   }, [token])
 
   function handleChange(field, value) {
@@ -54,38 +59,32 @@ function ProfileView({ profil, competences, utilisateur, token, onUpdate }) {
 
   async function handleSave() {
     setSaving(true)
-    const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
     try {
-      const res = await fetch(`${API}/profil/moi`, { method: 'PUT', headers, body: JSON.stringify(form) })
-      if (res.ok) {
-        const updated = await res.json()
-        onUpdate(updated)
-        setEditing(false)
-      }
+      const updated = await profilApi.updateMonProfil(form)
+      onUpdate(updated)
+      setEditing(false)
     } finally {
       setSaving(false)
     }
   }
 
   async function addCompetence(comp) {
-    const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
     const body = [
       ...competences.map(c => ({ competenceId: c.competenceId, type: c.type, niveau: c.niveau })),
       { competenceId: comp.id, type: 'MAITRISE', niveau: profil?.niveau || 'DEBUTANT' },
     ]
-    const res = await fetch(`${API}/profil/moi/competences`, { method: 'PUT', headers, body: JSON.stringify(body) })
-    if (res.ok) onUpdate(null, await res.json())
+    const updated = await profilApi.replaceMesCompetences(body)
+    onUpdate(null, updated)
     setAddingSkill(false)
     setSkillSearch('')
   }
 
   async function removeCompetence(competenceId) {
-    const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
     const body = competences
       .filter(c => c.competenceId !== competenceId)
       .map(c => ({ competenceId: c.competenceId, type: c.type, niveau: c.niveau }))
-    const res = await fetch(`${API}/profil/moi/competences`, { method: 'PUT', headers, body: JSON.stringify(body) })
-    if (res.ok) onUpdate(null, await res.json())
+    const updated = await profilApi.replaceMesCompetences(body)
+    onUpdate(null, updated)
   }
 
   const initials = utilisateur ? (utilisateur.prenom?.[0] || '') + (utilisateur.nom?.[0] || '') : '?'
@@ -284,7 +283,7 @@ export default function Dashboard() {
   const [competences, setCompetences] = useState([])
   const [utilisateur, setUtilisateur] = useState(null)
 
-  const token = localStorage.getItem('token')
+  const token = getToken()
 
   useEffect(() => {
     if (!token) {
@@ -292,23 +291,25 @@ export default function Dashboard() {
       return
     }
 
-    const u = localStorage.getItem('utilisateur')
-    if (u) setUtilisateur(JSON.parse(u))
+    const stored = getStoredUser()
+    if (stored) setUtilisateur(stored)
 
-    const headers = { Authorization: `Bearer ${token}` }
-
-    fetch(`${API}/profil/moi`, { headers })
-      .then(r => r.ok ? r.json() : null)
-      .then(data => { if (data) setProfil(data) })
-
-    fetch(`${API}/profil/moi/competences`, { headers })
-      .then(r => r.ok ? r.json() : null)
-      .then(data => { if (data) setCompetences(data) })
+    Promise.all([
+      profilApi.getMonProfil().catch(() => null),
+      profilApi.getMesCompetences().catch(() => null),
+      authApi.moi().catch(() => null),
+    ]).then(([p, c, u]) => {
+      if (p) setProfil(p)
+      if (c) setCompetences(c)
+      if (u) {
+        setUtilisateur(u)
+        setAuthSession({ token, utilisateur: u })
+      }
+    })
   }, [token, navigate])
 
   function handleLogout() {
-    localStorage.removeItem('token')
-    localStorage.removeItem('utilisateur')
+    clearAuthSession()
     navigate('/')
   }
 

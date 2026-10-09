@@ -1,23 +1,23 @@
 import CTA from '../components/CTA'
-import Ecosystem from '../components/Ecosystem'
+import Features from '../components/Features'
 import Footer from '../components/Footer'
 import Hero from '../components/Hero'
 import Navbar from '../components/Navbar'
 import PlanApproval from '../components/PlanApproval'
 import Projects from '../components/Projects'
 import Stats from '../components/Stats'
-import Testimonials from '../components/Testimonials'
+import TestimonialQuotes from '../components/TestimonialQuotes'
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-dark-1">
+    <div className="min-h-screen bg-white">
       <Navbar />
       <Hero />
       <PlanApproval />
-      <Ecosystem />
+      <Features />
       <Projects />
       <Stats />
-      <Testimonials />
+      <TestimonialQuotes />
       <CTA />
       <Footer />
     </div>

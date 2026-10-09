@@ -1,26 +1,28 @@
+import { Link } from 'react-router-dom'
+
 export default function CTA() {
   return (
-    <section id="join" className="bg-dark-3 py-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
+    <section className="bg-primary py-24">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
           Ready to Build for Africa?
         </h2>
-        <p className="text-gray-400 text-lg mb-10 max-w-xl mx-auto">
+        <p className="text-white/70 max-w-lg mx-auto mb-10">
           Join the CADEV 2026 movement today. Create your Identity and find your team.
         </p>
         <div className="flex flex-wrap justify-center gap-4">
-          <a
-            href="/login"
-            className="border-2 border-accent text-accent hover:bg-accent hover:text-white px-8 py-3.5 rounded-lg font-semibold transition text-lg"
+          <Link
+            to="/register"
+            className="border-2 border-white text-white hover:bg-white hover:text-primary px-6 py-3 rounded-lg font-semibold transition"
           >
             Join 54Devs
-          </a>
-          <a
-            href="#"
-            className="bg-dark-input hover:bg-dark-2 text-white px-8 py-3.5 rounded-lg font-semibold transition text-lg border border-dark-border"
+          </Link>
+          <Link
+            to="/projects"
+            className="bg-dark hover:bg-dark-2 text-white px-6 py-3 rounded-lg font-semibold transition"
           >
             Review Active Plans
-          </a>
+          </Link>
         </div>
       </div>
     </section>

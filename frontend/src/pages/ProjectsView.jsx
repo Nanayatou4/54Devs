@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react'
 import {
-  Plus, Search, X, ChevronLeft, Pencil, Save, Users, MapPin,
+  Plus, X, ChevronLeft, Pencil, Save, Users, MapPin,
   Clock, CheckCircle, Pause, Lightbulb, Rocket, ArrowRight, Loader2
 } from 'lucide-react'
-
-const API = 'http://localhost:8087/api'
+import { competencesApi, projetsApi } from '../api'
 
 const STATUT_LABELS = {
   IDEE: 'Idea', EN_DEVELOPPEMENT: 'In Development', EN_LANCEMENT: 'Launching',
@@ -60,20 +59,15 @@ function ProjectForm({ token, catalogue, onCreated, onCancel, existing }) {
     e.preventDefault()
     setSaving(true)
     setError('')
-    const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
     const body = {
       ...form,
       nombrePlacesRecherchees: Number(form.nombrePlacesRecherchees),
       competencesRecherchees: form.competencesRecherchees.map(({ competenceId, obligatoire, niveauRequis }) => ({ competenceId, obligatoire, niveauRequis })),
     }
     try {
-      const url = existing ? `${API}/projets/${existing.id}` : `${API}/projets`
-      const res = await fetch(url, { method: existing ? 'PUT' : 'POST', headers, body: JSON.stringify(body) })
-      if (!res.ok) {
-        const data = await res.json().catch(() => null)
-        throw new Error(data?.message || 'Error saving project')
-      }
-      const projet = await res.json()
+      const projet = existing
+        ? await projetsApi.modifier(existing.id, body)
+        : await projetsApi.creer(body)
       onCreated(projet)
     } catch (err) {
       setError(err.message)
@@ -208,11 +202,12 @@ function ProjectDetail({ projet, token, catalogue, onBack, onRefresh }) {
   }
 
   async function handleStatusChange(newStatut) {
-    const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
-    const res = await fetch(`${API}/projets/${projet.id}/statut`, {
-      method: 'PATCH', headers, body: JSON.stringify({ statut: newStatut })
-    })
-    if (res.ok) onRefresh(await res.json())
+    try {
+      const updated = await projetsApi.changerStatut(projet.id, newStatut)
+      onRefresh(updated)
+    } catch {
+      /* ignore */
+    }
     setChangingStatus(false)
   }
 
@@ -382,37 +377,25 @@ export default function ProjectsView({ token }) {
   const [projects, setProjects] = useState([])
   const [selectedProject, setSelectedProject] = useState(null)
   const [catalogue, setCatalogue] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [projectIdInput, setProjectIdInput] = useState('')
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (!token) return
-    fetch(`${API}/competences`, { headers: { Authorization: `Bearer ${token}` } })
-      .then(r => r.ok ? r.json() : [])
-      .then(setCatalogue)
+    competencesApi.lister().then(setCatalogue).catch(() => setCatalogue([]))
+  }, [token])
+
+  useEffect(() => {
+    if (!token) return
+    projetsApi
+      .mesProjets()
+      .then(setProjects)
+      .finally(() => setLoading(false))
   }, [token])
 
   function handleCreated(projet) {
     setProjects(prev => [projet, ...prev])
     setSelectedProject(projet)
     setView('detail')
-  }
-
-  async function loadProject(id) {
-    setLoading(true)
-    try {
-      const res = await fetch(`${API}/projets/${id}`, { headers: { Authorization: `Bearer ${token}` } })
-      if (!res.ok) throw new Error()
-      const data = await res.json()
-      setSelectedProject(data)
-      if (!projects.some(p => p.id === data.id)) setProjects(prev => [data, ...prev])
-      else setProjects(prev => prev.map(p => p.id === data.id ? data : p))
-      setView('detail')
-    } catch {
-      alert('Project not found')
-    } finally {
-      setLoading(false)
-    }
   }
 
   function handleRefresh(updated) {
@@ -424,7 +407,7 @@ export default function ProjectsView({ token }) {
     return (
       <div>
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-white mb-1">Submit a Proposal</h1>
+          <h1 className="text-2xl font-bold text-white mb-1">Create Project</h1>
           <p className="text-gray-400 text-sm">Create a new CADEV 2026 project and find your team.</p>
         </div>
         <div className="bg-dark-card border border-dark-border rounded-xl p-6">
@@ -443,67 +426,50 @@ export default function ProjectsView({ token }) {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-white mb-1">Project Discovery</h1>
-          <p className="text-gray-400 text-sm">Find CADEV 2026 projects or submit your own proposal.</p>
+          <h1 className="text-2xl font-bold text-white mb-1">My Projects</h1>
+          <p className="text-gray-400 text-sm">Manage your CADEV 2026 projects.</p>
         </div>
         <button onClick={() => setView('create')}
           className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition">
-          <Plus size={16} /> Submit Proposal
+          <Plus size={16} /> Create Project
         </button>
       </div>
 
-      {/* Search by ID (temporary until GET /api/projets is available) */}
-      <div className="bg-dark-card border border-dark-border rounded-xl p-4 mb-6">
-        <div className="flex items-center gap-3">
-          <div className="flex-1 relative">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-            <input value={projectIdInput} onChange={e => setProjectIdInput(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter' && projectIdInput.trim()) loadProject(projectIdInput.trim()) }}
-              placeholder="Enter project ID to view details..."
-              className="w-full bg-dark-2 border border-dark-border rounded-lg pl-10 pr-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-accent transition" />
-          </div>
-          <button onClick={() => projectIdInput.trim() && loadProject(projectIdInput.trim())} disabled={loading}
-            className="px-4 py-2.5 bg-dark-2 border border-dark-border rounded-lg text-sm text-gray-300 font-semibold hover:border-accent hover:text-accent transition">
-            {loading ? <Loader2 size={16} className="animate-spin" /> : 'View'}
-          </button>
+      {loading ? (
+        <div className="flex items-center justify-center py-20">
+          <Loader2 size={32} className="animate-spin text-accent" />
         </div>
-      </div>
-
-      {/* My Created Projects */}
-      {projects.length > 0 ? (
-        <div>
-          <h2 className="text-white font-bold text-sm mb-3">My Projects</h2>
-          <div className="grid grid-cols-2 gap-4">
-            {projects.map(p => {
-              const StatusIcon = STATUT_ICONS[p.statut] || Lightbulb
-              return (
-                <button key={p.id} onClick={() => { setSelectedProject(p); setView('detail') }}
-                  className="bg-dark-card border border-dark-border rounded-xl p-5 text-left hover:border-accent/50 transition group">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="min-w-0 flex-1">
-                      <h3 className="text-white font-bold text-sm truncate group-hover:text-accent transition">{p.nom}</h3>
-                      {p.categorie && <span className="text-gray-500 text-[10px] uppercase tracking-wider">{p.categorie}</span>}
-                    </div>
-                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-semibold shrink-0 ml-2 ${STATUT_COLORS[p.statut]}`}>
-                      <StatusIcon size={10} /> {STATUT_LABELS[p.statut]}
-                    </span>
+      ) : projects.length > 0 ? (
+        <div className="grid grid-cols-2 gap-4">
+          {projects.map(p => {
+            const StatusIcon = STATUT_ICONS[p.statut] || Lightbulb
+            return (
+              <button key={p.id} onClick={() => { setSelectedProject(p); setView('detail') }}
+                className="bg-dark-card border border-dark-border rounded-xl p-5 text-left hover:border-accent/50 transition group">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-white font-bold text-sm truncate group-hover:text-accent transition">{p.nom}</h3>
+                    {p.categorie && <span className="text-gray-500 text-[10px] uppercase tracking-wider">{p.categorie}</span>}
                   </div>
-                  <p className="text-gray-400 text-xs line-clamp-2 mb-3">{p.description}</p>
-                  <div className="flex items-center gap-4 text-[10px] text-gray-500">
-                    <span><Users size={12} className="inline mr-1" />{p.membres?.length || 0} members</span>
-                    <span>{p.placesRestantes} spot{p.placesRestantes !== 1 ? 's' : ''} open</span>
-                    {p.technologies && <span className="truncate">{p.technologies}</span>}
-                  </div>
-                </button>
-              )
-            })}
-          </div>
+                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-semibold shrink-0 ml-2 ${STATUT_COLORS[p.statut]}`}>
+                    <StatusIcon size={10} /> {STATUT_LABELS[p.statut]}
+                  </span>
+                </div>
+                <p className="text-gray-400 text-xs line-clamp-2 mb-3">{p.description}</p>
+                <div className="flex items-center gap-4 text-[10px] text-gray-500">
+                  <span><Users size={12} className="inline mr-1" />{p.membres?.length || 0} members</span>
+                  <span>{p.placesRestantes} spot{p.placesRestantes !== 1 ? 's' : ''} open</span>
+                  {p.technologies && <span className="truncate">{p.technologies}</span>}
+                </div>
+              </button>
+            )
+          })}
         </div>
       ) : (
         <div className="bg-dark-card border border-dark-border rounded-xl p-12 text-center">
           <Rocket size={40} className="text-gray-600 mx-auto mb-3" />
           <p className="text-gray-400 text-sm mb-1">No projects yet</p>
-          <p className="text-gray-600 text-xs mb-4">Create your first project or search for one by ID.</p>
+          <p className="text-gray-600 text-xs mb-4">Create your first CADEV 2026 project.</p>
           <button onClick={() => setView('create')}
             className="inline-flex items-center gap-2 bg-accent hover:bg-accent-hover text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition">
             <Plus size={16} /> Create Project
