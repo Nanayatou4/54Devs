@@ -12,8 +12,7 @@ export const projetsApi = {
     if (competenceId) params.set('competenceId', competenceId)
     params.set('page', page)
     params.set('taille', taille)
-    const q = params.toString()
-    return apiRequest(`/projets${q ? `?${q}` : ''}`)
+    return apiRequest(`/projets?${params.toString()}`)
   },
 
   mesProjets: () => apiRequest('/projets/mes-projets'),

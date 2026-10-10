@@ -1,5 +1,5 @@
 import { config } from './config'
-import { getToken } from '../lib/session'
+import { getToken, clearAuthSession } from '../lib/session'
 
 export class ApiError extends Error {
   constructor(message, status, body) {
@@ -50,6 +50,11 @@ export async function apiRequest(path, { method = 'GET', body, auth = true } = {
   }
 
   if (!res.ok) {
+    if (res.status === 401 && auth) {
+      clearAuthSession()
+      window.location.assign('/login?expire=1')
+      return
+    }
     const message =
       typeof data === 'object' && data?.message ? data.message : `Erreur ${res.status}`
     throw new ApiError(message, res.status, data)
