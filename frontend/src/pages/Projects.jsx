@@ -1,194 +1,419 @@
-import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { Plus, Rocket, Users, Loader2 } from 'lucide-react'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
+import { Plus, Search, FolderOpen, AlertCircle, ChevronLeft, ChevronRight, MapPin, Users, X } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
-import { getToken, projetsApi } from '../api'
+import { projetsApi, competencesApi } from '../api'
+import { styles } from './Projects.styles'
+import { STATUT_OPTIONS, STATUT_LABELS, STATUT_COLORS } from './Projects.data'
 
-const FILTERS = ['All Initiatives', 'Open Source', 'Co-founder Search', 'Startup Lab', 'Social Impact']
-
-const STATUT_LABELS = {
-  IDEE: 'Idea', EN_DEVELOPPEMENT: 'In Development', EN_LANCEMENT: 'Launching',
-  TERMINE: 'Completed', EN_PAUSE: 'On Pause',
-}
-const STATUT_COLORS = {
-  IDEE: 'bg-primary/10 text-primary',
-  EN_DEVELOPPEMENT: 'bg-green/10 text-green',
-  EN_LANCEMENT: 'bg-purple-100 text-purple-600',
-  TERMINE: 'bg-gray-100 text-gray-600',
-  EN_PAUSE: 'bg-yellow-100 text-yellow-700',
-}
+const TAILLE = 10
+const DEBOUNCE_MS = 300
 
 export default function Projects() {
-  const [activeFilter, setActiveFilter] = useState('All Initiatives')
-  const [myProjects, setMyProjects] = useState([])
-  const [loading, setLoading] = useState(true)
-  const token = getToken()
+  const [searchParams, setSearchParams] = useSearchParams()
 
+  /* --- Derive filter values from URL --- */
+  const texte = searchParams.get('texte') || ''
+  const statut = searchParams.get('statut') || ''
+  const competenceId = searchParams.get('competenceId') || ''
+  const categorie = searchParams.get('categorie') || ''
+  const technologie = searchParams.get('technologie') || ''
+  const page = parseInt(searchParams.get('page') || '0', 10)
+
+  /* --- Local state for debounced text inputs --- */
+  const [texteInput, setTexteInput] = useState(texte)
+  const [categorieInput, setCategorieInput] = useState(categorie)
+  const [technologieInput, setTechnologieInput] = useState(technologie)
+  const debounceTexte = useRef(null)
+  const debounceCategorie = useRef(null)
+  const debounceTechnologie = useRef(null)
+
+  /* --- API data --- */
+  const [result, setResult] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [competences, setCompetences] = useState([])
+
+  /* --- Load competences catalogue once --- */
   useEffect(() => {
-    if (!token) {
-      setLoading(false)
-      return
-    }
+    competencesApi.lister().then(data => {
+      if (Array.isArray(data)) setCompetences(data)
+    }).catch(() => {})
+  }, [])
+
+  /* --- Sync local inputs when URL changes externally (back/forward) --- */
+  useEffect(() => { setTexteInput(texte) }, [texte])
+  useEffect(() => { setCategorieInput(categorie) }, [categorie])
+  useEffect(() => { setTechnologieInput(technologie) }, [technologie])
+
+  /* --- Helper: update search params --- */
+  const updateParams = useCallback((updates, resetPage = true) => {
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev)
+      for (const [key, value] of Object.entries(updates)) {
+        if (value) {
+          next.set(key, value)
+        } else {
+          next.delete(key)
+        }
+      }
+      if (resetPage) {
+        next.delete('page')
+      }
+      return next
+    })
+  }, [setSearchParams])
+
+  /* --- Debounce: texte --- */
+  useEffect(() => {
+    if (debounceTexte.current) clearTimeout(debounceTexte.current)
+    debounceTexte.current = setTimeout(() => {
+      if (texteInput !== texte) updateParams({ texte: texteInput })
+    }, DEBOUNCE_MS)
+    return () => clearTimeout(debounceTexte.current)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [texteInput])
+
+  /* --- Debounce: categorie --- */
+  useEffect(() => {
+    if (debounceCategorie.current) clearTimeout(debounceCategorie.current)
+    debounceCategorie.current = setTimeout(() => {
+      if (categorieInput !== categorie) updateParams({ categorie: categorieInput })
+    }, DEBOUNCE_MS)
+    return () => clearTimeout(debounceCategorie.current)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [categorieInput])
+
+  /* --- Debounce: technologie --- */
+  useEffect(() => {
+    if (debounceTechnologie.current) clearTimeout(debounceTechnologie.current)
+    debounceTechnologie.current = setTimeout(() => {
+      if (technologieInput !== technologie) updateParams({ technologie: technologieInput })
+    }, DEBOUNCE_MS)
+    return () => clearTimeout(debounceTechnologie.current)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [technologieInput])
+
+  /* --- Fetch projects when URL params change --- */
+  useEffect(() => {
+    let cancelled = false
+    setLoading(true)
+    setError(null)
+
     projetsApi
-      .mesProjets()
-      .then(setMyProjects)
-      .finally(() => setLoading(false))
-  }, [token])
+      .rechercher({ texte, statut, competenceId, categorie, technologie, page, taille: TAILLE })
+      .then(data => {
+        if (!cancelled) setResult(data)
+      })
+      .catch(err => {
+        if (!cancelled) setError(err.message || 'Une erreur est survenue.')
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+
+    return () => { cancelled = true }
+  }, [texte, statut, competenceId, categorie, technologie, page])
+
+  /* --- Has any filter active? --- */
+  const hasFilters = !!(texte || statut || competenceId || categorie || technologie)
+
+  const clearFilters = () => {
+    setTexteInput('')
+    setCategorieInput('')
+    setTechnologieInput('')
+    setSearchParams({})
+  }
+
+  const goToPage = (p) => {
+    updateParams({ page: p === 0 ? '' : String(p) }, false)
+  }
+
+  const projets = result?.contenu || []
+  const totalPages = result?.totalPages || 0
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className={styles.page}>
       <Navbar />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className={styles.inner}>
         {/* Header */}
-        <div className="flex items-start justify-between mb-8">
-          <div>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-2">
-              Build the Next <span className="text-primary italic">Continental Unicorn</span>
-            </h1>
-            <p className="text-gray-500 max-w-lg">
-              Collaborate on open-source initiatives, join high-impact startup labs, or find the perfect co-founder for your next big idea.
+        <div className={styles.header}>
+          <div className={styles.headerLeft}>
+            <h1 className={styles.title}>Découvrir les projets</h1>
+            <p className={styles.subtitle}>
+              Trouvez un projet qui vous inspire ou publiez le vôtre
             </p>
           </div>
-          <div className="flex flex-col gap-3 shrink-0">
-            <Link to="/projects/create" className="inline-flex items-center gap-2 bg-primary hover:bg-primary-hover text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition">
-              <Plus size={16} /> Submit a Project
+          <div className={styles.headerActions}>
+            <Link to="/dashboard" className={styles.myProjectsLink}>
+              <FolderOpen size={16} /> Mes projets
             </Link>
-            <a href="#startup-lab" className="inline-flex items-center gap-2 border border-gray-300 text-gray-700 px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-50 transition">
-              <Rocket size={16} /> Join Startup Lab
-            </a>
+            <Link to="/projects/create" className={styles.publishButton}>
+              <Plus size={16} /> Publier un projet
+            </Link>
           </div>
         </div>
 
-        {/* Filters */}
-        <div className="flex flex-wrap gap-2 mb-10">
-          {FILTERS.map(f => (
-            <button key={f} onClick={() => setActiveFilter(f)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                activeFilter === f
-                  ? 'bg-primary text-white'
-                  : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-50'
-              }`}>
-              {f}
-            </button>
-          ))}
-        </div>
-
-        {/* Projects */}
-        {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 size={32} className="animate-spin text-primary" />
-          </div>
-        ) : myProjects.length > 0 ? (
-          <div className="grid md:grid-cols-3 gap-6 mb-10">
-            {myProjects.map(p => (
-              <Link key={p.id} to={`/projects/${p.id}`}
-                className="bg-white rounded-2xl overflow-hidden border border-gray-200 hover:shadow-lg transition group">
-                <div className="h-48 bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center relative">
-                  <Rocket size={40} className="text-primary/30" />
-                  {p.categorie && (
-                    <span className="absolute top-3 left-3 bg-primary text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded">
-                      {p.categorie}
-                    </span>
-                  )}
-                  <span className="absolute bottom-3 right-3 bg-white/90 text-gray-700 text-[10px] font-semibold px-2.5 py-1 rounded">
-                    {p.placesRestantes} spot{p.placesRestantes !== 1 ? 's' : ''} open
-                  </span>
-                </div>
-                <div className="p-5">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-bold text-gray-900 group-hover:text-primary transition">{p.nom}</h3>
-                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${STATUT_COLORS[p.statut] || 'bg-gray-100 text-gray-600'}`}>
-                      {STATUT_LABELS[p.statut] || p.statut}
-                    </span>
-                  </div>
-                  <p className="text-gray-500 text-sm line-clamp-2 mb-3">{p.description}</p>
-                  <div className="flex items-center gap-3 text-xs text-gray-400">
-                    <span><Users size={12} className="inline mr-1" />{p.membres?.length || 0} members</span>
-                    {p.technologies && <span className="truncate">{p.technologies}</span>}
-                  </div>
-                </div>
-              </Link>
-            ))}
-
-            {/* Create card */}
-            <Link to="/projects/create"
-              className="bg-white rounded-2xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center p-10 hover:border-primary hover:bg-primary-light transition group min-h-[300px]">
-              <div className="w-12 h-12 bg-gray-100 group-hover:bg-primary/10 rounded-full flex items-center justify-center mb-4 transition">
-                <Plus size={24} className="text-gray-400 group-hover:text-primary transition" />
-              </div>
-              <h3 className="font-bold text-gray-900 mb-1">Start Something New</h3>
-              <p className="text-gray-400 text-sm text-center">Have an idea that could change the continent? Share it with the community.</p>
-            </Link>
-          </div>
-        ) : (
-          <div className="bg-white rounded-2xl border border-gray-200 p-16 text-center mb-10">
-            <div className="w-16 h-16 bg-primary-light rounded-full flex items-center justify-center mx-auto mb-5">
-              <Rocket size={32} className="text-primary" />
+        {/* Search & Filters */}
+        <div className={styles.filtersSection}>
+          <div className={styles.searchRow}>
+            <div className="relative">
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Rechercher un projet par nom, description..."
+                value={texteInput}
+                onChange={e => setTexteInput(e.target.value)}
+                className={`${styles.searchInput} pl-9`}
+              />
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">No projects yet</h2>
-            <p className="text-gray-500 max-w-md mx-auto mb-6">
-              Create your first project to get started. Your projects will appear here once created.
-            </p>
-            <Link to="/projects/create" className="inline-flex items-center gap-2 bg-primary hover:bg-primary-hover text-white px-6 py-2.5 rounded-lg text-sm font-semibold transition">
-              <Plus size={16} /> Create Your First Project
-            </Link>
+          </div>
+          <div className={styles.filtersGrid}>
+            <div>
+              <label className={styles.filterLabel}>Statut</label>
+              <select
+                value={statut}
+                onChange={e => updateParams({ statut: e.target.value })}
+                className={styles.filterSelect}
+              >
+                {STATUT_OPTIONS.map(o => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className={styles.filterLabel}>Compétence recherchée</label>
+              <select
+                value={competenceId}
+                onChange={e => updateParams({ competenceId: e.target.value })}
+                className={styles.filterSelect}
+              >
+                <option value="">Toutes</option>
+                {competences.map(c => (
+                  <option key={c.id} value={c.id}>{c.nom}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className={styles.filterLabel}>Catégorie</label>
+              <input
+                type="text"
+                placeholder="Ex : Agriculture, Fintech..."
+                value={categorieInput}
+                onChange={e => setCategorieInput(e.target.value)}
+                className={styles.filterInput}
+              />
+            </div>
+            <div>
+              <label className={styles.filterLabel}>Technologie</label>
+              <input
+                type="text"
+                placeholder="Ex : React, Spring Boot..."
+                value={technologieInput}
+                onChange={e => setTechnologieInput(e.target.value)}
+                className={styles.filterInput}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Loading state: skeleton cards */}
+        {loading && (
+          <div className={styles.skeletonGrid}>
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className={styles.skeletonCard}>
+                <div className={styles.skeletonLine} />
+                <div className={styles.skeletonLineShort} />
+                <div className={styles.skeletonLine} />
+                <div className={styles.skeletonLineXs} />
+              </div>
+            ))}
           </div>
         )}
 
-        {/* Startup Lab Section */}
-        <div id="startup-lab" className="bg-dark rounded-3xl p-10 md:p-14">
-          <div className="grid md:grid-cols-2 gap-10 items-center">
-            <div>
-              <h2 className="text-3xl font-bold text-white mb-4">54Devs Startup Lab</h2>
-              <p className="text-gray-400 mb-8">
-                A 12-week intensive build program where we turn prototypes into venture-backed companies. We provide the infrastructure, the network, and the initial capital.
-              </p>
-              <ul className="space-y-3 mb-8">
-                {[
-                  { label: 'Zero-to-One Support', desc: 'Mentorship from founders who have exited $100M+ companies.' },
-                  { label: 'Elite Engineering Team', desc: 'Access to the top 1% of developers on the 54Devs platform.' },
-                ].map(item => (
-                  <li key={item.label} className="flex items-start gap-3">
-                    <div className="w-5 h-5 bg-green rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                      <span className="text-white text-xs font-bold">&#10003;</span>
+        {/* Error state */}
+        {!loading && error && (
+          <div className={styles.errorState}>
+            <div className={styles.errorIconWrapper}>
+              <AlertCircle size={32} className="text-red-500" />
+            </div>
+            <h2 className={styles.errorTitle}>Erreur de chargement</h2>
+            <p className={styles.errorText}>{error}</p>
+            <button
+              onClick={() => {
+                setError(null)
+                setLoading(true)
+                projetsApi
+                  .rechercher({ texte, statut, competenceId, categorie, technologie, page, taille: TAILLE })
+                  .then(setResult)
+                  .catch(err => setError(err.message || 'Une erreur est survenue.'))
+                  .finally(() => setLoading(false))
+              }}
+              className={styles.retryButton}
+            >
+              Réessayer
+            </button>
+          </div>
+        )}
+
+        {/* Empty state */}
+        {!loading && !error && projets.length === 0 && (
+          <div className={styles.emptyState}>
+            <div className={styles.emptyIconWrapper}>
+              <Search size={32} className="text-primary" />
+            </div>
+            {hasFilters ? (
+              <>
+                <h2 className={styles.emptyTitle}>Aucun projet ne correspond à votre recherche.</h2>
+                <p className={styles.emptyText}>
+                  Essayez de modifier vos filtres ou d'élargir votre recherche.
+                </p>
+                <button onClick={clearFilters} className={styles.clearFiltersButton}>
+                  <X size={16} /> Effacer les filtres
+                </button>
+              </>
+            ) : (
+              <>
+                <h2 className={styles.emptyTitle}>Soyez le premier à publier un projet</h2>
+                <p className={styles.emptyText}>
+                  Aucun projet n'a encore été publié. Lancez-vous !
+                </p>
+                <Link to="/projects/create" className={styles.emptyCreateButton}>
+                  <Plus size={16} /> Publier un projet
+                </Link>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Project cards */}
+        {!loading && !error && projets.length > 0 && (
+          <>
+            <div className={styles.projectsGrid}>
+              {projets.map(p => (
+                <Link key={p.id} to={`/projects/${p.id}`} className={styles.projectCard}>
+                  <div className={styles.cardBody}>
+                    <div className={styles.cardHeaderRow}>
+                      <h3 className={styles.cardTitle}>{p.nom}</h3>
+                      <CardBadge project={p} />
                     </div>
-                    <div>
-                      <span className="text-white font-semibold text-sm">{item.label}</span>
-                      <p className="text-gray-400 text-sm">{item.desc}</p>
+                    <p className={styles.cardDescription}>{p.description}</p>
+
+                    {/* Competences pills */}
+                    {p.competencesRecherchees?.length > 0 && (
+                      <div className={styles.cardSkills}>
+                        {p.competencesRecherchees.map(skill => (
+                          <span key={skill} className={styles.cardSkillPill}>{skill}</span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Footer: creator + places */}
+                    <div className={styles.cardFooter}>
+                      <span className={styles.cardCreator}>
+                        <Users size={12} />
+                        {p.createur?.prenom || p.createur?.pseudo || 'Anonyme'}
+                        {p.createur?.pays && (
+                          <>
+                            <MapPin size={10} className="ml-1" />
+                            {p.createur.pays}
+                          </>
+                        )}
+                      </span>
+                      <span className={styles.cardPlaces}>
+                        {p.placesRestantes} place{p.placesRestantes !== 1 ? 's' : ''} restante{p.placesRestantes !== 1 ? 's' : ''}
+                      </span>
                     </div>
-                  </li>
-                ))}
-              </ul>
-              <button className="bg-green hover:bg-green-hover text-white px-6 py-3 rounded-lg font-semibold transition">
-                Apply for Cohort 4
-              </button>
+                  </div>
+                </Link>
+              ))}
             </div>
 
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white/5 border border-white/10 rounded-xl p-6 text-center">
-                  <span className="text-primary text-2xl font-bold block">$2.4M</span>
-                  <span className="text-gray-400 text-xs uppercase tracking-wider font-bold">Funding Raised</span>
-                </div>
-                <div className="bg-white/5 border border-white/10 rounded-xl p-6 text-center">
-                  <span className="text-primary text-2xl font-bold block">12</span>
-                  <span className="text-gray-400 text-xs uppercase tracking-wider font-bold">Startups Launched</span>
-                </div>
-              </div>
-              <div className="bg-white/5 border border-white/10 rounded-xl p-5 flex items-center gap-4">
-                <div className="w-10 h-10 bg-gray-600 rounded-full shrink-0" />
-                <p className="text-gray-300 text-sm italic">
-                  "The Lab gave us the technical credibility to close our pre-seed in weeks."
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <Pagination page={page} totalPages={totalPages} goToPage={goToPage} />
+            )}
+          </>
+        )}
       </div>
 
       <Footer />
+    </div>
+  )
+}
+
+/* --- Card badge (status or closed) --- */
+function CardBadge({ project: p }) {
+  if (!p.ouvertAuxDemandes && p.placesRestantes === 0) {
+    return <span className={styles.cardBadgeClosed}>Complet</span>
+  }
+  if (p.statut === 'TERMINE') {
+    return <span className={`${styles.cardStatus} ${STATUT_COLORS.TERMINE}`}>Terminé</span>
+  }
+  return (
+    <span className={`${styles.cardStatus} ${STATUT_COLORS[p.statut] || 'bg-gray-100 text-gray-600'}`}>
+      {STATUT_LABELS[p.statut] || p.statut}
+    </span>
+  )
+}
+
+/* --- Pagination component --- */
+function Pagination({ page, totalPages, goToPage }) {
+  const pages = []
+  const maxVisible = 5
+  let start = Math.max(0, page - Math.floor(maxVisible / 2))
+  let end = Math.min(totalPages, start + maxVisible)
+  if (end - start < maxVisible) {
+    start = Math.max(0, end - maxVisible)
+  }
+
+  for (let i = start; i < end; i++) {
+    pages.push(i)
+  }
+
+  return (
+    <div className={styles.pagination}>
+      <button
+        onClick={() => goToPage(page - 1)}
+        disabled={page === 0}
+        className={`${styles.pageButton} ${page === 0 ? styles.pageButtonDisabled : styles.pageButtonInactive}`}
+      >
+        <ChevronLeft size={16} />
+      </button>
+
+      {start > 0 && (
+        <>
+          <button onClick={() => goToPage(0)} className={`${styles.pageButton} ${styles.pageButtonInactive}`}>1</button>
+          {start > 1 && <span className="text-gray-400 px-1">...</span>}
+        </>
+      )}
+
+      {pages.map(i => (
+        <button
+          key={i}
+          onClick={() => goToPage(i)}
+          className={`${styles.pageButton} ${i === page ? styles.pageButtonActive : styles.pageButtonInactive}`}
+        >
+          {i + 1}
+        </button>
+      ))}
+
+      {end < totalPages && (
+        <>
+          {end < totalPages - 1 && <span className="text-gray-400 px-1">...</span>}
+          <button onClick={() => goToPage(totalPages - 1)} className={`${styles.pageButton} ${styles.pageButtonInactive}`}>{totalPages}</button>
+        </>
+      )}
+
+      <button
+        onClick={() => goToPage(page + 1)}
+        disabled={page >= totalPages - 1}
+        className={`${styles.pageButton} ${page >= totalPages - 1 ? styles.pageButtonDisabled : styles.pageButtonInactive}`}
+      >
+        <ChevronRight size={16} />
+      </button>
     </div>
   )
 }
