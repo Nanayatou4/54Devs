@@ -4,8 +4,6 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import OnboardingProfile from './pages/OnboardingProfile'
 import OnboardingSkills from './pages/OnboardingSkills'
-import Community from './pages/Community'
-import Mentorship from './pages/Mentorship'
 import Projects from './pages/Projects'
 import ProjectDetail from './pages/ProjectDetail'
 import ProjectCreate from './pages/ProjectCreate'
@@ -13,6 +11,7 @@ import Profile from './pages/Profile'
 import GitHubCallback from './pages/GitHubCallback'
 import GoogleCallback from './pages/GoogleCallback'
 import Dashboard from './pages/Dashboard'
+import ProtectedRoute from './components/ProtectedRoute'
 
 export default function App() {
   return (
@@ -21,17 +20,17 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/onboarding/profile" element={<OnboardingProfile />} />
-        <Route path="/onboarding/skills" element={<OnboardingSkills />} />
-        <Route path="/community" element={<Community />} />
-        <Route path="/mentorship" element={<Mentorship />} />
-        <Route path="/projects" element={<Projects />} />
-        <Route path="/projects/create" element={<ProjectCreate />} />
-        <Route path="/projects/:id" element={<ProjectDetail />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/auth/callback/github" element={<GitHubCallback />} />
         <Route path="/auth/callback/google" element={<GoogleCallback />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/onboarding/profile" element={<OnboardingProfile />} />
+          <Route path="/onboarding/skills" element={<OnboardingSkills />} />
+          <Route path="/projects" element={<Projects />} />
+          <Route path="/projects/create" element={<ProjectCreate />} />
+          <Route path="/projects/:id" element={<ProjectDetail />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   )
