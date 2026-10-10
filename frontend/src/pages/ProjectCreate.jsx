@@ -1,18 +1,14 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import {
-  ArrowRight, Save, X, Loader2, Code, Rocket, Users, CheckCircle,
-  MapPin, ExternalLink,
+  ArrowRight, Save, X, Loader2, Users, CheckCircle,
+  Rocket, ExternalLink,
 } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
-import { ApiError, competencesApi, getToken, projetsApi } from '../api'
-
-const CATEGORIES = ['Agriculture', 'Education', 'FinTech', 'HealthTech', 'E-Commerce', 'Logistics', 'GreenTech', 'GovTech']
-const STATUT_LABELS = {
-  IDEE: 'Idea', EN_DEVELOPPEMENT: 'In Development', EN_LANCEMENT: 'Launching',
-  TERMINE: 'Completed', EN_PAUSE: 'On Pause',
-}
+import { competencesApi, getToken, projetsApi } from '../api'
+import { styles } from './ProjectCreate.styles'
+import { CATEGORIES, STATUT_LABELS } from './ProjectCreate.data'
 
 export default function ProjectCreate() {
   const navigate = useNavigate()
@@ -24,15 +20,16 @@ export default function ProjectCreate() {
   const [createdProject, setCreatedProject] = useState(null)
 
   const [form, setForm] = useState({
-    type: 'open-source',
     nom: '',
-    pitch: '',
     description: '',
+    probleme: '',
+    solution: '',
     categorie: '',
     technologies: '',
     statut: 'IDEE',
     nombrePlacesRecherchees: 3,
     rolesRecherches: '',
+    conditionsEngagement: '',
     competencesRecherchees: [],
   })
 
@@ -48,7 +45,7 @@ export default function ProjectCreate() {
     setError('')
 
     const nom = (form.nom || '').trim()
-    const description = (form.description || form.pitch || '').trim()
+    const description = (form.description || '').trim()
 
     if (nom.length < 3) {
       setError('Le nom du projet doit contenir au moins 3 caractères.')
@@ -56,7 +53,7 @@ export default function ProjectCreate() {
       return
     }
     if (!description) {
-      setError('Veuillez fournir une description ou un pitch.')
+      setError('Veuillez fournir une description.')
       setSaving(false)
       return
     }
@@ -70,25 +67,24 @@ export default function ProjectCreate() {
       const projet = await projetsApi.creer({
         nom,
         description,
-        probleme: (form.pitch || '').trim() || null,
-        solution: '',
-        categorie: form.categorie || null,
-        technologies: form.technologies || null,
+        probleme: form.probleme?.trim() || null,
+        solution: form.solution?.trim() || null,
+        categorie: form.categorie?.trim() || null,
+        technologies: form.technologies?.trim() || null,
         statut: form.statut,
         nombrePlacesRecherchees: Math.max(1, Number(form.nombrePlacesRecherchees) || 1),
-        rolesRecherches: form.rolesRecherches || null,
+        rolesRecherches: form.rolesRecherches?.trim() || null,
+        conditionsEngagement: form.conditionsEngagement?.trim() || null,
         competencesRecherchees: form.competencesRecherchees.map(({ competenceId, obligatoire, niveauRequis }) => ({
           competenceId, obligatoire, niveauRequis,
         })),
       })
 
       setCreatedProject(projet)
+      // Redirect after a short delay
+      setTimeout(() => navigate(`/projects/${projet.id}`), 3000)
     } catch (err) {
-      if (err instanceof ApiError && err.status === 0) {
-        setError(err.message)
-      } else {
-        setError(err.message || 'Une erreur inattendue est survenue.')
-      }
+      setError(err.message || 'Une erreur inattendue est survenue.')
       setSaving(false)
     }
   }
@@ -99,51 +95,58 @@ export default function ProjectCreate() {
     const techs = (p.technologies || '').split(',').filter(Boolean)
 
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className={styles.page}>
         <Navbar />
         <div className="max-w-3xl mx-auto px-4 py-10">
-          <div className="bg-green/10 border border-green/30 rounded-xl p-4 flex items-center gap-3 mb-8">
+          <div className={styles.successBanner}>
             <CheckCircle size={20} className="text-green shrink-0" />
-            <p className="text-green font-semibold text-sm">Project created successfully! Review the details below and publish when ready.</p>
+            <p className="text-green font-semibold text-sm">Projet créé avec succès ! Redirection automatique dans quelques secondes...</p>
           </div>
 
-          <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
-            <div className="h-40 bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center relative">
+          <div className={styles.successCard}>
+            <div className={styles.successHeader}>
               <Rocket size={48} className="text-primary/30" />
               {p.categorie && (
-                <span className="absolute top-4 left-4 bg-primary text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded">
+                <span className={styles.successCategory}>
                   {p.categorie}
                 </span>
               )}
-              <span className="absolute top-4 right-4 bg-white/90 text-gray-600 text-xs font-semibold px-3 py-1 rounded-full">
+              <span className={styles.successStatus}>
                 {STATUT_LABELS[p.statut] || p.statut}
               </span>
             </div>
 
-            <div className="p-8">
+            <div className={styles.successBody}>
               <h1 className="text-2xl font-bold text-gray-900 mb-2">{p.nom}</h1>
               <p className="text-gray-500 leading-relaxed mb-6">{p.description}</p>
 
               {p.probleme && (
                 <div className="mb-6">
-                  <h3 className="text-sm font-bold text-gray-900 mb-1">Problem</h3>
+                  <h3 className="text-sm font-bold text-gray-900 mb-1">Problème</h3>
                   <p className="text-gray-600 text-sm">{p.probleme}</p>
                 </div>
               )}
 
+              {p.solution && (
+                <div className="mb-6">
+                  <h3 className="text-sm font-bold text-gray-900 mb-1">Solution</h3>
+                  <p className="text-gray-600 text-sm">{p.solution}</p>
+                </div>
+              )}
+
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-                <div className="bg-gray-50 rounded-xl p-4 text-center">
+                <div className={styles.statBox}>
                   <Users size={18} className="text-primary mx-auto mb-1" />
                   <span className="text-lg font-bold text-gray-900 block">{p.nombrePlacesRecherchees}</span>
-                  <span className="text-gray-400 text-[10px] uppercase tracking-wider font-bold">Team Size</span>
+                  <span className="text-gray-400 text-[10px] uppercase tracking-wider font-bold">Places recherchées</span>
                 </div>
-                <div className="bg-gray-50 rounded-xl p-4 text-center">
+                <div className={styles.statBox}>
                   <span className="text-lg font-bold text-primary block">{p.placesRestantes ?? p.nombrePlacesRecherchees}</span>
-                  <span className="text-gray-400 text-[10px] uppercase tracking-wider font-bold">Spots Open</span>
+                  <span className="text-gray-400 text-[10px] uppercase tracking-wider font-bold">Places restantes</span>
                 </div>
-                <div className="bg-gray-50 rounded-xl p-4 text-center">
+                <div className={styles.statBox}>
                   <span className="text-lg font-bold text-gray-900 block">{p.membres?.length || 1}</span>
-                  <span className="text-gray-400 text-[10px] uppercase tracking-wider font-bold">Members</span>
+                  <span className="text-gray-400 text-[10px] uppercase tracking-wider font-bold">Membres</span>
                 </div>
               </div>
 
@@ -152,7 +155,7 @@ export default function ProjectCreate() {
                   <h3 className="text-sm font-bold text-gray-900 mb-2">Technologies</h3>
                   <div className="flex flex-wrap gap-2">
                     {techs.map(t => (
-                      <span key={t.trim()} className="bg-gray-100 text-gray-600 text-xs px-3 py-1.5 rounded-lg font-medium">{t.trim()}</span>
+                      <span key={t.trim()} className={styles.techTag}>{t.trim()}</span>
                     ))}
                   </div>
                 </div>
@@ -160,22 +163,29 @@ export default function ProjectCreate() {
 
               {p.rolesRecherches && (
                 <div className="mb-6">
-                  <h3 className="text-sm font-bold text-gray-900 mb-2">Roles Needed</h3>
+                  <h3 className="text-sm font-bold text-gray-900 mb-2">Rôles recherchés</h3>
                   <div className="flex flex-wrap gap-2">
                     {p.rolesRecherches.split(',').map(r => (
-                      <span key={r.trim()} className="border border-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded-lg font-medium">{r.trim()}</span>
+                      <span key={r.trim()} className={styles.roleTag}>{r.trim()}</span>
                     ))}
                   </div>
                 </div>
               )}
 
+              {p.conditionsEngagement && (
+                <div className="mb-6">
+                  <h3 className="text-sm font-bold text-gray-900 mb-2">Conditions d'engagement</h3>
+                  <p className="text-gray-600 text-sm">{p.conditionsEngagement}</p>
+                </div>
+              )}
+
               {p.competencesRecherchees?.length > 0 && (
                 <div className="mb-6">
-                  <h3 className="text-sm font-bold text-gray-900 mb-2">Required Skills</h3>
+                  <h3 className="text-sm font-bold text-gray-900 mb-2">Compétences recherchées</h3>
                   <div className="flex flex-wrap gap-2">
                     {p.competencesRecherchees.map(c => (
-                      <span key={c.competenceId} className="bg-primary/10 text-primary text-xs px-3 py-1.5 rounded-lg font-medium">
-                        {c.nom || `Skill #${c.competenceId}`}
+                      <span key={c.competenceId} className={styles.skillTag}>
+                        {c.nom || `Compétence #${c.competenceId}`}
                         {c.obligatoire && <span className="ml-1 text-red-500">*</span>}
                       </span>
                     ))}
@@ -184,17 +194,11 @@ export default function ProjectCreate() {
               )}
 
               <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-100">
-                <Link
-                  to={`/projects/${p.id}`}
-                  className="flex-1 inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover text-white px-6 py-3 rounded-lg font-semibold transition"
-                >
-                  <ExternalLink size={16} /> View Published Project
+                <Link to={`/projects/${p.id}`} className={styles.successViewButton}>
+                  <ExternalLink size={16} /> Voir le projet
                 </Link>
-                <Link
-                  to="/projects"
-                  className="flex-1 inline-flex items-center justify-center gap-2 border border-gray-300 text-gray-700 hover:bg-gray-50 px-6 py-3 rounded-lg font-semibold transition"
-                >
-                  Browse All Projects
+                <Link to="/projects" className={styles.successBrowseButton}>
+                  Parcourir tous les projets
                 </Link>
               </div>
             </div>
@@ -206,109 +210,117 @@ export default function ProjectCreate() {
   }
 
   // ---------- CREATION FORM ----------
-  const inputClass = 'w-full border-b border-gray-300 px-1 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-primary transition bg-transparent'
-  const labelClass = 'block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1'
+  const stepLabels = { 1: 'Informations', 2: 'Équipe & Technologies', 3: 'Récapitulatif' }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="text-lg font-bold text-gray-900">54<span className="font-extrabold">Devs</span></Link>
+    <div className={styles.page}>
+      <div className={styles.header}>
+        <div className={styles.headerInner}>
+          <Link to="/" className={styles.logo}>54<span className="font-extrabold">Devs</span></Link>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-500">Step {step} of 3: {step === 1 ? 'Core Details' : step === 2 ? 'Team & Stack' : 'Review'}</span>
-            <Link to="/projects" className="text-gray-400 hover:text-gray-600"><X size={20} /></Link>
+            <span className={styles.stepLabel}>Étape {step} sur 3 : {stepLabels[step]}</span>
+            <Link to="/projects" className={styles.closeButton}><X size={20} /></Link>
           </div>
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 py-10">
-        <div className="flex items-center justify-center mb-12">
+      <div className={styles.inner}>
+        <div className={styles.stepperWrapper}>
           {[1, 2, 3].map((s, i) => (
             <div key={s} className="flex items-center">
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition ${
-                s <= step ? 'bg-primary text-white' : 'bg-gray-200 text-gray-500'
-              }`}>{s}</div>
-              {i < 2 && <div className={`w-32 h-0.5 mx-2 ${s < step ? 'bg-primary' : 'bg-gray-200'}`} />}
+              <div className={s <= step ? styles.stepCircleActive : styles.stepCircleInactive}>{s}</div>
+              {i < 2 && <div className={s < step ? styles.stepConnectorActive : styles.stepConnectorInactive} />}
             </div>
           ))}
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-200 p-8 md:p-10 shadow-sm">
-          {error && <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-2.5 mb-6">{error}</div>}
+        <div className={styles.card}>
+          {error && <div className={styles.error}>{error}</div>}
 
           {step === 1 && (
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Launch Your Initiative</h2>
-              <p className="text-gray-500 mb-8">Tell us what you're building. Every unicorn starts with a single line of code and a clear mission.</p>
+              <h2 className={styles.cardTitle}>Décrivez votre projet</h2>
+              <p className={styles.cardSubtitle}>Présentez votre idée. Chaque projet commence par une vision claire et une mission précise.</p>
 
-              <div className="mb-8">
-                <label className={labelClass}>Project Type</label>
-                <div className="grid grid-cols-2 gap-4 mt-2">
-                  <button type="button" onClick={() => set('type', 'open-source')}
-                    className={`p-5 rounded-xl border-2 text-left transition ${form.type === 'open-source' ? 'border-primary bg-primary-light' : 'border-gray-200 hover:border-gray-300'}`}>
-                    <Code size={20} className={form.type === 'open-source' ? 'text-primary mb-3' : 'text-gray-400 mb-3'} />
-                    <h4 className="font-semibold text-gray-900 text-sm">Open Source</h4>
-                    <p className="text-gray-500 text-xs mt-1">Public repository for community collaboration.</p>
-                  </button>
-                  <button type="button" onClick={() => set('type', 'startup-lab')}
-                    className={`p-5 rounded-xl border-2 text-left transition ${form.type === 'startup-lab' ? 'border-primary bg-primary-light' : 'border-gray-200 hover:border-gray-300'}`}>
-                    <Rocket size={20} className={form.type === 'startup-lab' ? 'text-primary mb-3' : 'text-gray-400 mb-3'} />
-                    <h4 className="font-semibold text-gray-900 text-sm">Startup Lab</h4>
-                    <p className="text-gray-500 text-xs mt-1">Proprietary venture seeking co-founders.</p>
-                  </button>
-                </div>
+              <div className="mb-6">
+                <label className={styles.label}>Nom du projet *</label>
+                <input value={form.nom} onChange={e => set('nom', e.target.value)} placeholder="ex. AgriConnect, SaharaAI..." maxLength={100} className={styles.input} required />
+                <p className="text-[10px] text-gray-400 text-right mt-1">{form.nom.length} / 100</p>
               </div>
 
               <div className="mb-6">
-                <label className={labelClass}>Project Name</label>
-                <input value={form.nom} onChange={e => set('nom', e.target.value)} placeholder="e.g. NilePay, SaharaAI..." className={inputClass} required />
-              </div>
-
-              <div className="mb-6">
-                <label className={labelClass}>One-Line Pitch</label>
-                <input value={form.pitch} onChange={e => set('pitch', e.target.value)} placeholder="What does it do in 10 words or less?" className={inputClass} />
-              </div>
-
-              <div className="mb-8">
-                <label className={labelClass}>Deep Dive</label>
+                <label className={styles.label}>Description *</label>
                 <textarea value={form.description} onChange={e => set('description', e.target.value)}
-                  placeholder="Explain the problem you're solving and why it matters for the continent..."
-                  rows={4} className={`${inputClass} resize-none`} />
+                  placeholder="Décrivez ce que fait votre projet et pourquoi il est important..."
+                  rows={4} maxLength={2000} className={`${styles.input} resize-none`} />
+                <p className="text-[10px] text-gray-400 text-right mt-1">{form.description.length} / 2000</p>
+              </div>
+
+              <div className="mb-6">
+                <label className={styles.label}>Quel problème résout-il ?</label>
+                <textarea value={form.probleme} onChange={e => set('probleme', e.target.value)}
+                  placeholder="Décrivez le problème que votre projet cherche à résoudre..."
+                  rows={3} maxLength={1000} className={`${styles.input} resize-none`} />
+                <p className="text-[10px] text-gray-400 text-right mt-1">{form.probleme.length} / 1000</p>
+              </div>
+
+              <div className="mb-8">
+                <label className={styles.label}>Quelle solution proposez-vous ?</label>
+                <textarea value={form.solution} onChange={e => set('solution', e.target.value)}
+                  placeholder="Expliquez comment votre projet résout ce problème..."
+                  rows={3} maxLength={1000} className={`${styles.input} resize-none`} />
+                <p className="text-[10px] text-gray-400 text-right mt-1">{form.solution.length} / 1000</p>
               </div>
             </div>
           )}
 
           {step === 2 && (
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Team & Tech Stack</h2>
-              <p className="text-gray-500 mb-8">Define who you need and what tools you'll use.</p>
+              <h2 className={styles.cardTitle}>Équipe & Technologies</h2>
+              <p className={styles.cardSubtitle}>Définissez vos besoins en termes d'équipe et d'outils.</p>
 
               <div className="grid grid-cols-2 gap-6 mb-6">
                 <div>
-                  <label className={labelClass}>Category</label>
-                  <select value={form.categorie} onChange={e => set('categorie', e.target.value)} className={`${inputClass} appearance-none`}>
-                    <option value="">Select...</option>
+                  <label className={styles.label}>Catégorie</label>
+                  <select value={form.categorie} onChange={e => set('categorie', e.target.value)} className={`${styles.input} appearance-none`}>
+                    <option value="">Sélectionner...</option>
                     {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className={labelClass}>Team Size Needed</label>
-                  <input type="number" value={form.nombrePlacesRecherchees} onChange={e => set('nombrePlacesRecherchees', e.target.value)} min={1} max={20} className={inputClass} />
+                  <label className={styles.label}>Avancement du projet *</label>
+                  <select value={form.statut} onChange={e => set('statut', e.target.value)} className={`${styles.input} appearance-none`}>
+                    {Object.entries(STATUT_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-6 mb-6">
+                <div>
+                  <label className={styles.label}>Combien de personnes recherchez-vous (sans vous compter) ? *</label>
+                  <input type="number" value={form.nombrePlacesRecherchees} onChange={e => set('nombrePlacesRecherchees', e.target.value)} min={1} max={20} className={styles.input} />
+                </div>
+                <div>
+                  <label className={styles.label}>Rôles recherchés</label>
+                  <input value={form.rolesRecherches} onChange={e => set('rolesRecherches', e.target.value)} placeholder="ex. Développeur Frontend, Designer, DevOps" maxLength={500} className={styles.input} />
                 </div>
               </div>
 
               <div className="mb-6">
-                <label className={labelClass}>Technologies</label>
-                <input value={form.technologies} onChange={e => set('technologies', e.target.value)} placeholder="e.g. React, Spring Boot, PostgreSQL" className={inputClass} />
+                <label className={styles.label}>Technologies (séparées par des virgules)</label>
+                <input value={form.technologies} onChange={e => set('technologies', e.target.value)} placeholder="ex. React, Spring Boot, PostgreSQL" maxLength={255} className={styles.input} />
               </div>
 
               <div className="mb-6">
-                <label className={labelClass}>Roles Needed</label>
-                <input value={form.rolesRecherches} onChange={e => set('rolesRecherches', e.target.value)} placeholder="e.g. Frontend Dev, Designer, DevOps" className={inputClass} />
+                <label className={styles.label}>Conditions d'engagement (disponibilité attendue, durée...)</label>
+                <textarea value={form.conditionsEngagement} onChange={e => set('conditionsEngagement', e.target.value)}
+                  placeholder="ex. Disponible 10h/semaine minimum, projet sur 3 mois..."
+                  rows={3} maxLength={1000} className={`${styles.input} resize-none`} />
+                <p className="text-[10px] text-gray-400 text-right mt-1">{form.conditionsEngagement.length} / 1000</p>
               </div>
 
               <div className="mb-8">
-                <label className={labelClass}>Required Skills</label>
+                <label className={styles.label}>Compétences recherchées ({form.competencesRecherchees.length}/15)</label>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {catalogue.slice(0, 12).map(c => {
                     const selected = form.competencesRecherchees.some(s => s.competenceId === c.id)
@@ -316,9 +328,7 @@ export default function ProjectCreate() {
                       <button key={c.id} type="button" onClick={() => {
                         if (selected) set('competencesRecherchees', form.competencesRecherchees.filter(s => s.competenceId !== c.id))
                         else if (form.competencesRecherchees.length < 15) set('competencesRecherchees', [...form.competencesRecherchees, { competenceId: c.id, obligatoire: false, niveauRequis: 'DEBUTANT' }])
-                      }} className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition ${
-                        selected ? 'border-primary bg-primary-light text-primary' : 'border-gray-200 text-gray-600 hover:border-gray-300'
-                      }`}>
+                      }} className={selected ? styles.skillTagSelected : styles.skillTagUnselected}>
                         {c.nom}
                       </button>
                     )
@@ -330,61 +340,103 @@ export default function ProjectCreate() {
 
           {step === 3 && (
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Review & Submit</h2>
-              <p className="text-gray-500 mb-8">Everything looks good? Let's launch your initiative.</p>
+              <h2 className={styles.cardTitle}>Récapitulatif</h2>
+              <p className={styles.cardSubtitle}>Vérifiez les informations avant de publier votre projet.</p>
 
               <div className="space-y-4">
-                <div className="bg-gray-50 rounded-xl p-5 border border-gray-100">
-                  <span className="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Project Name</span>
-                  <p className="text-gray-900 font-semibold mt-1">{form.nom || '—'}</p>
+                <div className={styles.reviewItem}>
+                  <span className={styles.reviewItemLabel}>Nom du projet</span>
+                  <p className={styles.reviewItemValue}>{form.nom || '—'}</p>
                 </div>
-                <div className="bg-gray-50 rounded-xl p-5 border border-gray-100">
-                  <span className="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Pitch</span>
-                  <p className="text-gray-900 mt-1">{form.pitch || '—'}</p>
+                <div className={styles.reviewItem}>
+                  <span className={styles.reviewItemLabel}>Description</span>
+                  <p className="text-gray-600 text-sm mt-1">{form.description || '—'}</p>
                 </div>
-                <div className="bg-gray-50 rounded-xl p-5 border border-gray-100">
-                  <span className="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Description</span>
-                  <p className="text-gray-600 text-sm mt-1">{form.description || form.pitch || '—'}</p>
-                </div>
+                {form.probleme && (
+                  <div className={styles.reviewItem}>
+                    <span className={styles.reviewItemLabel}>Problème</span>
+                    <p className="text-gray-600 text-sm mt-1">{form.probleme}</p>
+                  </div>
+                )}
+                {form.solution && (
+                  <div className={styles.reviewItem}>
+                    <span className={styles.reviewItemLabel}>Solution</span>
+                    <p className="text-gray-600 text-sm mt-1">{form.solution}</p>
+                  </div>
+                )}
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-gray-50 rounded-xl p-5 border border-gray-100">
-                    <span className="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Category</span>
+                  <div className={styles.reviewItem}>
+                    <span className={styles.reviewItemLabel}>Catégorie</span>
                     <p className="text-gray-900 mt-1">{form.categorie || '—'}</p>
                   </div>
-                  <div className="bg-gray-50 rounded-xl p-5 border border-gray-100">
-                    <span className="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Team Size</span>
-                    <p className="text-gray-900 mt-1">{form.nombrePlacesRecherchees}</p>
+                  <div className={styles.reviewItem}>
+                    <span className={styles.reviewItemLabel}>Avancement</span>
+                    <p className="text-gray-900 mt-1">{STATUT_LABELS[form.statut]}</p>
                   </div>
                 </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className={styles.reviewItem}>
+                    <span className={styles.reviewItemLabel}>Personnes recherchées</span>
+                    <p className="text-gray-900 mt-1">{form.nombrePlacesRecherchees}</p>
+                  </div>
+                  {form.rolesRecherches && (
+                    <div className={styles.reviewItem}>
+                      <span className={styles.reviewItemLabel}>Rôles recherchés</span>
+                      <p className="text-gray-900 mt-1">{form.rolesRecherches}</p>
+                    </div>
+                  )}
+                </div>
                 {form.technologies && (
-                  <div className="bg-gray-50 rounded-xl p-5 border border-gray-100">
-                    <span className="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Technologies</span>
+                  <div className={styles.reviewItem}>
+                    <span className={styles.reviewItemLabel}>Technologies</span>
                     <p className="text-gray-900 mt-1">{form.technologies}</p>
+                  </div>
+                )}
+                {form.conditionsEngagement && (
+                  <div className={styles.reviewItem}>
+                    <span className={styles.reviewItemLabel}>Conditions d'engagement</span>
+                    <p className="text-gray-600 text-sm mt-1">{form.conditionsEngagement}</p>
+                  </div>
+                )}
+                {form.competencesRecherchees.length > 0 && (
+                  <div className={styles.reviewItem}>
+                    <span className={styles.reviewItemLabel}>Compétences recherchées</span>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {form.competencesRecherchees.map(s => {
+                        const comp = catalogue.find(c => c.id === s.competenceId)
+                        return (
+                          <span key={s.competenceId} className="bg-primary/10 text-primary text-xs px-2.5 py-1 rounded-lg font-medium">
+                            {comp?.nom || `#${s.competenceId}`}
+                            {s.obligatoire && <span className="ml-1 text-red-500">*</span>}
+                          </span>
+                        )
+                      })}
+                    </div>
                   </div>
                 )}
               </div>
             </div>
           )}
 
-          <div className="flex items-center justify-between mt-10 pt-6 border-t border-gray-100">
+          <div className={styles.navRow}>
             {step > 1 ? (
-              <button onClick={() => setStep(step - 1)} className="text-gray-600 font-semibold text-sm hover:text-gray-900 transition">
-                Back
+              <button onClick={() => setStep(step - 1)} className={styles.backButton}>
+                Retour
               </button>
             ) : (
-              <button onClick={() => navigate('/projects')} className="text-gray-500 font-semibold text-sm hover:text-gray-700 transition">
-                Cancel
+              <button onClick={() => navigate('/projects')} className={styles.cancelButton}>
+                Annuler
               </button>
             )}
             {step < 3 ? (
               <button onClick={() => setStep(step + 1)} disabled={step === 1 && !form.nom}
-                className="inline-flex items-center gap-2 bg-gray-700 hover:bg-gray-800 disabled:opacity-40 text-white px-6 py-3 rounded-lg font-semibold text-sm transition">
-                Next: {step === 1 ? 'Team & Stack' : 'Review'} <ArrowRight size={16} />
+                className={styles.nextButton}>
+                Suivant : {step === 1 ? 'Équipe & Technologies' : 'Récapitulatif'} <ArrowRight size={16} />
               </button>
             ) : (
               <button onClick={handleSubmit} disabled={saving || !form.nom}
-                className="inline-flex items-center gap-2 bg-primary hover:bg-primary-hover disabled:opacity-40 text-white px-6 py-3 rounded-lg font-semibold text-sm transition">
-                {saving ? <><Loader2 size={16} className="animate-spin" /> Creating...</> : <><Save size={16} /> Launch Project</>}
+                className={styles.submitButton}>
+                {saving ? <><Loader2 size={16} className="animate-spin" /> Création en cours...</> : <><Save size={16} /> Publier le projet</>}
               </button>
             )}
           </div>

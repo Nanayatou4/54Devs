@@ -1,28 +1,24 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
-  LayoutDashboard, Rocket, Zap, Users, GraduationCap, Briefcase,
-  Settings, LogOut, ChevronRight, User, Pencil, Save, X, MapPin, Globe, Plus, ExternalLink
+  Users, Settings, LogOut, ChevronRight, Pencil, Save, X, MapPin, Globe, Plus,
+  Rocket, Loader2, Clock, FileText,
 } from 'lucide-react'
-import ProjectsView from './ProjectsView'
 import {
-  authApi,
   clearAuthSession,
   competencesApi,
+  demandesApi,
   getStoredUser,
   getToken,
   profilApi,
-  setAuthSession,
+  projetsApi,
 } from '../api'
-
-const navItems = [
-  { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { key: 'projects', label: 'Projects', icon: Rocket },
-  { key: 'smart-match', label: 'Smart Match', icon: Zap },
-  { key: 'community', label: 'Community', icon: Users },
-  { key: 'mentorship', label: 'Mentorship', icon: GraduationCap },
-  { key: 'job-board', label: 'Job Board', icon: Briefcase },
-]
+import { styles } from './Dashboard.styles'
+import {
+  navItems, niveauLabels, typeLabels, typeColors,
+  STATUT_LABELS, STATUT_COLORS, ROLE_LABELS,
+  STATUT_DEMANDE_LABELS, STATUT_DEMANDE_COLORS,
+} from './Dashboard.data'
 
 function ProfileView({ profil, competences, utilisateur, token, onUpdate }) {
   const [editing, setEditing] = useState(false)
@@ -88,13 +84,6 @@ function ProfileView({ profil, competences, utilisateur, token, onUpdate }) {
   }
 
   const initials = utilisateur ? (utilisateur.prenom?.[0] || '') + (utilisateur.nom?.[0] || '') : '?'
-  const niveauLabels = { DEBUTANT: 'Junior', INTERMEDIAIRE: 'Mid-Level', AVANCE: 'Senior' }
-  const typeLabels = { MAITRISE: 'Mastered', APPRENDRE: 'Learning', ENSEIGNER: 'Teaching' }
-  const typeColors = {
-    MAITRISE: 'bg-green-500/20 text-green-400 border-green-500/30',
-    APPRENDRE: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-    ENSEIGNER: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
-  }
   const availableSkills = catalogue.filter(c => !competences.some(uc => uc.competenceId === c.id))
   const filteredSkills = skillSearch
     ? availableSkills.filter(c => c.nom.toLowerCase().includes(skillSearch.toLowerCase()))
@@ -103,10 +92,10 @@ function ProfileView({ profil, competences, utilisateur, token, onUpdate }) {
   return (
     <div>
       {/* Profile Header */}
-      <div className="bg-dark-card border border-dark-border rounded-xl p-6 mb-6">
+      <div className={styles.profileHeader}>
         <div className="flex items-start justify-between mb-6">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center text-white text-xl font-bold">
+            <div className={styles.profileAvatar}>
               {initials.toUpperCase()}
             </div>
             <div>
@@ -118,19 +107,15 @@ function ProfileView({ profil, competences, utilisateur, token, onUpdate }) {
                     <MapPin size={12} /> {profil.pays}{profil.ville ? `, ${profil.ville}` : ''}
                   </span>
                 )}
-                <span className="text-accent text-xs font-semibold">{niveauLabels[profil?.niveau] || 'Junior'}</span>
+                <span className="text-accent text-xs font-semibold">{niveauLabels[profil?.niveau] || 'Débutant'}</span>
               </div>
             </div>
           </div>
           <button
             onClick={() => setEditing(!editing)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition ${
-              editing
-                ? 'bg-dark-2 text-gray-400 border border-dark-border hover:text-white'
-                : 'bg-accent/10 text-accent border border-accent/30 hover:bg-accent/20'
-            }`}
+            className={editing ? styles.editProfileButtonActive : styles.editProfileButtonInactive}
           >
-            {editing ? <><X size={14} /> Cancel</> : <><Pencil size={14} /> Edit Profile</>}
+            {editing ? <><X size={14} /> Annuler</> : <><Pencil size={14} /> Modifier le profil</>}
           </button>
         </div>
 
@@ -139,76 +124,75 @@ function ProfileView({ profil, competences, utilisateur, token, onUpdate }) {
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Pseudo</label>
+                <label className={styles.profileLabel}>Pseudo</label>
                 <input value={form.pseudo} onChange={e => handleChange('pseudo', e.target.value)}
-                  className="w-full bg-dark-2 border border-dark-border rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent transition" />
+                  className={styles.profileInput} />
               </div>
               <div>
-                <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Level</label>
+                <label className={styles.profileLabel}>Niveau</label>
                 <select value={form.niveau} onChange={e => handleChange('niveau', e.target.value)}
-                  className="w-full bg-dark-2 border border-dark-border rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent transition appearance-none">
-                  <option value="DEBUTANT">Junior (0-2 yrs)</option>
-                  <option value="INTERMEDIAIRE">Mid-Level (2-5 yrs)</option>
-                  <option value="AVANCE">Senior (5+ yrs)</option>
+                  className={styles.profileInputSelect}>
+                  <option value="DEBUTANT">Débutant (0-2 ans)</option>
+                  <option value="INTERMEDIAIRE">Intermédiaire (2-5 ans)</option>
+                  <option value="AVANCE">Avancé (5+ ans)</option>
                 </select>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Country</label>
+                <label className={styles.profileLabel}>Pays</label>
                 <select value={form.pays} onChange={e => handleChange('pays', e.target.value)}
-                  className="w-full bg-dark-2 border border-dark-border rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent transition appearance-none">
-                  <option value="">Select your country</option>
+                  className={styles.profileInputSelect}>
+                  <option value="">Sélectionnez votre pays</option>
                   {['Sénégal','Côte d\'Ivoire','Cameroun','Mali','Togo','Bénin','Maroc','Tunisie','Algérie','Égypte','Nigeria','Ghana','Kenya','Rwanda','Éthiopie','Tanzanie','Afrique du Sud','RDC','Guinée','Burkina Faso','Niger','Mauritanie','Madagascar','Gabon','Congo','Tchad','Autre'].map(p => (
                     <option key={p} value={p}>{p}</option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">City</label>
+                <label className={styles.profileLabel}>Ville</label>
                 <input value={form.ville} onChange={e => handleChange('ville', e.target.value)}
-                  className="w-full bg-dark-2 border border-dark-border rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent transition" />
+                  className={styles.profileInput} />
               </div>
             </div>
             <div>
-              <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Bio</label>
+              <label className={styles.profileLabel}>Bio</label>
               <textarea value={form.bio} onChange={e => handleChange('bio', e.target.value)} rows={3}
-                className="w-full bg-dark-2 border border-dark-border rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent transition resize-none" />
+                className={styles.profileInputTextarea} />
             </div>
             <div>
-              <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Availability</label>
-              <input value={form.disponibilite} onChange={e => handleChange('disponibilite', e.target.value)} placeholder="e.g. Full-time, Weekends only"
-                className="w-full bg-dark-2 border border-dark-border rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-accent transition" />
+              <label className={styles.profileLabel}>Disponibilité</label>
+              <input value={form.disponibilite} onChange={e => handleChange('disponibilite', e.target.value)} placeholder="ex. Temps plein, Weekends uniquement"
+                className={styles.profileInputWithPlaceholder} />
             </div>
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">GitHub</label>
+                <label className={styles.profileLabel}>GitHub</label>
                 <input value={form.github} onChange={e => handleChange('github', e.target.value)} placeholder="https://github.com/..."
-                  className="w-full bg-dark-2 border border-dark-border rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-accent transition" />
+                  className={styles.profileInputWithPlaceholder} />
               </div>
               <div>
-                <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">LinkedIn</label>
+                <label className={styles.profileLabel}>LinkedIn</label>
                 <input value={form.linkedin} onChange={e => handleChange('linkedin', e.target.value)} placeholder="https://linkedin.com/in/..."
-                  className="w-full bg-dark-2 border border-dark-border rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-accent transition" />
+                  className={styles.profileInputWithPlaceholder} />
               </div>
               <div>
-                <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Portfolio</label>
+                <label className={styles.profileLabel}>Portfolio</label>
                 <input value={form.portfolio} onChange={e => handleChange('portfolio', e.target.value)} placeholder="https://..."
-                  className="w-full bg-dark-2 border border-dark-border rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-accent transition" />
+                  className={styles.profileInputWithPlaceholder} />
               </div>
             </div>
-            <button onClick={handleSave} disabled={saving}
-              className="flex items-center gap-2 bg-accent hover:bg-accent-hover disabled:opacity-60 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition">
-              <Save size={16} /> {saving ? 'Saving...' : 'Save Changes'}
+            <button onClick={handleSave} disabled={saving} className={styles.saveButton}>
+              <Save size={16} /> {saving ? 'Enregistrement...' : 'Enregistrer'}
             </button>
           </div>
         ) : (
           <div>
             {profil?.bio && <p className="text-gray-300 text-sm mb-4">{profil.bio}</p>}
-            {!profil?.bio && <p className="text-gray-600 text-sm italic mb-4">No bio yet. Click "Edit Profile" to add one.</p>}
+            {!profil?.bio && <p className="text-gray-600 text-sm italic mb-4">Aucune bio pour le moment. Cliquez sur "Modifier le profil" pour en ajouter une.</p>}
             <div className="flex items-center gap-4">
               {profil?.disponibilite && (
-                <span className="text-xs text-gray-400 bg-dark-2 px-3 py-1 rounded-full border border-dark-border">{profil.disponibilite}</span>
+                <span className={styles.availabilityBadge}>{profil.disponibilite}</span>
               )}
               {profil?.github && (
                 <a href={profil.github} target="_blank" rel="noreferrer" className="text-gray-500 hover:text-white transition">
@@ -229,28 +213,26 @@ function ProfileView({ profil, competences, utilisateur, token, onUpdate }) {
       </div>
 
       {/* Skills */}
-      <div className="bg-dark-card border border-dark-border rounded-xl p-6">
+      <div className={styles.skillsCard}>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-white font-bold text-sm">My Skills</h3>
-          <button onClick={() => setAddingSkill(!addingSkill)}
-            className="flex items-center gap-1 text-accent text-xs font-semibold hover:underline">
-            {addingSkill ? <><X size={14} /> Cancel</> : <><Plus size={14} /> Add Skill</>}
+          <h3 className="text-white font-bold text-sm">Mes compétences</h3>
+          <button onClick={() => setAddingSkill(!addingSkill)} className={styles.addSkillButton}>
+            {addingSkill ? <><X size={14} /> Annuler</> : <><Plus size={14} /> Ajouter</>}
           </button>
         </div>
 
         {addingSkill && (
           <div className="mb-4">
-            <input value={skillSearch} onChange={e => setSkillSearch(e.target.value)} placeholder="Search skills..."
+            <input value={skillSearch} onChange={e => setSkillSearch(e.target.value)} placeholder="Rechercher une compétence..."
               autoFocus
-              className="w-full bg-dark-2 border border-dark-border rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-accent transition mb-2" />
+              className={styles.skillSearchInput} />
             <div className="flex flex-wrap gap-2">
               {filteredSkills.map(c => (
-                <button key={c.id} onClick={() => addCompetence(c)}
-                  className="text-xs bg-dark-2 text-gray-300 border border-dark-border px-3 py-1.5 rounded-lg hover:border-accent hover:text-accent transition">
+                <button key={c.id} onClick={() => addCompetence(c)} className={styles.skillSuggestionButton}>
                   {c.nom} <span className="text-gray-600">({c.categorie})</span>
                 </button>
               ))}
-              {filteredSkills.length === 0 && <p className="text-gray-600 text-xs">No matching skills found.</p>}
+              {filteredSkills.length === 0 && <p className="text-gray-600 text-xs">Aucune compétence trouvée.</p>}
             </div>
           </div>
         )}
@@ -259,7 +241,7 @@ function ProfileView({ profil, competences, utilisateur, token, onUpdate }) {
           <div className="flex flex-wrap gap-2">
             {competences.map(c => (
               <div key={c.competenceId}
-                className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium ${typeColors[c.type] || 'bg-dark-2 text-gray-400 border-dark-border'}`}>
+                className={`${styles.skillBadge} ${typeColors[c.type] || 'bg-dark-2 text-gray-400 border-dark-border'}`}>
                 <span>{c.nom}</span>
                 <span className="opacity-60">{typeLabels[c.type]}</span>
                 <button onClick={() => removeCompetence(c.competenceId)} className="opacity-40 hover:opacity-100 transition">
@@ -269,7 +251,7 @@ function ProfileView({ profil, competences, utilisateur, token, onUpdate }) {
             ))}
           </div>
         ) : (
-          <p className="text-gray-600 text-sm">No skills added yet. Click "+ Add Skill" to get started.</p>
+          <p className="text-gray-600 text-sm">Aucune compétence ajoutée. Cliquez sur "+ Ajouter" pour commencer.</p>
         )}
       </div>
     </div>
@@ -282,8 +264,32 @@ export default function Dashboard() {
   const [profil, setProfil] = useState(null)
   const [competences, setCompetences] = useState([])
   const [utilisateur, setUtilisateur] = useState(null)
+  const [mesProjets, setMesProjets] = useState([])
+  const [mesDemandes, setMesDemandes] = useState([])
+  const [loadingProjets, setLoadingProjets] = useState(true)
+  const [loadingDemandes, setLoadingDemandes] = useState(true)
+  const [erreurProjets, setErreurProjets] = useState('')
+  const [erreurDemandes, setErreurDemandes] = useState('')
 
   const token = getToken()
+
+  function chargerMesProjets() {
+    setLoadingProjets(true)
+    setErreurProjets('')
+    projetsApi.mesProjets()
+      .then(data => setMesProjets(Array.isArray(data) ? data : []))
+      .catch(err => setErreurProjets(err.message || 'Impossible de charger vos projets.'))
+      .finally(() => setLoadingProjets(false))
+  }
+
+  function chargerMesDemandes() {
+    setLoadingDemandes(true)
+    setErreurDemandes('')
+    demandesApi.mesDemandes()
+      .then(data => setMesDemandes(Array.isArray(data) ? data : []))
+      .catch(err => setErreurDemandes(err.message || 'Impossible de charger vos demandes.'))
+      .finally(() => setLoadingDemandes(false))
+  }
 
   useEffect(() => {
     if (!token) {
@@ -297,15 +303,13 @@ export default function Dashboard() {
     Promise.all([
       profilApi.getMonProfil().catch(() => null),
       profilApi.getMesCompetences().catch(() => null),
-      authApi.moi().catch(() => null),
-    ]).then(([p, c, u]) => {
+    ]).then(([p, c]) => {
       if (p) setProfil(p)
       if (c) setCompetences(c)
-      if (u) {
-        setUtilisateur(u)
-        setAuthSession({ token, utilisateur: u })
-      }
     })
+
+    chargerMesProjets()
+    chargerMesDemandes()
   }, [token, navigate])
 
   function handleLogout() {
@@ -319,14 +323,15 @@ export default function Dashboard() {
   }
 
   const displayName = profil?.pseudo || utilisateur?.prenom || 'Dev'
+  const demandesEnAttente = mesDemandes.filter(d => d.statut === 'EN_ATTENTE')
 
   return (
-    <div className="min-h-screen bg-dark-1 flex">
+    <div className={styles.page}>
       {/* Sidebar */}
-      <aside className="w-64 bg-dark-2 border-r border-dark-border flex flex-col justify-between py-6 px-4 shrink-0">
+      <aside className={styles.sidebar}>
         <div>
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 text-lg font-bold text-white px-3 mb-8">
+          <Link to="/" className={styles.sidebarLogo}>
             <span className="text-accent">&lt;/&gt;</span>
             <span>54<span className="text-accent">Devs</span></span>
           </Link>
@@ -334,13 +339,9 @@ export default function Dashboard() {
           {/* User mini-card */}
           <button
             onClick={() => setActive('profile')}
-            className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl mb-4 transition ${
-              active === 'profile'
-                ? 'bg-dark-card border border-accent/30'
-                : 'bg-dark-card border border-dark-border hover:border-gray-600'
-            }`}
+            className={`${styles.userCard} ${active === 'profile' ? styles.userCardActive : styles.userCardInactive}`}
           >
-            <div className="w-9 h-9 bg-accent rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0">
+            <div className={styles.userAvatar}>
               {((utilisateur?.prenom?.[0] || '') + (utilisateur?.nom?.[0] || '')).toUpperCase() || '?'}
             </div>
             <div className="text-left min-w-0">
@@ -357,12 +358,14 @@ export default function Dashboard() {
               return (
                 <button
                   key={item.key}
-                  onClick={() => setActive(item.key)}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
-                    isActive
-                      ? 'bg-accent text-white'
-                      : 'text-gray-400 hover:text-white hover:bg-dark-card'
-                  }`}
+                  onClick={() => {
+                    if (item.key === 'projects') {
+                      navigate('/projects')
+                    } else {
+                      setActive(item.key)
+                    }
+                  }}
+                  className={`${styles.navItem} ${isActive ? styles.navItemActive : styles.navItemInactive}`}
                 >
                   <Icon size={18} />
                   {item.label}
@@ -374,127 +377,176 @@ export default function Dashboard() {
 
         {/* Bottom section */}
         <div className="space-y-3">
-          {/* CADEV 2026 card */}
-          <div className="bg-dark-card border border-dark-border rounded-xl p-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-accent text-xs font-bold uppercase tracking-wider">CADEV 2026</span>
-              <span className="text-gray-500 text-[10px]">182 Days Left</span>
-            </div>
-            <div className="w-full bg-dark-border rounded-full h-1.5 mb-3">
-              <div className="bg-accent h-1.5 rounded-full" style={{ width: '35%' }} />
-            </div>
-            <p className="text-white text-sm font-semibold mb-0.5">Next: Proposal Approval</p>
-            <p className="text-gray-500 text-xs mb-3">Required for competition entry.</p>
-            <button className="w-full bg-accent hover:bg-accent-hover text-white text-xs font-semibold py-2 rounded-lg transition">
-              Approve Current Plan
-            </button>
+          {/* Simplified CADEV card */}
+          <div className={styles.cadevCard}>
+            <span className="text-accent text-xs font-bold uppercase tracking-wider">CADEV 2026</span>
+            <p className="text-white text-sm font-semibold mt-2 mb-1">Concours africain des développeurs</p>
+            <p className="text-gray-500 text-xs mb-3">Créez ou rejoignez un projet pour participer.</p>
+            <Link to="/projects/new" className={`block text-center ${styles.cadevApplyButton}`}>
+              Publier un projet
+            </Link>
           </div>
 
           {/* Settings & Logout */}
-          <button className="w-full flex items-center gap-3 px-3 py-2.5 text-gray-400 hover:text-white text-sm font-medium transition rounded-lg hover:bg-dark-card">
+          <button className={styles.settingsButton}>
             <Settings size={18} />
-            Settings
+            Paramètres
           </button>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2.5 text-red-400 hover:text-red-300 text-sm font-medium transition rounded-lg hover:bg-dark-card"
+            className={styles.logoutButton}
           >
             <LogOut size={18} />
-            Logout
+            Déconnexion
           </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-8 overflow-y-auto">
+      <main className={styles.mainContent}>
         {active === 'profile' ? (
           <div>
             <div className="mb-6">
-              <h1 className="text-2xl font-bold text-white mb-1">My Profile</h1>
-              <p className="text-gray-400 text-sm">Manage your developer identity and skills.</p>
+              <h1 className="text-2xl font-bold text-white mb-1">Mon profil</h1>
+              <p className="text-gray-400 text-sm">Gérez votre identité de développeur et vos compétences.</p>
             </div>
             <ProfileView profil={profil} competences={competences} utilisateur={utilisateur} token={token} onUpdate={handleProfileUpdate} />
           </div>
-        ) : active === 'projects' ? (
-          <ProjectsView token={token} />
         ) : (
         <div>
         {/* Welcome header */}
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-white mb-1">
-            Welcome back, <span className="text-accent">{displayName}</span>
+            Bienvenue, <span className="text-accent">{displayName}</span>
           </h1>
-          <p className="text-gray-400 text-sm">Here's what's happening across your network.</p>
+          <p className="text-gray-400 text-sm">Voici un aperçu de votre activité.</p>
         </div>
 
         {/* Stats row */}
-        <div className="grid grid-cols-4 gap-4 mb-8">
-          {[
-            { label: 'Reputation Score', value: '0', sub: 'Starting out' },
-            { label: 'Active Projects', value: '0', sub: 'Join or create one' },
-            { label: 'Skills', value: String(competences.length), sub: competences.length > 0 ? competences.slice(0, 3).map(c => c.nom).join(', ') : 'Add your skills' },
-            { label: 'Connections', value: '0', sub: 'Grow your network' },
-          ].map(stat => (
-            <div key={stat.label} className="bg-dark-card border border-dark-border rounded-xl p-5">
-              <p className="text-gray-500 text-xs uppercase tracking-wider font-medium mb-2">{stat.label}</p>
-              <p className="text-white text-2xl font-bold mb-1">{stat.value}</p>
-              <p className="text-gray-500 text-xs">{stat.sub}</p>
-            </div>
-          ))}
+        <div className="grid grid-cols-2 gap-4 mb-8">
+          <div className={styles.statCard}>
+            <p className="text-gray-500 text-xs uppercase tracking-wider font-medium mb-2">Mes projets</p>
+            <p className="text-white text-2xl font-bold mb-1">{loadingProjets ? '...' : mesProjets.length}</p>
+            <p className="text-gray-500 text-xs">
+              {loadingProjets ? 'Chargement...' : mesProjets.length > 0
+                ? mesProjets.slice(0, 2).map(p => p.nom).join(', ')
+                : 'Aucun projet pour le moment'}
+            </p>
+          </div>
+          <div className={styles.statCard}>
+            <p className="text-gray-500 text-xs uppercase tracking-wider font-medium mb-2">Compétences</p>
+            <p className="text-white text-2xl font-bold mb-1">{competences.length}</p>
+            <p className="text-gray-500 text-xs">
+              {competences.length > 0
+                ? competences.slice(0, 3).map(c => c.nom).join(', ')
+                : 'Ajoutez vos compétences'}
+            </p>
+          </div>
         </div>
 
         {/* Two columns */}
         <div className="grid grid-cols-2 gap-6">
-          {/* Active Project Feed */}
-          <div className="bg-dark-card border border-dark-border rounded-xl p-6">
+          {/* Mes projets */}
+          <div className={styles.feedCard}>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-white font-bold text-sm">Active Project Feed</h2>
-              <button className="text-accent text-xs font-semibold hover:underline flex items-center gap-1">
-                View All <ChevronRight size={14} />
-              </button>
+              <h2 className="text-white font-bold text-sm">Mes projets</h2>
+              <Link to="/projects" className="text-accent text-xs font-semibold hover:underline flex items-center gap-1">
+                Voir tout <ChevronRight size={14} />
+              </Link>
             </div>
-            <div className="flex flex-col items-center justify-center py-10 text-center">
-              <Rocket size={32} className="text-gray-600 mb-3" />
-              <p className="text-gray-400 text-sm mb-1">No active projects yet</p>
-              <p className="text-gray-600 text-xs">Create or join a project to get started.</p>
-            </div>
-          </div>
 
-          {/* Recommended Collaborators */}
-          <div className="bg-dark-card border border-dark-border rounded-xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-white font-bold text-sm">Recommended Collaborators</h2>
-              <button className="text-accent text-xs font-semibold hover:underline flex items-center gap-1">
-                See More <ChevronRight size={14} />
-              </button>
-            </div>
-            <div className="flex flex-col items-center justify-center py-10 text-center">
-              <Users size={32} className="text-gray-600 mb-3" />
-              <p className="text-gray-400 text-sm mb-1">Matching in progress</p>
-              <p className="text-gray-600 text-xs">Complete your profile to get matched.</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Upcoming milestones */}
-        <div className="mt-6 bg-dark-card border border-dark-border rounded-xl p-6">
-          <h2 className="text-white font-bold text-sm mb-4">Upcoming CADEV 2026 Milestones</h2>
-          <div className="grid grid-cols-3 gap-4">
-            {[
-              { date: 'Nov 2026', title: 'Proposal Deadline', status: 'upcoming' },
-              { date: 'Jan 2027', title: 'Team Formation', status: 'locked' },
-              { date: 'Mar 2027', title: 'Competition Start', status: 'locked' },
-            ].map(m => (
-              <div key={m.title} className="bg-dark-2 rounded-lg p-4 border border-dark-border">
-                <span className="text-accent text-[10px] font-bold uppercase tracking-wider">{m.date}</span>
-                <p className="text-white text-sm font-semibold mt-1">{m.title}</p>
-                <span className={`inline-block mt-2 text-[10px] font-bold uppercase tracking-wider ${
-                  m.status === 'upcoming' ? 'text-accent' : 'text-gray-600'
-                }`}>
-                  {m.status === 'upcoming' ? 'Next Step' : 'Locked'}
-                </span>
+            {loadingProjets ? (
+              <div className="flex items-center justify-center py-10">
+                <Loader2 size={24} className="animate-spin text-accent" />
               </div>
-            ))}
+            ) : erreurProjets ? (
+              <div className={styles.emptyStateInline}>
+                <p className="text-red-400 text-sm mb-3">{erreurProjets}</p>
+                <button onClick={chargerMesProjets} className={styles.secondaryButton}>Réessayer</button>
+              </div>
+            ) : mesProjets.length > 0 ? (
+              <div className="space-y-3">
+                {mesProjets.slice(0, 5).map(p => (
+                  <Link key={p.id} to={`/projects/${p.id}`} className={styles.projectCard}>
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="min-w-0 flex-1">
+                        <h3 className={styles.projectCardName}>{p.nom}</h3>
+                      </div>
+                      <span className={`${styles.statusBadge} ${STATUT_COLORS[p.statut] || ''} ml-2`}>
+                        {STATUT_LABELS[p.statut] || p.statut}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 text-[10px] text-gray-500">
+                      <span className={`${styles.roleBadge} ${p.roleMembre === 'CREATEUR' ? 'text-accent' : 'text-gray-500'}`}>
+                        {ROLE_LABELS[p.roleMembre] || p.roleMembre}
+                      </span>
+                      <span><Users size={10} className="inline mr-1" />{p.nombreMembres} membre{p.nombreMembres > 1 ? 's' : ''}</span>
+                      {p.roleMembre === 'CREATEUR' && p.demandesEnAttente > 0 && (
+                        <span className={styles.pendingBadge}>
+                          {p.demandesEnAttente} demande{p.demandesEnAttente > 1 ? 's' : ''} à traiter
+                        </span>
+                      )}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className={styles.emptyStateInline}>
+                <Rocket size={32} className="text-gray-600 mb-3" />
+                <p className="text-gray-400 text-sm mb-1">Vous ne participez à aucun projet.</p>
+                <p className="text-gray-600 text-xs mb-4">Créez ou rejoignez un projet pour commencer.</p>
+                <div className="flex gap-3">
+                  <Link to="/projects" className={styles.secondaryButton}>
+                    Découvrir les projets
+                  </Link>
+                  <Link to="/projects/create" className={styles.actionButton}>
+                    <Plus size={16} /> Publier un projet
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Mes demandes en cours */}
+          <div className={styles.feedCard}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-white font-bold text-sm">Mes demandes en cours</h2>
+            </div>
+
+            {loadingDemandes ? (
+              <div className="flex items-center justify-center py-10">
+                <Loader2 size={24} className="animate-spin text-accent" />
+              </div>
+            ) : erreurDemandes ? (
+              <div className={styles.emptyStateInline}>
+                <p className="text-red-400 text-sm mb-3">{erreurDemandes}</p>
+                <button onClick={chargerMesDemandes} className={styles.secondaryButton}>Réessayer</button>
+              </div>
+            ) : demandesEnAttente.length > 0 ? (
+              <div className="space-y-3">
+                {demandesEnAttente.map(d => (
+                  <Link key={d.id} to={`/projects/${d.projetId}`} className={styles.demandeRow}>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-white text-sm font-medium truncate">{d.projetNom || `Projet #${d.projetId}`}</p>
+                      {d.dateDemande && (
+                        <p className="text-gray-600 text-[10px] flex items-center gap-1 mt-0.5">
+                          <Clock size={10} /> {new Date(d.dateDemande).toLocaleDateString('fr-FR')}
+                        </p>
+                      )}
+                    </div>
+                    <span className={`${styles.statusBadge} ${STATUT_DEMANDE_COLORS[d.statut] || ''}`}>
+                      {STATUT_DEMANDE_LABELS[d.statut] || d.statut}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className={styles.emptyStateInline}>
+                <FileText size={32} className="text-gray-600 mb-3" />
+                <p className="text-gray-400 text-sm mb-1">Aucune demande en cours.</p>
+                <p className="text-gray-600 text-xs">Vos demandes d'adhésion aux projets apparaîtront ici.</p>
+              </div>
+            )}
           </div>
         </div>
         </div>
