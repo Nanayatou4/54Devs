@@ -33,4 +33,10 @@ public interface MembreProjetRepository extends JpaRepository<MembreProjet, Long
             + "where m.utilisateur.id = :utilisateurId and m.projet.statut in :statuts")
     long compterProjetsActifs(@Param("utilisateurId") Long utilisateurId,
                               @Param("statuts") Collection<StatutProjet> statuts);
+
+    long countByUtilisateurId(Long utilisateurId);
+
+    @Query("select count(m) from MembreProjet m where m.utilisateur.id = :id "
+            + "and m.projet.statut = StatutProjet.TERMINE")
+    long compterProjetsTermines(@Param("id") Long id);
 }

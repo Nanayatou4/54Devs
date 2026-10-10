@@ -34,6 +34,8 @@ public class DemandeService {
     private final DemandeAdhesionRepository demandes;
     private final CompetenceUtilisateurRepository competencesUtilisateur;
     private final LimiteProjetsService limite;
+    private final BadgeService badges;
+
 
     @Transactional
     public DemandeDto envoyer(Long projetId, String email, DemandeRequete req) {
@@ -120,6 +122,7 @@ public class DemandeService {
             m.setUtilisateur(d.getDemandeur());
             m.setRole(RoleMembre.MEMBRE);
             membres.save(m);
+            badges.evaluer(d.getDemandeur().getId());
         }
 
         d.setStatut(decision);

@@ -34,6 +34,7 @@ public class DeveloppeurService {
     private final UtilisateurRepository utilisateurs;
     private final CompetenceUtilisateurRepository competencesUtilisateur;
     private final MembreProjetRepository membres;
+    private final BadgeService badges;
 
     @Transactional(readOnly = true)
     public PageDto<DeveloppeurResumeDto> rechercher(String email, String texte, Long competenceId,
@@ -82,7 +83,7 @@ public class DeveloppeurService {
 
         return new DeveloppeurDetailDto(u.getId(), u.getPrenom(), u.getNom(), p.getPseudo(),
                 p.getPays(), p.getVille(), p.getNiveau(), p.getDisponibilite(), p.getBio(),
-                p.getGithub(), p.getLinkedin(), p.getPortfolio(), competences, projets);
+                p.getGithub(), p.getLinkedin(), p.getPortfolio(), competences, projets,badges.badgesObtenus(utilisateurId));
     }
 
     private static List<String> noms(List<CompetenceUtilisateur> liste, TypeCompetence type) {

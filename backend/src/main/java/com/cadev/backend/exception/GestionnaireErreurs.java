@@ -1,5 +1,6 @@
 package com.cadev.backend.exception;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.core.AuthenticationException;
@@ -62,5 +63,11 @@ public class GestionnaireErreurs {
     ResponseEntity<Map<String, String>> parametreInvalide(MethodArgumentTypeMismatchException ex) {
         return ResponseEntity.badRequest()
                 .body(Map.of("message", "Valeur invalide pour le paramètre « " + ex.getName() + " »"));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    ResponseEntity<Map<String, String>> conflitDonnees() {
+        return ResponseEntity.status(409)
+                .body(Map.of("message", "L'opération n'a pas pu être enregistrée à cause d'un conflit. Veuillez réessayer."));
     }
 }

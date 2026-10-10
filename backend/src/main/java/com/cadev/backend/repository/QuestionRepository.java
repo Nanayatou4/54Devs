@@ -19,4 +19,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> , JpaS
     @Modifying(flushAutomatically = true)
     @Query("update Question q set q.nombreReponses = q.nombreReponses + 1 where q.id = :id")
     void incrementerReponses(@Param("id") Long id);
+
+    long countByAuteurId(Long auteurId);
+
 }

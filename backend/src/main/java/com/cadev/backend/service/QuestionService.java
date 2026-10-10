@@ -32,6 +32,7 @@ public class QuestionService {
     private final QuestionRepository questions;
     private final ReponseRepository reponses;
     private final UtilisateurRepository utilisateurs;
+    private final BadgeService badges;
 
     @Transactional
     public QuestionDetailDto creer(String email, QuestionRequete req) {
@@ -40,6 +41,7 @@ public class QuestionService {
         q.setAuteur(moi);
         appliquer(q, req);
         questions.save(q);
+        badges.evaluer(moi.getId());
         return construireDetail(q, moi);
     }
 
@@ -97,6 +99,7 @@ public class QuestionService {
         r.setContenu(req.contenu().trim());
         reponses.save(r);
         questions.incrementerReponses(questionId);
+        badges.evaluer(moi.getId());
         return ReponseDto.depuis(r);
     }
 
@@ -124,6 +127,7 @@ public class QuestionService {
         reponses.findByQuestionIdAndSolutionTrue(questionId).forEach(ancienne -> ancienne.setSolution(false));
         r.setSolution(true);
         q.setResolue(true);
+        badges.evaluer(r.getAuteur().getId());
         return ReponseDto.depuis(r);
     }
 

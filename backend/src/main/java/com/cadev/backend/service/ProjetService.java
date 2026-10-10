@@ -30,6 +30,8 @@ public class ProjetService {
     private final MembreProjetRepository membres;
     private final DemandeAdhesionRepository demandes;
     private final LimiteProjetsService limite;
+    private final BadgeService badges;
+
 
     @Transactional
     public ProjetDetailDto creer(String email, ProjetRequete req) {
@@ -46,6 +48,7 @@ public class ProjetService {
         m.setUtilisateur(moi);
         m.setRole(RoleMembre.CREATEUR);
         membres.save(m);
+        badges.evaluer(moi.getId());
 
         return construireDetail(p, moi);
     }
@@ -80,7 +83,9 @@ public class ProjetService {
                             + autresMembres + ")");
         }
         verifierReactivation(p, req.statut());
+        StatutProjet ancien = p.getStatut();
         appliquer(p, req);
+        evaluerBadgesSiTermine(p, ancien, p.getStatut());
         return construireDetail(p, moi);
     }
 
@@ -90,7 +95,9 @@ public class ProjetService {
         Utilisateur moi = trouverUtilisateur(email);
         verifierCreateur(p, moi);
         verifierReactivation(p, statut);
+        StatutProjet ancien = p.getStatut();
         p.setStatut(statut);
+        evaluerBadgesSiTermine(p, ancien, statut);
         return construireDetail(p, moi);
     }
 
@@ -186,4 +193,13 @@ public class ProjetService {
         return utilisateurs.findByEmail(email)
                 .orElseThrow(() -> new RessourceIntrouvableException("Utilisateur introuvable"));
     }
+
+    private void evaluerBadgesSiTermine(Projet p, StatutProjet ancien, StatutProjet nouveau) {
+        if (nouveau == StatutProjet.TERMINE && ancien != StatutProjet.TERMINE) {
+            for (MembreProjet m : membres.findAvecUtilisateur(p.getId())) {
+                badges.evaluer(m.getUtilisateur().getId());
+            }
+        }
+    }
+
 }
