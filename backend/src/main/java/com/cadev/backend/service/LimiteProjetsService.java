@@ -13,7 +13,7 @@ import java.util.List;
 public class LimiteProjetsService {
 
     private static final List<StatutProjet> STATUTS_ACTIFS =
-            List.of(StatutProjet.IDEE, StatutProjet.EN_DEVELOPPEMENT, StatutProjet.EN_LANCEMENT);
+            List.of(StatutProjet.IDEE, StatutProjet.EN_DEVELOPPEMENT, StatutProjet.EN_LANCEMENT,StatutProjet.EN_PAUSE);
 
     private final MembreProjetRepository membres;
     private final int maximum;
@@ -31,5 +31,9 @@ public class LimiteProjetsService {
             throw new ConflitException((pourSoiMeme ? "Vous participez" : "Cette personne participe")
                     + " déjà à " + maximum + " projets actifs (maximum autorisé)");
         }
+    }
+
+    public static boolean estActif(StatutProjet statut) {
+        return STATUTS_ACTIFS.contains(statut);
     }
 }

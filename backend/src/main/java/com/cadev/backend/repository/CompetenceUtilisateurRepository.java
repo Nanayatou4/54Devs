@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface CompetenceUtilisateurRepository extends JpaRepository<CompetenceUtilisateur, Long> {
@@ -19,4 +20,8 @@ public interface CompetenceUtilisateurRepository extends JpaRepository<Competenc
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("delete from CompetenceUtilisateur cu where cu.utilisateur.id = :utilisateurId")
     void supprimerParUtilisateur(@Param("utilisateurId") Long utilisateurId);
+
+    @Query("select cu from CompetenceUtilisateur cu join fetch cu.competence where cu.utilisateur.id in :ids")
+    List<CompetenceUtilisateur> findParUtilisateurs(@Param("ids") Collection<Long> ids);
+
 }

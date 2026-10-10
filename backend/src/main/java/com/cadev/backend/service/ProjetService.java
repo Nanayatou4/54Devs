@@ -55,6 +55,18 @@ public class ProjetService {
         return construireDetail(trouverProjet(id), trouverUtilisateur(email));
     }
 
+    private void verifierReactivation(Projet p, StatutProjet nouveauStatut) {
+        boolean redevientActif = !LimiteProjetsService.estActif(p.getStatut())
+                && LimiteProjetsService.estActif(nouveauStatut);
+        if (!redevientActif) {
+            return;
+        }
+        // Chaque membre (créateur compris) doit pouvoir porter un projet actif de plus
+        for (MembreProjet m : membres.findAvecUtilisateur(p.getId())) {
+            limite.verifier(m.getUtilisateur(), false);
+        }
+    }
+
     @Transactional
     public ProjetDetailDto modifier(Long id, String email, ProjetRequete req) {
         Projet p = trouverProjet(id);
@@ -67,7 +79,7 @@ public class ProjetService {
                     "Le nombre de places ne peut pas être inférieur au nombre de membres déjà acceptés ("
                             + autresMembres + ")");
         }
-
+        verifierReactivation(p, req.statut());
         appliquer(p, req);
         return construireDetail(p, moi);
     }
@@ -77,9 +89,11 @@ public class ProjetService {
         Projet p = trouverProjet(id);
         Utilisateur moi = trouverUtilisateur(email);
         verifierCreateur(p, moi);
+        verifierReactivation(p, statut);
         p.setStatut(statut);
         return construireDetail(p, moi);
     }
+
 
     // ---------- Règle métier réutilisée par la recherche et les demandes ----------
 

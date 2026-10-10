@@ -1,6 +1,5 @@
-package com.cadev.backend.dto.entree;
+package com.cadev.backend.entite;
 
-import com.cadev.backend.entite.Utilisateur;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
