@@ -1,16 +1,34 @@
-# React + Vite
+# 54Devs — Front (React + Vite)
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Interface de la plateforme 54Devs (concours CADEV). Elle consomme l'API Spring Boot du dossier `backend/`.
 
-Currently, two official plugins are available:
+## Installation
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+npm install
+cp .env.example .env   # puis renseigner les variables
+npm run dev            # http://localhost:5173
+```
 
-## React Compiler
+## Variables d'environnement (`.env`)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+| Variable | Rôle |
+|---|---|
+| `VITE_API_BASE_URL` | URL de l'API, par exemple `http://localhost:8087/api` |
+| `VITE_APP_ORIGIN` | URL publique du front (retour OAuth) |
+| `VITE_GITHUB_CLIENT_ID` | Client ID GitHub OAuth (public) |
+| `VITE_GOOGLE_CLIENT_ID` | Client ID Google OAuth (public) |
 
-## Expanding the Oxlint configuration
+Ces variables sont figées au moment du `npm run build` : pour un déploiement, renseigner les adresses publiques avant de construire. Côté back, `CORS_ORIGIN` doit pointer vers l'adresse publique du front.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+## Scripts
+
+- `npm run dev` : serveur de développement
+- `npm run build` : build de production (`dist/`)
+- `npm run lint` : vérification oxlint
+
+## Organisation
+
+- `src/api/` : client HTTP unique (`client.js`) et un fichier par ressource, alignés sur le contrat d'API
+- `src/lib/libelles.js` : libellés français des valeurs d'énumération de l'API
+- `src/pages/`, `src/components/` : écrans et composants
