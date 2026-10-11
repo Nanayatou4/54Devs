@@ -1,4 +1,7 @@
 package com.cadev.backend.dto.sortie;
 
-public class EchangeCompetencesDto {
+import java.util.List;
+
+public record EchangeCompetencesDto(DeveloppeurResumeDto developpeur,
+                                    List<String> ilPeutMEnseigner, List<String> jePeuxLuiEnseigner) {
 }

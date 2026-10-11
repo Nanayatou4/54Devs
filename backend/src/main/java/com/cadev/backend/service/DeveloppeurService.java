@@ -36,6 +36,15 @@ public class DeveloppeurService {
     private final MembreProjetRepository membres;
     private final BadgeService badges;
 
+    public DeveloppeurResumeDto resume(Profil p, List<CompetenceUtilisateur> comps) {
+        Utilisateur u = p.getUtilisateur();
+        return new DeveloppeurResumeDto(u.getId(), u.getPrenom(), u.getNom(), p.getPseudo(),
+                p.getPays(), p.getVille(), p.getNiveau(), p.getDisponibilite(), extrait(p.getBio()),
+                noms(comps, TypeCompetence.MAITRISE),
+                noms(comps, TypeCompetence.ENSEIGNER),
+                noms(comps, TypeCompetence.APPRENDRE));
+    }
+
     @Transactional(readOnly = true)
     public PageDto<DeveloppeurResumeDto> rechercher(String email, String texte, Long competenceId,
                                                     TypeCompetence type, String pays, Niveau niveau,
@@ -56,13 +65,8 @@ public class DeveloppeurService {
                 .collect(Collectors.groupingBy(cu -> cu.getUtilisateur().getId()));
 
         List<DeveloppeurResumeDto> contenu = resultat.getContent().stream().map(p -> {
-            Utilisateur u = p.getUtilisateur();
-            List<CompetenceUtilisateur> comps = competencesParId.getOrDefault(u.getId(), List.of());
-            return new DeveloppeurResumeDto(u.getId(), u.getPrenom(), u.getNom(), p.getPseudo(),
-                    p.getPays(), p.getVille(), p.getNiveau(), p.getDisponibilite(), extrait(p.getBio()),
-                    noms(comps, TypeCompetence.MAITRISE),
-                    noms(comps, TypeCompetence.ENSEIGNER),
-                    noms(comps, TypeCompetence.APPRENDRE));
+            List<CompetenceUtilisateur> comps = competencesParId.getOrDefault(p.getUtilisateur().getId(), List.of());
+            return resume(p, comps);
         }).toList();
         return PageDto.depuis(resultat, contenu);
     }

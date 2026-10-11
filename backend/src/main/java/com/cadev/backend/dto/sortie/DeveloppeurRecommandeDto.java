@@ -1,4 +1,4 @@
 package com.cadev.backend.dto.sortie;
 
-public class DeveloppeurRecommandeDto {
+public record DeveloppeurRecommandeDto(DeveloppeurResumeDto developpeur, ScoreDto compatibilite) {
 }

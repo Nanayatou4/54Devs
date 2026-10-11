@@ -76,7 +76,7 @@ public class RechercheProjetService {
         }).toList();
     }
 
-    private Map<Long, Long> compterMembres(List<Projet> liste) {
+    public Map<Long, Long> compterMembres(List<Projet> liste) {
         if (liste.isEmpty()) {
             return Map.of();
         }
@@ -88,7 +88,7 @@ public class RechercheProjetService {
         return resultat;
     }
 
-    private ProjetResumeDto resume(Projet p, long nombreMembres) {
+    public ProjetResumeDto resume(Projet p, long nombreMembres) {
         int places = ProjetService.calculerPlacesRestantes(p, nombreMembres);
         String description = p.getDescription().length() > 200
                 ? p.getDescription().substring(0, 200) + "…"

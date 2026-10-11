@@ -10,4 +10,6 @@ public interface UtilisateurRepository extends JpaRepository<Utilisateur, Long> 
     Optional<Utilisateur> findByGithubId(String githubId);
     Optional<Utilisateur> findByGoogleId(String googleId);
     boolean existsByEmail(String email);
+
+    long countByActifTrue();
 }

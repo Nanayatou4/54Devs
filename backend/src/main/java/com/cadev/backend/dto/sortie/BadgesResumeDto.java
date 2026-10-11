@@ -1,4 +1,4 @@
 package com.cadev.backend.dto.sortie;
 
-public class BadgesResumeDto {
+public record BadgesResumeDto(int obtenus, int total) {
 }

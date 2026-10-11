@@ -1,4 +1,6 @@
 package com.cadev.backend.dto.sortie;
 
-public class EchangesDto {
+import java.util.List;
+
+public record EchangesDto(int total, List<EchangeCompetencesDto> exemples) {
 }

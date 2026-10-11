@@ -1,4 +1,4 @@
 package com.cadev.backend.dto.sortie;
 
-public class CollaborateurRecommandeDto {
+public record CollaborateurRecommandeDto(Long projetId, String projetNom, DeveloppeurRecommandeDto candidat) {
 }

@@ -86,6 +86,18 @@ public class ChallengeService {
     }
 
     @Transactional(readOnly = true)
+    public ChallengeDetailDto duJourOuNull(String email) {
+        Utilisateur moi = trouverUtilisateur(email);
+        LocalDate jour = aujourdhui();
+        List<Challenge> ouverts = challenges.findOuverts(jour);
+        if (ouverts.isEmpty()) {
+            return null;
+        }
+        return construireDetail(ouverts.get(jour.getDayOfYear() % ouverts.size()), moi);
+    }
+
+
+    @Transactional(readOnly = true)
     public ChallengeDetailDto detail(Long id, String email) {
         return construireDetail(trouverChallengeVisible(id), trouverUtilisateur(email));
     }
@@ -287,4 +299,5 @@ public class ChallengeService {
         return utilisateurs.findByEmail(email)
                 .orElseThrow(() -> new RessourceIntrouvableException("Utilisateur introuvable"));
     }
+
 }

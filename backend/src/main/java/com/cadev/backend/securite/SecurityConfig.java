@@ -41,6 +41,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/inscription", "/api/auth/connexion", "/api/auth/github", "/api/auth/google", "/error").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/public/**").permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(e -> e.authenticationEntryPoint(
                         (req, res, ex) -> {
