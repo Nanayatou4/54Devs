@@ -383,24 +383,24 @@ export default function ProjectDetail() {
           <div className={styles.mainColumn}>
             {/* Header */}
             <div className={styles.header}>
-              <div className="flex items-start justify-between mb-4">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-5">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
                     <span className={`${styles.statusBadge} ${STATUT_COLORS[projet.statut] || 'bg-gray-100 text-gray-500'}`}>
                       {STATUT_LABELS[projet.statut] || projet.statut}
                     </span>
                     {projet.categorie && (
-                      <span className="text-xs text-gray-400 font-medium">{projet.categorie}</span>
+                      <span className="text-xs text-slate-300 font-medium">{projet.categorie}</span>
                     )}
                   </div>
-                  <h1 className="text-2xl font-bold text-gray-900">{projet.nom}</h1>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Créé par {projet.createur?.prenom || projet.createur?.pseudo} &middot; {projet.createur?.pays}
+                  <h1 className="text-2xl sm:text-3xl font-bold text-white">{projet.nom}</h1>
+                  <p className="text-sm text-slate-300 mt-1">
+                    Créé par {projet.createur?.prenom || projet.createur?.pseudo || 'un membre'}{projet.createur?.pays && ` · ${projet.createur.pays}`}
                   </p>
                 </div>
                 {renderActionButton()}
               </div>
-              <p className="text-gray-600 leading-relaxed">{projet.description}</p>
+              <p className="text-slate-300 leading-relaxed">{projet.description}</p>
             </div>
 
             {/* Tabs */}

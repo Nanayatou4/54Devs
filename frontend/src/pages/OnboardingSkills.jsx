@@ -4,6 +4,7 @@ import { X, Check } from 'lucide-react'
 import { competencesApi, profilApi, getToken, getStoredUser } from '../api'
 import { styles } from './OnboardingSkills.styles'
 import { SUGGESTIONS, experienceLevels } from './OnboardingSkills.data'
+import { TYPE_COMPETENCE } from '../lib/libelles'
 
 export default function OnboardingSkills() {
   const navigate = useNavigate()
@@ -15,14 +16,14 @@ export default function OnboardingSkills() {
 
   function addSkill(skill) {
     const trimmed = skill.trim()
-    if (trimmed && !skills.includes(trimmed) && skills.length < 8) {
-      setSkills([...skills, trimmed])
+    if (trimmed && !skills.some(item => item.nom.toLowerCase() === trimmed.toLowerCase()) && skills.length < 8) {
+      setSkills([...skills, { nom: trimmed, type: 'MAITRISE' }])
       setInputValue('')
     }
   }
 
   function removeSkill(skill) {
-    setSkills(skills.filter((s) => s !== skill))
+    setSkills(skills.filter((s) => s.nom !== skill))
   }
 
   function handleKeyDown(e) {
@@ -64,13 +65,13 @@ export default function OnboardingSkills() {
       const introuvables = []
 
       const competencesBody = skills
-        .map(name => {
-          const c = catalogue.find(x => x.nom.toLowerCase() === name.toLowerCase())
-          if (!c) introuvables.push(name)
-          return c
+        .map(skill => {
+          const c = catalogue.find(x => x.nom.toLowerCase() === skill.nom.toLowerCase())
+          if (!c) introuvables.push(skill.nom)
+          return c ? { competence: c, type: skill.type } : null
         })
         .filter(Boolean)
-        .map(c => ({ competenceId: c.id, type: 'MAITRISE', niveau: niveauMap[experience] || 'DEBUTANT' }))
+        .map(({ competence, type }) => ({ competenceId: competence.id, type, niveau: niveauMap[experience] || 'DEBUTANT' }))
 
       if (competencesBody.length > 0) {
         await profilApi.replaceMesCompetences(competencesBody)
@@ -103,31 +104,39 @@ export default function OnboardingSkills() {
             <div className={styles.stepBarActive} />
             <div className={styles.stepBarActive} />
           </div>
-          <span className={styles.stepLabel}>Step 3 of 3</span>
+          <span className={styles.stepLabel}>Étape 3 sur 3</span>
         </div>
       </div>
 
       {/* Content */}
       <div className={styles.content}>
-        <h1 className={styles.title}>Validate your talent</h1>
+        <h1 className={styles.title}>Partagez vos compétences</h1>
         <p className={styles.subtitle}>
-          Your reputation starts here. Sync your work and define your stack.
+          Pour chaque compétence, indiquez si vous la maîtrisez, souhaitez l’apprendre ou pouvez l’enseigner.
         </p>
 
         <form onSubmit={handleComplete} className="space-y-8">
-          {/* Primary Tech Stack */}
+          {/* Compétences */}
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className={styles.sectionLabel}>
-                Primary Tech Stack
+                Compétences principales
               </label>
-              <span className="text-[10px] text-gray-400 uppercase tracking-wider">Select up to 8 skills</span>
+              <span className="text-[10px] text-gray-400 uppercase tracking-wider">8 compétences maximum</span>
             </div>
             <div className={styles.skillInputWrapper}>
               {skills.map((skill) => (
-                <span key={skill} className={styles.skillTag}>
-                  {skill}
-                  <button type="button" onClick={() => removeSkill(skill)} className="text-gray-500 hover:text-gray-700">
+                <span key={skill.nom} className={styles.skillTag}>
+                  {skill.nom}
+                  <select
+                    aria-label={`Type de compétence pour ${skill.nom}`}
+                    value={skill.type}
+                    onChange={e => setSkills(current => current.map(item => item.nom === skill.nom ? { ...item, type: e.target.value } : item))}
+                    className="bg-transparent text-[10px] font-semibold text-blue-700 outline-none"
+                  >
+                    {Object.entries(TYPE_COMPETENCE).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                  </select>
+                  <button type="button" onClick={() => removeSkill(skill.nom)} aria-label={`Retirer ${skill.nom}`} className="text-gray-500 hover:text-gray-700">
                     <X size={12} />
                   </button>
                 </span>
@@ -137,14 +146,14 @@ export default function OnboardingSkills() {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder={skills.length === 0 ? 'Add skill (e.g. Python, Docker...)' : ''}
+                placeholder={skills.length === 0 ? 'Ajouter une compétence (ex. gestion de projet, Python...)' : ''}
                 className={styles.skillInput}
               />
             </div>
             {/* Suggestions */}
             <div className={styles.suggestionRow}>
-              <span className={styles.suggestionLabel}>Suggestions:</span>
-              {SUGGESTIONS.filter((s) => !skills.includes(s)).map((s) => (
+              <span className={styles.suggestionLabel}>Suggestions :</span>
+              {SUGGESTIONS.filter((s) => !skills.some(skill => skill.nom === s)).map((s) => (
                 <button
                   key={s}
                   type="button"
@@ -157,10 +166,10 @@ export default function OnboardingSkills() {
             </div>
           </div>
 
-          {/* Years of Experience */}
+          {/* Expérience */}
           <div>
             <label className={styles.sectionLabel}>
-              Years of Experience
+              Votre expérience
             </label>
             <div className="flex gap-3">
               {experienceLevels.map((level) => {
@@ -195,14 +204,14 @@ export default function OnboardingSkills() {
               onClick={() => navigate('/onboarding/profile')}
               className={styles.backButton}
             >
-              Back
+              Retour
             </button>
             <button
               type="submit"
               disabled={loading}
               className={styles.submitButton}
             >
-              Complete Onboarding <Check size={16} />
+              Terminer mon profil <Check size={16} />
             </button>
           </div>
         </form>

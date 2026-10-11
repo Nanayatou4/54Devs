@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X, Bell } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 import { styles } from './Navbar.styles'
 import { NAV_LINKS } from './Navbar.data'
 
@@ -30,12 +30,7 @@ export default function Navbar() {
   }
 
   return (
-    <>
-      <div className={styles.banner}>
-        Coupe d'Afrique des D&eacute;veloppeurs (CADEV) 2026
-      </div>
-
-      <nav className={styles.nav}>
+    <nav className={styles.nav}>
         <div className={styles.container}>
           <Link to="/" className={styles.logo}>
             <span className={styles.logoIcon}>&lt;/&gt;</span>{' '}
@@ -43,23 +38,19 @@ export default function Navbar() {
           </Link>
 
           <div className={styles.desktopNav}>
-            {NAV_LINKS.map(l => (
-              <Link
-                key={l.to}
-                to={l.to}
-                className={isActive(l.to) ? styles.linkActive : styles.linkInactive}
-              >
-                {l.label}
-              </Link>
-            ))}
+            {NAV_LINKS.map(l => {
+              const className = isActive(l.to) ? styles.linkActive : styles.linkInactive
+              return l.to.includes('#') ? (
+                <a key={l.to} href={l.to} className={className}>{l.label}</a>
+              ) : (
+                <Link key={l.to} to={l.to} className={className}>{l.label}</Link>
+              )
+            })}
           </div>
 
           <div className={styles.desktopActions}>
             {utilisateur ? (
               <>
-                <button className={styles.bellButton}>
-                  <Bell size={20} />
-                </button>
                 <Link to="/profile">
                   <div className={styles.avatarContainer}>
                     {photo ? (
@@ -75,19 +66,27 @@ export default function Navbar() {
             )}
           </div>
 
-          <button className={styles.mobileMenuButton} onClick={() => setOpen(!open)}>
+          <button
+            type="button"
+            aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'}
+            aria-expanded={open}
+            className={styles.mobileMenuButton}
+            onClick={() => setOpen(!open)}
+          >
             {open ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
 
         {open && (
           <div className={styles.mobileMenu}>
-            {NAV_LINKS.map(l => (
-              <Link key={l.to} to={l.to} onClick={() => setOpen(false)}
-                className={isActive(l.to) ? styles.mobileLinkActive : styles.mobileLinkInactive}>
-                {l.label}
-              </Link>
-            ))}
+            {NAV_LINKS.map(l => {
+              const className = isActive(l.to) ? styles.mobileLinkActive : styles.mobileLinkInactive
+              return l.to.includes('#') ? (
+                <a key={l.to} href={l.to} onClick={() => setOpen(false)} className={className}>{l.label}</a>
+              ) : (
+                <Link key={l.to} to={l.to} onClick={() => setOpen(false)} className={className}>{l.label}</Link>
+              )
+            })}
             {utilisateur ? (
               <Link to="/profile" onClick={() => setOpen(false)} className={styles.mobileAvatarRow}>
                 <div className={styles.mobileAvatarContainer}>
@@ -104,7 +103,6 @@ export default function Navbar() {
             )}
           </div>
         )}
-      </nav>
-    </>
+    </nav>
   )
 }

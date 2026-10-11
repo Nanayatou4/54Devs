@@ -1,0 +1,17 @@
+export const styles = {
+  page: 'min-h-screen bg-slate-50 text-slate-900',
+  main: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12',
+  hero: 'rounded-3xl bg-slate-900 text-white p-6 sm:p-9 mb-7',
+  eyebrow: 'text-xs font-bold uppercase tracking-[0.16em] text-blue-300 mb-3',
+  title: 'text-3xl md:text-4xl font-bold tracking-tight',
+  subtitle: 'text-slate-300 leading-relaxed mt-3 max-w-2xl',
+  layout: 'grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_290px] gap-6 items-start',
+  panel: 'bg-white border border-slate-200 rounded-2xl shadow-sm',
+  filters: 'p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 border-b border-slate-100',
+  field: 'w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-sm text-slate-700 outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10',
+  card: 'p-5 sm:p-6 border-b last:border-b-0 border-slate-100 hover:bg-slate-50/70 transition',
+  avatar: 'grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-blue-100 text-blue-700 font-bold',
+  tag: 'inline-flex rounded-full bg-slate-100 text-slate-600 px-2.5 py-1 text-[11px] font-medium',
+  detail: 'p-5 sm:p-8',
+  primaryButton: 'inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-5 py-3 text-sm font-semibold transition',
+}

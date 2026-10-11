@@ -40,6 +40,21 @@ export default function ProjectCreate() {
 
   function set(field, value) { setForm(prev => ({ ...prev, [field]: value })) }
 
+  function goToNextStep() {
+    if (step === 1) {
+      if (form.nom.trim().length < 3) {
+        setError('Le nom du projet doit contenir au moins 3 caractères.')
+        return
+      }
+      if (!form.description.trim()) {
+        setError('Ajoutez une description pour présenter votre projet.')
+        return
+      }
+    }
+    setError('')
+    setStep(step + 1)
+  }
+
   async function handleSubmit() {
     setSaving(true)
     setError('')
@@ -225,10 +240,15 @@ export default function ProjectCreate() {
       </div>
 
       <div className={styles.inner}>
+        <div className="max-w-2xl mx-auto text-center mb-8 md:mb-10">
+          <span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 mb-4">Nouveau projet</span>
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900">Faisons avancer votre idée</h1>
+          <p className="text-slate-500 mt-3 leading-relaxed">Présentez votre projet et les profils qui pourraient vous aider à le réaliser.</p>
+        </div>
         <div className={styles.stepperWrapper}>
           {[1, 2, 3].map((s, i) => (
-            <div key={s} className="flex items-center">
-              <div className={s <= step ? styles.stepCircleActive : styles.stepCircleInactive}>{s}</div>
+            <div key={s} className="flex items-center" aria-current={s === step ? 'step' : undefined}>
+              <div className={s <= step ? styles.stepCircleActive : styles.stepCircleInactive}>{s < step ? <CheckCircle size={16} /> : s}</div>
               {i < 2 && <div className={s < step ? styles.stepConnectorActive : styles.stepConnectorInactive} />}
             </div>
           ))}
@@ -279,7 +299,7 @@ export default function ProjectCreate() {
               <h2 className={styles.cardTitle}>Équipe & Technologies</h2>
               <p className={styles.cardSubtitle}>Définissez vos besoins en termes d'équipe et d'outils.</p>
 
-              <div className="grid grid-cols-2 gap-6 mb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6 mb-6">
                 <div>
                   <label className={styles.label}>Catégorie</label>
                   <select value={form.categorie} onChange={e => set('categorie', e.target.value)} className={`${styles.input} appearance-none`}>
@@ -295,7 +315,7 @@ export default function ProjectCreate() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-6 mb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6 mb-6">
                 <div>
                   <label className={styles.label}>Combien de personnes recherchez-vous (sans vous compter) ? *</label>
                   <input type="number" value={form.nombrePlacesRecherchees} onChange={e => set('nombrePlacesRecherchees', e.target.value)} min={1} max={20} className={styles.input} />
@@ -364,7 +384,7 @@ export default function ProjectCreate() {
                     <p className="text-gray-600 text-sm mt-1">{form.solution}</p>
                   </div>
                 )}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className={styles.reviewItem}>
                     <span className={styles.reviewItemLabel}>Catégorie</span>
                     <p className="text-gray-900 mt-1">{form.categorie || '—'}</p>
@@ -374,7 +394,7 @@ export default function ProjectCreate() {
                     <p className="text-gray-900 mt-1">{STATUT_LABELS[form.statut]}</p>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className={styles.reviewItem}>
                     <span className={styles.reviewItemLabel}>Personnes recherchées</span>
                     <p className="text-gray-900 mt-1">{form.nombrePlacesRecherchees}</p>
@@ -429,7 +449,7 @@ export default function ProjectCreate() {
               </button>
             )}
             {step < 3 ? (
-              <button onClick={() => setStep(step + 1)} disabled={step === 1 && !form.nom}
+              <button onClick={goToNextStep}
                 className={styles.nextButton}>
                 Suivant : {step === 1 ? 'Équipe & Technologies' : 'Récapitulatif'} <ArrowRight size={16} />
               </button>

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { Plus, Search, FolderOpen, AlertCircle, ChevronLeft, ChevronRight, MapPin, Users, X } from 'lucide-react'
+import { Plus, Search, FolderOpen, AlertCircle, ChevronLeft, ChevronRight, MapPin, Users, X, Code2, ArrowRight } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { projetsApi, competencesApi } from '../api'
@@ -141,9 +141,9 @@ export default function Projects() {
         {/* Header */}
         <div className={styles.header}>
           <div className={styles.headerLeft}>
-            <h1 className={styles.title}>Découvrir les projets</h1>
+            <h1 className={styles.title}>Trouvez votre prochain projet</h1>
             <p className={styles.subtitle}>
-              Trouvez un projet qui vous inspire ou publiez le vôtre
+              Parcourez les idées de la communauté et rejoignez une équipe qui vous correspond.
             </p>
           </div>
           <div className={styles.headerActions}>
@@ -157,32 +157,35 @@ export default function Projects() {
         </div>
 
         {/* Search & Filters */}
-        <div className={styles.filtersSection}>
+        <section className={styles.filtersSection} aria-label="Recherche et filtres des projets">
           <div className={styles.searchRow}>
-            <div className="relative">
+            <div className={styles.searchWrap}>
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
-                placeholder="Rechercher un projet par nom, description..."
+                placeholder="Rechercher un projet, une idée, une technologie..."
                 value={texteInput}
                 onChange={e => setTexteInput(e.target.value)}
-                className={`${styles.searchInput} pl-9`}
+                className={styles.searchInput}
               />
+              {texteInput && <button type="button" onClick={() => setTexteInput('')} className={styles.clearSearch} aria-label="Effacer la recherche"><X size={16} /></button>}
             </div>
           </div>
-          <div className={styles.filtersGrid}>
-            <div>
-              <label className={styles.filterLabel}>Statut</label>
-              <select
-                value={statut}
-                onChange={e => updateParams({ statut: e.target.value })}
-                className={styles.filterSelect}
+          <div className={styles.statusChips} aria-label="Filtrer par statut">
+            {STATUT_OPTIONS.map(o => (
+              <button
+                key={o.value || 'all'}
+                type="button"
+                aria-pressed={statut === o.value}
+                onClick={() => updateParams({ statut: o.value })}
+                className={`${styles.statusChip} ${statut === o.value ? styles.statusChipActive : styles.statusChipInactive}`}
               >
-                {STATUT_OPTIONS.map(o => (
-                  <option key={o.value} value={o.value}>{o.label}</option>
-                ))}
-              </select>
-            </div>
+                {o.value ? STATUT_LABELS[o.value] || o.label : 'Tous les projets'}
+              </button>
+            ))}
+          </div>
+          <div className={styles.filtersDivider}>
+          <div className={styles.filtersGrid}>
             <div>
               <label className={styles.filterLabel}>Compétence recherchée</label>
               <select
@@ -217,7 +220,18 @@ export default function Projects() {
               />
             </div>
           </div>
-        </div>
+          </div>
+        </section>
+
+        {!loading && !error && projets.length > 0 && (
+          <div className={styles.resultsHeader}>
+            <div>
+              <h2 className={styles.resultsTitle}>Projets de la communauté</h2>
+              <p className={styles.resultsMeta}>{result?.totalElements ?? projets.length} projet{(result?.totalElements ?? projets.length) === 1 ? '' : 's'} trouvé{(result?.totalElements ?? projets.length) === 1 ? '' : 's'}</p>
+            </div>
+            {hasFilters && <button onClick={clearFilters} className={styles.clearFiltersLink}><X size={14} /> Effacer les filtres</button>}
+          </div>
+        )}
 
         {/* Loading state: skeleton cards */}
         {loading && (
@@ -295,13 +309,22 @@ export default function Projects() {
               {projets.map(p => (
                 <Link key={p.id} to={`/projects/${p.id}`} className={styles.projectCard}>
                   <div className={styles.cardBody}>
-                    <div className={styles.cardHeaderRow}>
-                      <h3 className={styles.cardTitle}>{p.nom}</h3>
+                    <div className={styles.cardTop}>
+                      <div className={styles.projectIcon}><Code2 size={22} /></div>
                       <CardBadge project={p} />
                     </div>
+                    <h3 className={styles.cardTitle}>{p.nom}</h3>
+                    {p.categorie && <p className={styles.cardCategory}>{p.categorie}</p>}
                     <p className={styles.cardDescription}>{p.description}</p>
 
-                    {/* Competences pills */}
+                    {p.technologies && (
+                      <div className={styles.cardTech}>
+                        {p.technologies.split(',').map(technology => technology.trim()).filter(Boolean).slice(0, 4).map(technology => (
+                          <span key={technology} className={styles.cardTechPill}>{technology}</span>
+                        ))}
+                      </div>
+                    )}
+
                     {p.competencesRecherchees?.length > 0 && (
                       <div className={styles.cardSkills}>
                         {p.competencesRecherchees.map(skill => (
@@ -310,21 +333,21 @@ export default function Projects() {
                       </div>
                     )}
 
-                    {/* Footer: creator + places */}
                     <div className={styles.cardFooter}>
-                      <span className={styles.cardCreator}>
-                        <Users size={12} />
-                        {p.createur?.prenom || p.createur?.pseudo || 'Anonyme'}
-                        {p.createur?.pays && (
-                          <>
-                            <MapPin size={10} className="ml-1" />
-                            {p.createur.pays}
-                          </>
-                        )}
-                      </span>
-                      <span className={styles.cardPlaces}>
-                        {p.placesRestantes} place{p.placesRestantes !== 1 ? 's' : ''} restante{p.placesRestantes !== 1 ? 's' : ''}
-                      </span>
+                      <div className={styles.cardMeta}>
+                        <span className={styles.cardCreator}>
+                          <Users size={13} />
+                          <span className="truncate">{p.createur?.prenom || p.createur?.pseudo || 'Membre 54Devs'}</span>
+                          {p.createur?.pays && <><MapPin size={12} className="shrink-0" />{p.createur.pays}</>}
+                        </span>
+                        <span className="inline-flex items-center gap-1 shrink-0"><Users size={12} />{p.nombreMembres}</span>
+                      </div>
+                      <div className="flex items-center justify-between gap-3">
+                        <span className={styles.cardPlaces}>
+                          {p.placesRestantes > 0 ? `${p.placesRestantes} place${p.placesRestantes === 1 ? '' : 's'} restante${p.placesRestantes === 1 ? '' : 's'}` : 'Aucune place restante'}
+                        </span>
+                        <span className="inline-flex items-center gap-1 text-primary text-xs font-semibold group-hover:gap-2 transition-all">Voir le projet <ArrowRight size={14} /></span>
+                      </div>
                     </div>
                   </div>
                 </Link>
@@ -346,16 +369,17 @@ export default function Projects() {
 
 /* --- Card badge (status or closed) --- */
 function CardBadge({ project: p }) {
-  if (!p.ouvertAuxDemandes && p.placesRestantes === 0) {
-    return <span className={styles.cardBadgeClosed}>Complet</span>
-  }
-  if (p.statut === 'TERMINE') {
-    return <span className={`${styles.cardStatus} ${STATUT_COLORS.TERMINE}`}>Terminé</span>
-  }
   return (
-    <span className={`${styles.cardStatus} ${STATUT_COLORS[p.statut] || 'bg-gray-100 text-gray-600'}`}>
-      {STATUT_LABELS[p.statut] || p.statut}
-    </span>
+    <div className={styles.badgeGroup}>
+      <span className={`${styles.cardStatus} ${STATUT_COLORS[p.statut] || 'bg-slate-100 text-slate-600'}`}>
+        {STATUT_LABELS[p.statut] || p.statut}
+      </span>
+      {p.statut !== 'TERMINE' && (
+        <span className={p.ouvertAuxDemandes ? styles.cardOpen : styles.cardBadgeClosed}>
+          {p.ouvertAuxDemandes ? 'Ouvert' : p.placesRestantes === 0 ? 'Complet' : 'Fermé'}
+        </span>
+      )}
+    </div>
   )
 }
 

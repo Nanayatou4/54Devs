@@ -6,17 +6,17 @@ export default function CTA() {
     <section className={styles.section}>
       <div className={styles.container}>
         <h2 className={styles.title}>
-          Ready to Build for Africa?
+          Vous avez une idée à faire grandir ?
         </h2>
         <p className={styles.subtitle}>
-          Join the CADEV 2026 movement today. Create your Identity and find your team.
+          Rejoignez 54Devs et trouvez des personnes avec qui la concrétiser.
         </p>
         <div className={styles.buttonsRow}>
           <Link to="/register" className={styles.primaryButton}>
-            Join 54Devs
+            Créer mon compte
           </Link>
           <Link to="/projects" className={styles.secondaryButton}>
-            Review Active Plans
+            Voir les projets
           </Link>
         </div>
       </div>

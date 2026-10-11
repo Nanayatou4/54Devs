@@ -1,7 +1,7 @@
 export const styles = {
   footer: 'bg-white border-t border-gray-200',
   container: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14',
-  grid: 'grid md:grid-cols-4 gap-10',
+  grid: 'grid md:grid-cols-3 gap-10',
   logoWrapper: 'text-xl font-bold text-gray-900 flex items-center gap-1 mb-4',
   logoIcon: 'text-gray-400',
   description: 'text-gray-500 text-sm leading-relaxed max-w-sm mb-6',

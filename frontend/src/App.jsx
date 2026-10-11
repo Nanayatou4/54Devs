@@ -11,6 +11,9 @@ import Profile from './pages/Profile'
 import GitHubCallback from './pages/GitHubCallback'
 import GoogleCallback from './pages/GoogleCallback'
 import Dashboard from './pages/Dashboard'
+import Questions from './pages/Questions'
+import Challenges from './pages/Challenges'
+import Developers from './pages/Developers'
 import ProtectedRoute from './components/ProtectedRoute'
 
 export default function App() {
@@ -30,6 +33,12 @@ export default function App() {
           <Route path="/projects/:id" element={<ProjectDetail />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/questions" element={<Questions />} />
+          <Route path="/questions/:id" element={<Questions />} />
+          <Route path="/challenges" element={<Challenges />} />
+          <Route path="/challenges/:id" element={<Challenges />} />
+          <Route path="/developers" element={<Developers />} />
+          <Route path="/developers/:id" element={<Developers />} />
         </Route>
       </Routes>
     </BrowserRouter>

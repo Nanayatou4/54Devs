@@ -1,27 +1,29 @@
 import { ArrowRight } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { styles } from './Features.styles'
 import { FEATURES } from './Features.data'
 
 export default function Features() {
   return (
-    <section className={styles.section}>
+    <section id="fonctionnement" className={styles.section}>
       <div className={styles.container}>
-        <h2 className={styles.title}>The 54Devs Core Ecosystem</h2>
+        <p className={styles.eyebrow}>Comment ça marche</p>
+        <h2 className={styles.title}>Une idée, les bonnes personnes, un projet concret.</h2>
         <p className={styles.subtitle}>
-          Moving from individual talent to collective creation across 54 nations.
+          Que vous codiez, conceviez, organisiez ou apportiez une idée, vous avez votre place dans l’équipe.
         </p>
         <div className={styles.grid}>
           {FEATURES.map(f => (
-            <div key={f.title} className={styles.card}>
+            <article key={f.title} className={styles.card}>
               <div className={`${styles.iconContainer} ${f.iconBg}`}>
                 <f.icon size={24} className={f.iconColor} />
               </div>
               <h3 className={styles.featureTitle}>{f.title}</h3>
               <p className={styles.featureDescription}>{f.description}</p>
-              <a href="#" className={styles.featureLink}>
+              <Link to={f.to} className={styles.featureLink}>
                 {f.link} <ArrowRight size={16} />
-              </a>
-            </div>
+              </Link>
+            </article>
           ))}
         </div>
       </div>

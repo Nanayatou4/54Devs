@@ -8,23 +8,22 @@ export default function Hero() {
         <div className={styles.grid}>
           <div>
             <span className={styles.badge}>
-              Built for Africa, by Africa
+              Développeurs · designers · porteurs d’idées
             </span>
             <h1 className={styles.title}>
-              Connect. Learn.
+              Les bonnes idées
               <br />
-              <span className={styles.titleHighlight}>Build across
-              Africa.</span>
+              prennent vie ensemble.
             </h1>
             <p className={styles.subtitle}>
-              The pan-African ecosystem where developers move from individual talent to collective creation. Join 54 nations in building the future.
+              54Devs met en relation les personnes qui veulent créer des projets numériques, partager leurs compétences et apprendre en équipe.
             </p>
             <div className={styles.buttonsRow}>
               <Link to="/register" className={styles.primaryButton}>
-                Create Identity
+                Créer mon compte
               </Link>
               <Link to="/projects" className={styles.secondaryButton}>
-                Explore Projects
+                Découvrir les projets
               </Link>
             </div>
           </div>
@@ -32,7 +31,7 @@ export default function Hero() {
           <div className={styles.imageWrapper}>
             <img
               src="/image.png"
-              alt="African developers collaborating"
+              alt="Une équipe échange autour d’un projet numérique"
               className={styles.image}
             />
           </div>

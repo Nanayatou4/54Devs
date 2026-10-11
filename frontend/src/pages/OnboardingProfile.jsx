@@ -41,15 +41,15 @@ export default function OnboardingProfile() {
             <div className={styles.stepBarActive} />
             <div className={styles.stepBarInactive} />
           </div>
-          <span className={styles.stepLabel}>Step 2 of 3</span>
+          <span className={styles.stepLabel}>Étape 2 sur 3</span>
         </div>
       </div>
 
       {/* Content */}
       <div className={styles.content}>
-        <h1 className={styles.title}>Define your identity</h1>
+        <h1 className={styles.title}>Présentez-vous</h1>
         <p className={styles.subtitle}>
-          Tell us where you are building from and what you specialize in.
+          Dites-nous d’où vous venez et ce que vous aimeriez apporter à la communauté.
         </p>
 
         <form onSubmit={handleNext} className="space-y-8">
@@ -79,10 +79,10 @@ export default function OnboardingProfile() {
               </span>
             </button>
             <div>
-              <div className="text-sm font-bold text-gray-900">Profile Photo</div>
-              <p className="text-xs text-gray-500 mb-1">A professional photo helps in mentorship and job matching.</p>
+              <div className="text-sm font-bold text-gray-900">Photo de profil</div>
+              <p className="text-xs text-gray-500 mb-1">Ajoutez une photo pour aider la communauté à vous reconnaître.</p>
               <button type="button" onClick={() => fileInputRef.current?.click()} className={styles.helpLink}>
-                Upload custom image
+                Choisir une photo
               </button>
             </div>
           </div>
@@ -91,7 +91,7 @@ export default function OnboardingProfile() {
           <div className="flex gap-4">
             <div className="flex-1">
               <label className={styles.sectionLabel}>
-                Your Nation (54 of 54)
+                Votre pays
               </label>
               <select
                 value={pays}
@@ -99,7 +99,7 @@ export default function OnboardingProfile() {
                 required
                 className={styles.countrySelect}
               >
-                <option value="">Select your country</option>
+                <option value="">Sélectionnez votre pays</option>
                 <option value="Sénégal">Sénégal</option>
                 <option value="Côte d'Ivoire">Côte d'Ivoire</option>
                 <option value="Cameroun">Cameroun</option>
@@ -128,17 +128,17 @@ export default function OnboardingProfile() {
                 <option value="Tchad">Tchad</option>
                 <option value="Autre">Autre</option>
               </select>
-              <p className="text-[10px] text-gray-400 mt-1">We support talent from every nation on the continent.</p>
+              <p className="text-[10px] text-gray-400 mt-1">La communauté est ouverte à tous les pays et à tous les parcours.</p>
             </div>
             <div className="flex-1">
               <label className={styles.sectionLabel}>
-                City / Tech Hub
+                Ville
               </label>
               <input
                 type="text"
                 value={ville}
                 onChange={(e) => setVille(e.target.value)}
-                placeholder="e.g. Nairobi, Lagos, Cairo"
+                placeholder="Ex. Dakar, Abidjan, Nairobi"
                 className={styles.cityInput}
               />
             </div>
@@ -147,7 +147,7 @@ export default function OnboardingProfile() {
           {/* Primary Focus */}
           <div>
             <label className={styles.sectionLabel}>
-              What is your primary focus?
+              Quel est votre domaine ou votre rôle ?
             </label>
             <div className="flex gap-3">
               {focusOptions.map((opt) => {
@@ -171,17 +171,17 @@ export default function OnboardingProfile() {
           {/* Professional Bio */}
           <div>
             <label className={styles.sectionLabel}>
-              Professional Bio
+              Présentation
             </label>
             <textarea
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              placeholder="Briefly describe your journey and what you're passionate about building..."
+              placeholder="Présentez votre parcours, vos idées ou ce que vous aimeriez apprendre…"
               maxLength={250}
               rows={4}
               className={styles.bioTextarea}
             />
-            <p className={styles.bioCharCount}>{bio.length} / 250 characters</p>
+            <p className={styles.bioCharCount}>{bio.length} / 250 caractères</p>
           </div>
 
           {/* Buttons */}
@@ -191,19 +191,19 @@ export default function OnboardingProfile() {
               onClick={() => navigate(-1)}
               className={styles.draftButton}
             >
-              Save Draft
+              Enregistrer le brouillon
             </button>
             <button
               type="submit"
               className={styles.nextButton}
             >
-              Next: Skills & Experience &rarr;
+              Suivant : compétences et expérience →
             </button>
           </div>
         </form>
 
         <p className={styles.helpText}>
-          Need help? <a href="#" className={styles.helpLink}>Contact onboarding support</a>
+          Besoin d’aide ? Consultez les informations de votre profil ou réessayez plus tard.
         </p>
       </div>
     </div>

@@ -1,7 +1,7 @@
 export const steps = [
-  { number: 1, title: 'Account Basics', description: 'Set up your secure credentials.' },
-  { number: 2, title: 'Developer Identity', description: 'Profile, country, and focus area.' },
-  { number: 3, title: 'Skills & Verified Bio', description: 'Establish your skill and reputation.' },
+  { number: 1, title: 'Votre compte', description: 'Créez vos identifiants de connexion.' },
+  { number: 2, title: 'Votre profil', description: 'Présentez-vous et indiquez où vous êtes.' },
+  { number: 3, title: 'Vos compétences', description: 'Partagez ce que vous savez faire ou souhaitez apprendre.' },
 ]
 
 export function getPasswordStrength(password) {
