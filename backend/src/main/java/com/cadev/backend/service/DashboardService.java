@@ -6,12 +6,10 @@ import com.cadev.backend.entite.Profil;
 import com.cadev.backend.entite.Utilisateur;
 import com.cadev.backend.enumeration.RoleMembre;
 import com.cadev.backend.enumeration.StatutDemande;
+import com.cadev.backend.enumeration.StatutMentorat;
 import com.cadev.backend.enumeration.TypeCompetence;
 import com.cadev.backend.exception.RessourceIntrouvableException;
-import com.cadev.backend.repository.CompetenceUtilisateurRepository;
-import com.cadev.backend.repository.ProfilRepository;
-import com.cadev.backend.repository.QuestionRepository;
-import com.cadev.backend.repository.UtilisateurRepository;
+import com.cadev.backend.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +33,7 @@ public class DashboardService {
     private final ChallengeService challengeService;
     private final BadgeService badgeService;
     private final MatchingService matching;
+    private final MentoratRepository mentorats;
 
     @Transactional(readOnly = true)
     public DashboardDto construire(String email) {
@@ -69,6 +68,7 @@ public class DashboardService {
                 UtilisateurResumeDto.depuis(moi),
                 profilComplet(moi, mesCompetences.size()),
                 demandesATraiter,
+                (int) mentorats.countByMentorIdAndStatut(moi.getId(), StatutMentorat.EN_ATTENTE),
                 mesProjets.stream().limit(6).toList(),
                 mesDemandes,
                 challengeService.duJourOuNull(email),

@@ -11,6 +11,7 @@ import tools.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
@@ -25,6 +26,7 @@ public class GitHubOAuthService {
     private final UtilisateurRepository utilisateurs;
     private final JwtService jwtService;
     private final ObjectMapper objectMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${app.github.client-id}")
     private String clientId;
@@ -52,6 +54,7 @@ public class GitHubOAuthService {
             u.setNom(nom);
             u.setPrenom(prenom);
             u.setGithubId(githubId);
+            u.setMotDePasse(passwordEncoder.encode(java.util.UUID.randomUUID().toString()));
 
             Profil p = new Profil();
             p.setUtilisateur(u);

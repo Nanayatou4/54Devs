@@ -31,10 +31,11 @@ public class BadgeService {
     private final QuestionRepository questions;
     private final ParticipationChallengeRepository participations;
     private final MembreProjetRepository membres;
+    private final SeanceMentoratRepository seancesMentorat;
 
     /** Tout ce qu'on sait compter sur un utilisateur pour décider des badges. */
     private record Statistiques(long reponsesAcceptees, long contributions, long challengesReussis,
-                                long joursChallenge, long projetsRejoints, long projetsTermines) {}
+                                long joursChallenge, long projetsRejoints, long projetsTermines, long seancesAnimees) {}
 
     private record DefinitionBadge(String code, String nom, String description, int objectif,
                                    ToLongFunction<Statistiques> valeur) {}
@@ -58,7 +59,10 @@ public class BadgeService {
                     1, Statistiques::projetsTermines),
             new DefinitionBadge("RISING_DEVELOPER", "Rising Developer",
                     "Vous avez réussi des challenges sur 3 jours différents.",
-                    3, Statistiques::joursChallenge)
+                    3, Statistiques::joursChallenge),
+            new DefinitionBadge("MENTOR", "Mentor",
+                    "Vous avez animé 2 séances de mentorat avec compte rendu.",
+                    2, Statistiques::seancesAnimees)
     );
 
     /** Crée ou met à jour le catalogue en base (appelé au démarrage). */
@@ -125,6 +129,7 @@ public class BadgeService {
                 participations.countByUtilisateurIdAndStatut(id, StatutParticipation.REUSSIE),
                 jours,
                 membres.countByUtilisateurId(id),
-                membres.compterProjetsTermines(id));
+                membres.compterProjetsTermines(id),
+                seancesMentorat.compterSeancesAnimees(id));
     }
 }
