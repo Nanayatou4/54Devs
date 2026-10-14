@@ -71,6 +71,7 @@ public class RechercheProjetService {
                     ? (int) demandes.countByProjetIdAndStatut(p.getId(), StatutDemande.EN_ATTENTE)
                     : 0;
             return new MonProjetDto(r.id(), r.nom(), r.description(), r.categorie(), r.technologies(),
+                    r.imageUrl(),
                     r.statut(), r.placesRestantes(), r.ouvertAuxDemandes(), r.nombreMembres(),
                     r.createur(), r.competencesRecherchees(), m.getRole(), enAttente);
         }).toList();
@@ -94,7 +95,7 @@ public class RechercheProjetService {
                 ? p.getDescription().substring(0, 200) + "…"
                 : p.getDescription();
         return new ProjetResumeDto(
-                p.getId(), p.getNom(), description, p.getCategorie(), p.getTechnologies(), p.getStatut(),
+                p.getId(), p.getNom(), description, p.getCategorie(), p.getTechnologies(), p.getImageUrl(), p.getStatut(),
                 places, ProjetService.estOuvertAuxDemandes(p, places), (int) nombreMembres,
                 UtilisateurResumeDto.depuis(p.getCreateur()),
                 p.getCompetencesRecherchees().stream().map(cp -> cp.getCompetence().getNom()).toList());

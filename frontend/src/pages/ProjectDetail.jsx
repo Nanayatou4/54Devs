@@ -3,10 +3,10 @@ import { useParams, Link, useNavigate } from 'react-router-dom'
 import {
   ArrowLeft, Loader2, Pencil, Save, X, Users, MessageSquare,
   Send, CheckCircle, XCircle, Clock, UserMinus, RefreshCw, AlertTriangle,
+  Image as ImageIcon,
 } from 'lucide-react'
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
 import { getToken, getStoredUser, projetsApi, competencesApi } from '../api'
+import { getProjectImage, getAvatarForIndex, COVER_PRESETS } from '../lib/projectImages'
 import { styles } from './ProjectDetail.styles'
 import {
   STATUT_LABELS, STATUT_COLORS, ALL_STATUTS, NIVEAU_LABELS,
@@ -141,6 +141,7 @@ export default function ProjectDetail() {
       probleme: projet.probleme || '',
       solution: projet.solution || '',
       technologies: projet.technologies || '',
+      imageUrl: projet.imageUrl || '',
       categorie: projet.categorie || '',
       rolesRecherches: projet.rolesRecherches || '',
       nombrePlacesRecherchees: projet.nombrePlacesRecherchees || 3,
@@ -169,6 +170,7 @@ export default function ProjectDetail() {
         probleme: editForm.probleme?.trim() || null,
         solution: editForm.solution?.trim() || null,
         technologies: editForm.technologies?.trim() || null,
+        imageUrl: editForm.imageUrl?.trim() || null,
         categorie: editForm.categorie?.trim() || null,
         rolesRecherches: editForm.rolesRecherches?.trim() || null,
         nombrePlacesRecherchees: Number(editForm.nombrePlacesRecherchees) || 3,
@@ -271,9 +273,8 @@ export default function ProjectDetail() {
   if (loading) {
     return (
       <div className={styles.page}>
-        <Navbar />
         <div className="flex items-center justify-center py-32">
-          <Loader2 size={32} className="animate-spin text-primary" />
+          <Loader2 size={32} className="animate-spin text-[#C9F06A]" />
         </div>
       </div>
     )
@@ -282,10 +283,9 @@ export default function ProjectDetail() {
   if (erreur || !projet) {
     return (
       <div className={styles.page}>
-        <Navbar />
         <div className="max-w-7xl mx-auto px-4 py-20 text-center">
-          <AlertTriangle size={48} className="text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500 text-lg mb-4">{erreur || 'Projet introuvable.'}</p>
+          <AlertTriangle size={48} className="text-[#C9F06A]/40 mx-auto mb-4" />
+          <p className="text-white/60 text-lg mb-4">{erreur || 'Projet introuvable.'}</p>
           <div className="flex gap-3 justify-center">
             <button onClick={loadProjet} className={styles.btnPrimary}>Réessayer</button>
             <Link to="/projects" className={styles.btnSecondary}>Retour aux projets</Link>
@@ -336,14 +336,14 @@ export default function ProjectDetail() {
     }
     if (projet.maDemande?.statut === 'EN_ATTENTE') {
       return (
-        <button disabled className="bg-gray-100 text-gray-500 px-5 py-2.5 rounded-lg text-sm font-semibold cursor-not-allowed">
+        <button disabled className="bg-white/5 border border-white/10 text-white/50 px-5 py-2.5 rounded-xl text-xs font-mono uppercase tracking-wider font-semibold cursor-not-allowed">
           <Clock size={14} className="inline mr-1" /> Demande envoyée
         </button>
       )
     }
     if (!projet.ouvertAuxDemandes) {
       return (
-        <span className="text-sm font-semibold px-4 py-2 rounded-full bg-gray-100 text-gray-500">
+        <span className="text-xs font-mono font-semibold px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white/50 uppercase tracking-wider">
           {projet.statut === 'TERMINE' ? 'Terminé' : 'Complet'}
         </span>
       )
@@ -351,7 +351,7 @@ export default function ProjectDetail() {
     return (
       <div>
         {projet.maDemande?.statut === 'REFUSEE' && (
-          <p className="text-sm text-red-500 mb-2">Votre dernière demande a été refusée.</p>
+          <p className="text-sm text-red-400 mb-2">Votre dernière demande a été refusée.</p>
         )}
         <button onClick={() => setShowJoinModal(true)} className={styles.btnPrimary}>
           Demander à rejoindre
@@ -372,7 +372,6 @@ export default function ProjectDetail() {
 
   return (
     <div className={styles.page}>
-      <Navbar />
       <div className={styles.inner}>
         <Link to="/projects" className={styles.backLink}>
           <ArrowLeft size={16} /> Retour aux projets
@@ -381,20 +380,42 @@ export default function ProjectDetail() {
         <div className={styles.grid}>
           {/* ---- Main Column ---- */}
           <div className={styles.mainColumn}>
+            {/* Cover Banner */}
+            <div className="relative w-full h-56 sm:h-72 rounded-[28px] overflow-hidden border border-white/10 shadow-2xl group">
+              <img
+                src={getProjectImage(projet)}
+                alt={projet.nom}
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#101915] via-[#101915]/30 to-transparent" />
+
+              {/* Badges on cover */}
+              <div className="absolute top-4 left-4 flex flex-wrap gap-2">
+                <span className="bg-black/75 backdrop-blur-md border border-[#C9F06A]/30 text-[#C9F06A] text-xs font-mono font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full shadow-lg">
+                  {projet.categorie || 'PROJET 54DEVS'}
+                </span>
+              </div>
+              <div className="absolute top-4 right-4 flex items-center gap-2">
+                <span className="bg-black/75 backdrop-blur-md border border-white/15 text-white text-xs font-mono font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full shadow-lg">
+                  {projet.placesRestantes > 0 ? `${projet.placesRestantes} PLACES RESTANTES` : 'COMPLET'}
+                </span>
+              </div>
+            </div>
+
             {/* Header */}
             <div className={styles.header}>
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-5">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <span className={`${styles.statusBadge} ${STATUT_COLORS[projet.statut] || 'bg-gray-100 text-gray-500'}`}>
+                    <span className={`${styles.statusBadge} ${STATUT_COLORS[projet.statut] || 'bg-white/5 border border-white/10 text-white/50'}`}>
                       {STATUT_LABELS[projet.statut] || projet.statut}
                     </span>
                     {projet.categorie && (
-                      <span className="text-xs text-slate-300 font-medium">{projet.categorie}</span>
+                      <span className="text-xs text-white/60 font-mono font-medium">{projet.categorie}</span>
                     )}
                   </div>
-                  <h1 className="text-2xl sm:text-3xl font-bold text-white">{projet.nom}</h1>
-                  <p className="text-sm text-slate-300 mt-1">
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-white font-display">{projet.nom}</h1>
+                  <p className="text-sm text-white/60 mt-1 font-body">
                     Créé par {projet.createur?.prenom || projet.createur?.pseudo || 'un membre'}{projet.createur?.pays && ` · ${projet.createur.pays}`}
                   </p>
                 </div>
@@ -419,19 +440,19 @@ export default function ProjectDetail() {
               <div className="space-y-6">
                 {projet.probleme && (
                   <div className={styles.overviewCard}>
-                    <h3 className="font-bold text-gray-900 mb-2">Problème</h3>
-                    <p className="text-gray-600 text-sm leading-relaxed">{projet.probleme}</p>
+                    <h3 className="font-bold text-[#C9F06A] mb-2 font-mono uppercase tracking-wider text-xs">Problème</h3>
+                    <p className="text-white/70 text-sm leading-relaxed">{projet.probleme}</p>
                   </div>
                 )}
                 {projet.solution && (
                   <div className={styles.overviewCard}>
-                    <h3 className="font-bold text-gray-900 mb-2">Solution</h3>
-                    <p className="text-gray-600 text-sm leading-relaxed">{projet.solution}</p>
+                    <h3 className="font-bold text-[#C9F06A] mb-2 font-mono uppercase tracking-wider text-xs">Solution</h3>
+                    <p className="text-white/70 text-sm leading-relaxed">{projet.solution}</p>
                   </div>
                 )}
                 {projet.technologies && (
                   <div>
-                    <h3 className="font-bold text-gray-900 mb-3">Technologies</h3>
+                    <h3 className="font-bold text-white mb-3 font-display">Technologies</h3>
                     <div className="flex flex-wrap gap-2">
                       {projet.technologies.split(',').filter(Boolean).map(t => (
                         <span key={t.trim()} className={styles.techTag}>{t.trim()}</span>
@@ -441,7 +462,7 @@ export default function ProjectDetail() {
                 )}
                 {projet.competencesRecherchees?.length > 0 && (
                   <div>
-                    <h3 className="font-bold text-gray-900 mb-3">Compétences recherchées</h3>
+                    <h3 className="font-bold text-white mb-3 font-display">Compétences recherchées</h3>
                     <div className="flex flex-wrap gap-2">
                       {projet.competencesRecherchees.map(c => (
                         <span key={c.competenceId}
@@ -456,14 +477,14 @@ export default function ProjectDetail() {
                 )}
                 {projet.rolesRecherches && (
                   <div>
-                    <h3 className="font-bold text-gray-900 mb-3">Rôles recherchés</h3>
-                    <p className="text-gray-600 text-sm">{projet.rolesRecherches}</p>
+                    <h3 className="font-bold text-white mb-3 font-display">Rôles recherchés</h3>
+                    <p className="text-white/70 text-sm">{projet.rolesRecherches}</p>
                   </div>
                 )}
                 {projet.conditionsEngagement && (
                   <div className={styles.overviewCard}>
-                    <h3 className="font-bold text-gray-900 mb-2">Conditions d'engagement</h3>
-                    <p className="text-gray-600 text-sm leading-relaxed">{projet.conditionsEngagement}</p>
+                    <h3 className="font-bold text-[#C9F06A] mb-2 font-mono uppercase tracking-wider text-xs">Conditions d'engagement</h3>
+                    <p className="text-white/70 text-sm leading-relaxed">{projet.conditionsEngagement}</p>
                   </div>
                 )}
               </div>
@@ -489,15 +510,20 @@ export default function ProjectDetail() {
             {/* === Members === */}
             {activeTab === 'members' && (
               <div className="space-y-3">
-                {(projet.membres || []).map(m => (
+                {(projet.membres || []).map((m, idx) => (
                   <div key={m.utilisateurId} className={styles.memberItem}>
                     <div className="flex items-center gap-3">
-                      <div className={styles.memberAvatar}>
-                        {(m.prenom?.[0] || '') + (m.nom?.[0] || '')}
+                      <div className="w-11 h-11 rounded-full overflow-hidden border border-[#C9F06A]/40 shrink-0 bg-[#C9F06A] text-black flex items-center justify-center font-bold text-xs shadow-md">
+                        <img
+                          src={getAvatarForIndex(idx)}
+                          alt={`${m.prenom} ${m.nom}`}
+                          className="w-full h-full object-cover"
+                          onError={(e) => { e.currentTarget.style.display = 'none' }}
+                        />
                       </div>
                       <div>
-                        <p className="font-semibold text-gray-900 text-sm">{m.prenom} {m.nom}</p>
-                        <p className="text-gray-400 text-xs">
+                        <p className="font-semibold text-white text-sm">{m.prenom} {m.nom}</p>
+                        <p className="text-white/40 text-xs font-mono">
                           {ROLE_LABELS[m.roleMembre] || m.roleMembre}
                           {m.pays && ` · ${m.pays}`}
                           {m.dateAdhesion && ` · ${new Date(m.dateAdhesion).toLocaleDateString('fr-FR')}`}
@@ -535,14 +561,19 @@ export default function ProjectDetail() {
                         <div key={d.id} className={styles.requestItem}>
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-3">
-                              <div className={styles.requestAvatar}>
-                                {d.demandeur?.prenom?.[0] || '?'}
+                              <div className="w-10 h-10 rounded-full overflow-hidden border border-[#C9F06A]/40 shrink-0 bg-[#C9F06A] text-black flex items-center justify-center font-bold text-xs shadow-md">
+                                <img
+                                  src={getAvatarForIndex(d.demandeur?.id || d.id || 0)}
+                                  alt={d.demandeur?.pseudo || 'Demandeur'}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => { e.currentTarget.style.display = 'none' }}
+                                />
                               </div>
                               <div>
-                                <p className="font-semibold text-gray-900 text-sm">
+                                <p className="font-semibold text-white text-sm">
                                   {d.demandeur?.pseudo || `${d.demandeur?.prenom} ${d.demandeur?.nom}`}
                                 </p>
-                                <p className="text-gray-400 text-xs">
+                                <p className="text-white/40 text-xs">
                                   {d.demandeur?.pays}
                                   {d.dateDemande && ` · ${new Date(d.dateDemande).toLocaleDateString('fr-FR')}`}
                                 </p>
@@ -557,7 +588,7 @@ export default function ProjectDetail() {
                               </button>
                             </div>
                           </div>
-                          {d.message && <p className="text-gray-600 text-sm mt-1 pl-12">{d.message}</p>}
+                          {d.message && <p className="text-white/70 text-sm mt-1 pl-12">{d.message}</p>}
                           {Object.keys(groups).length > 0 && (
                             <div className="mt-3 pl-12">
                               {Object.entries(groups).map(([type, comps]) => (
@@ -565,7 +596,7 @@ export default function ProjectDetail() {
                                   <p className={styles.competenceGroupTitle}>{TYPE_LABELS[type] || type}</p>
                                   <div className="flex flex-wrap gap-1.5">
                                     {comps.map(c => (
-                                      <span key={c.nom} className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded">
+                                      <span key={c.nom} className="text-xs bg-white/5 border border-white/10 text-white/80 px-2.5 py-0.5 rounded-lg font-mono">
                                         {c.nom} {c.niveau && `(${NIVEAU_LABELS[c.niveau] || c.niveau})`}
                                       </span>
                                     ))}
@@ -629,7 +660,7 @@ export default function ProjectDetail() {
                       <input
                         value={newMessage}
                         onChange={e => setNewMessage(e.target.value.slice(0, 1000))}
-                        placeholder="Écrire un message..."
+                        placeholder="Ã‰crire un message..."
                         className={styles.messageInput}
                       />
                       <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-gray-400">
@@ -653,11 +684,11 @@ export default function ProjectDetail() {
                   <div className="space-y-3">
                     {departs.map((d, i) => (
                       <div key={i} className={styles.departItem}>
-                        <p className="font-semibold text-gray-900 text-sm">
+                        <p className="font-semibold text-white text-sm">
                           {d.prenom} {d.nom}
                         </p>
-                        <p className="text-gray-600 text-sm mt-1">Motif : {d.motif || '—'}</p>
-                        <p className="text-gray-400 text-xs mt-1">
+                        <p className="text-white/70 text-sm mt-1">Motif : {d.motif || 'â€”'}</p>
+                        <p className="text-white/40 text-xs mt-1">
                           {d.dateDepart && new Date(d.dateDepart).toLocaleDateString('fr-FR')}
                           {' · '}
                           {d.retireParCreateur ? 'Retiré par le créateur' : 'Parti de lui-même'}
@@ -666,7 +697,7 @@ export default function ProjectDetail() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-400 text-sm text-center py-8">Aucun départ enregistré.</p>
+                  <p className="text-white/50 text-sm text-center py-8">Aucun départ enregistré.</p>
                 )}
               </div>
             )}
@@ -677,19 +708,19 @@ export default function ProjectDetail() {
             {/* Status Change (Creator) */}
             {projet.estCreateur && (
               <div className={styles.statusCard}>
-                <h3 className="font-bold text-gray-900 mb-3">Statut du projet</h3>
+                <h3 className="font-bold text-white mb-3 font-display">Statut du projet</h3>
                 <div className="space-y-2">
                   {ALL_STATUTS.map(s => (
                     <button key={s} onClick={() => handleChangeStatut(s)}
                       disabled={changingStatut || projet.statut === s}
                       className={projet.statut === s ? styles.statusButtonActive : styles.statusButtonInactive}>
                       {STATUT_LABELS[s]}
-                      {projet.statut === s && ' ✓'}
+                      {projet.statut === s && ' âœ“'}
                     </button>
                   ))}
                 </div>
                 {changingStatut && (
-                  <div className="flex items-center gap-2 mt-2 text-primary text-xs">
+                  <div className="flex items-center gap-2 mt-2 text-[#C9F06A] text-xs">
                     <Loader2 size={12} className="animate-spin" /> Mise à jour...
                   </div>
                 )}
@@ -699,19 +730,24 @@ export default function ProjectDetail() {
             {/* Team */}
             <div className={styles.teamCard}>
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold text-gray-900">Équipe</h3>
-                <span className="text-xs text-gray-400 font-medium">
+                <h3 className="font-bold text-white font-display">Équipe</h3>
+                <span className="text-xs text-white/40 font-mono font-medium">
                   {projet.membres?.length || 0} membre{(projet.membres?.length || 0) > 1 ? 's' : ''}
                 </span>
               </div>
-              {projet.membres?.map(m => (
+              {projet.membres?.map((m, idx) => (
                 <div key={m.utilisateurId} className="flex items-center gap-3 mb-3">
-                  <div className={styles.teamMemberAvatar}>
-                    {(m.prenom?.[0] || '') + (m.nom?.[0] || '')}
+                  <div className="w-9 h-9 rounded-full overflow-hidden border border-[#C9F06A]/40 shrink-0 bg-[#C9F06A] text-black flex items-center justify-center font-bold text-xs shadow-md">
+                    <img
+                      src={getAvatarForIndex(idx)}
+                      alt={m.prenom}
+                      className="w-full h-full object-cover"
+                      onError={(e) => { e.currentTarget.style.display = 'none' }}
+                    />
                   </div>
                   <div>
-                    <p className="text-gray-900 text-sm font-semibold">{m.prenom} {m.nom?.[0]}.</p>
-                    <p className="text-gray-400 text-xs">{ROLE_LABELS[m.roleMembre] || m.roleMembre}</p>
+                    <p className="text-white text-sm font-semibold">{m.prenom} {m.nom?.[0]}.</p>
+                    <p className="text-white/40 text-xs">{ROLE_LABELS[m.roleMembre] || m.roleMembre}</p>
                   </div>
                 </div>
               ))}
@@ -720,23 +756,23 @@ export default function ProjectDetail() {
             {/* Stats */}
             <div className="grid grid-cols-2 gap-3">
               <div className={styles.statCard}>
-                <span className="text-xl font-bold text-primary block">{projet.membres?.length || 0}</span>
-                <span className="text-gray-400 text-[10px] uppercase tracking-wider font-bold">Membres</span>
+                <span className="text-xl font-bold text-[#C9F06A] block font-display">{projet.membres?.length || 0}</span>
+                <span className="text-white/40 text-[10px] uppercase tracking-wider font-mono font-bold">Membres</span>
               </div>
               <div className={styles.statCard}>
-                <span className="text-xl font-bold text-primary block">{projet.placesRestantes ?? 0}</span>
-                <span className="text-gray-400 text-[10px] uppercase tracking-wider font-bold">Places restantes</span>
+                <span className="text-xl font-bold text-[#C9F06A] block font-display">{projet.placesRestantes ?? 0}</span>
+                <span className="text-white/40 text-[10px] uppercase tracking-wider font-mono font-bold">Places restantes</span>
               </div>
             </div>
 
             {/* Roles */}
             {projet.rolesRecherches && (
-              <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                <h3 className="font-bold text-gray-900 mb-3">Rôles recherchés</h3>
+              <div className="bg-[#16221C]/90 rounded-2xl border border-white/10 p-6 shadow-xl backdrop-blur-md">
+                <h3 className="font-bold text-white mb-3 font-display">Rôles recherchés</h3>
                 <div className="space-y-2">
                   {projet.rolesRecherches.split(',').filter(Boolean).map((role, i) => (
-                    <div key={i} className="bg-gray-50 rounded-lg p-3 border border-gray-100">
-                      <span className="text-sm font-medium text-gray-900">{role.trim()}</span>
+                    <div key={i} className="bg-[#18251E] rounded-xl p-3 border border-white/10">
+                      <span className="text-sm font-medium text-white">{role.trim()}</span>
                     </div>
                   ))}
                 </div>
@@ -763,15 +799,15 @@ export default function ProjectDetail() {
               </div>
             ) : (
               <>
-                <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                  <h4 className="text-sm font-bold text-gray-900 mb-1">Conditions d'engagement</h4>
-                  <p className="text-sm text-gray-600">
+                <div className="bg-[#18251E] rounded-xl p-4 mb-4 border border-white/10">
+                  <h4 className="text-sm font-bold text-[#C9F06A] font-mono mb-1">Conditions d'engagement</h4>
+                  <p className="text-sm text-white/70 leading-relaxed">
                     {projet.conditionsEngagement || 'Le créateur n\'a pas précisé de conditions particulières.'}
                   </p>
                 </div>
 
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-xs font-bold text-[#C9F06A] font-mono uppercase mb-1">
                     Message (facultatif)
                   </label>
                   <textarea
@@ -781,7 +817,7 @@ export default function ProjectDetail() {
                     rows={3}
                     className={`${styles.input} resize-none`}
                   />
-                  <span className="text-xs text-gray-400">{joinMessage.length}/500</span>
+                  <span className="text-xs text-white/40 font-mono">{joinMessage.length}/500</span>
                 </div>
 
                 <label className="flex items-start gap-2 mb-4 cursor-pointer">
@@ -789,9 +825,9 @@ export default function ProjectDetail() {
                     type="checkbox"
                     checked={engagementAccepte}
                     onChange={e => setEngagementAccepte(e.target.checked)}
-                    className="mt-1 rounded border-gray-300"
+                    className="mt-1 rounded border-white/20 bg-[#18251E] text-[#C9F06A] focus:ring-[#C9F06A]"
                   />
-                  <span className="text-sm text-gray-700">
+                  <span className="text-sm text-white/80">
                     Je m'engage à contribuer à ce projet jusqu'à sa fin.
                   </span>
                 </label>
@@ -832,7 +868,7 @@ export default function ProjectDetail() {
 
             <p className="text-sm text-gray-600 mb-4">
               {showMotifModal.utilisateurId === currentUser?.id
-                ? 'Êtes-vous sûr de vouloir quitter ce projet ?'
+                ? 'ÃŠtes-vous sûr de vouloir quitter ce projet ?'
                 : `Retirer ${showMotifModal.prenom} ${showMotifModal.nom} du projet ?`}
             </p>
 
@@ -890,6 +926,50 @@ export default function ProjectDetail() {
                 <label className={styles.editLabel}>Description</label>
                 <textarea value={editForm.description} onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))}
                   rows={3} className={`${styles.input} resize-none`} />
+              </div>
+
+              <div>
+                <label className={styles.editLabel}>
+                  <span className="inline-flex items-center gap-1.5">
+                    <ImageIcon size={14} className="text-[#C9F06A]" />
+                    Image de couverture du projet
+                  </span>
+                </label>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {COVER_PRESETS.map(preset => (
+                    <button
+                      key={preset.label}
+                      type="button"
+                      onClick={() => setEditForm(f => ({ ...f, imageUrl: preset.url }))}
+                      className="text-[11px] px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-white/70 hover:border-[#C9F06A] hover:text-white transition"
+                    >
+                      {preset.label}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    value={editForm.imageUrl || ''}
+                    onChange={e => setEditForm(f => ({ ...f, imageUrl: e.target.value }))}
+                    placeholder="https://images.unsplash.com/... ou URL personnalisée"
+                    className={styles.input}
+                  />
+                  {editForm.imageUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setEditForm(f => ({ ...f, imageUrl: '' }))}
+                      className="px-3 rounded-xl border border-white/15 bg-white/5 text-white/50 hover:text-white text-xs"
+                      title="Effacer"
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
+                </div>
+                {editForm.imageUrl && (
+                  <div className="mt-2 h-32 rounded-xl overflow-hidden border border-white/10 relative">
+                    <img src={editForm.imageUrl} alt="Aperçu" className="w-full h-full object-cover" />
+                  </div>
+                )}
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -958,7 +1038,7 @@ export default function ProjectDetail() {
                             }))
                           }
                         }}
-                          className={`text-xs px-2.5 py-1 rounded-full border transition ${sel ? 'bg-primary text-white border-primary' : 'bg-gray-50 text-gray-600 border-gray-200 hover:border-primary'}`}>
+                          className={`text-xs px-2.5 py-1 rounded-full border transition ${sel ? 'bg-[#C9F06A] text-black font-semibold border-[#C9F06A]' : 'bg-[#18251E] text-white/70 border-white/10 hover:border-[#C9F06A]'}`}>
                           {c.nom}
                         </button>
                       )
@@ -968,8 +1048,8 @@ export default function ProjectDetail() {
               )}
             </div>
 
-            {saveError && <p className="text-red-500 text-sm mt-3">{saveError}</p>}
-            <div className="flex gap-3 justify-end mt-4 pt-4 border-t border-gray-100">
+            {saveError && <p className="text-red-400 text-sm mt-3">{saveError}</p>}
+            <div className="flex gap-3 justify-end mt-4 pt-4 border-t border-white/10">
               <button onClick={() => setEditing(false)} className={styles.btnSecondary}>Annuler</button>
               <button onClick={handleSaveEdit} disabled={saving} className={styles.btnPrimary}>
                 {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
@@ -979,8 +1059,6 @@ export default function ProjectDetail() {
           </div>
         </div>
       )}
-
-      <Footer />
     </div>
   )
 }

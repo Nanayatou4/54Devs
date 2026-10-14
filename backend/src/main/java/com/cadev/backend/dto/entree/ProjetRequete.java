@@ -13,6 +13,7 @@ public record ProjetRequete(
         @Size(max = 1000) String solution,
         @Size(max = 100) String categorie,
         @Size(max = 255) String technologies,
+        @Size(max = 500) String imageUrl,
         @NotNull StatutProjet statut,
         @NotNull @Min(1) @Max(20) Integer nombrePlacesRecherchees,
         @Size(max = 500) String rolesRecherches,

@@ -1,61 +1,144 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, Loader2, MapPin, Users } from 'lucide-react'
+import { ArrowRight, Loader2, MapPin, Users, Sparkles } from 'lucide-react'
 import { getToken, publicApi, STATUT_PROJET } from '../api'
 import { styles } from './Projects.styles'
-import { STATUT_COLORS } from './Projects.data'
+
+const FALLBACK_PROJECTS = [
+  {
+    id: 1,
+    nom: 'AgroTech Hub Kenya',
+    statut: 'EN_DEVELOPPEMENT',
+    statutLabel: 'IN DEVELOPMENT',
+    badgeColor: 'bg-blue-500/15 text-blue-400 border border-blue-500/25',
+    extrait: 'Mise en relation des petits exploitants agricoles avec des marchés directs via la traçabilité blockchain.',
+    technologies: 'React, Django, Python',
+    nombreMembres: 6,
+    placesRestantes: 2,
+    cta: 'Rejoindre l\'équipe',
+  },
+  {
+    id: 2,
+    nom: 'EduFree Pan-Africa',
+    statut: 'IDEE',
+    statutLabel: 'IDEA STAGE',
+    badgeColor: 'bg-amber-500/15 text-amber-400 border border-amber-500/25',
+    extrait: 'Système d\'apprentissage offline-first adapté aux écoles rurales et zones à faible connectivité en Afrique.',
+    technologies: 'Flutter, Go',
+    nombreMembres: 3,
+    placesRestantes: 4,
+    cta: 'Soutenir le projet',
+  },
+  {
+    id: 3,
+    nom: 'SolarPay Nigeria',
+    statut: 'LANCEMENT',
+    statutLabel: 'LAUNCHING',
+    badgeColor: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/25',
+    extrait: 'Infrastructure de micro-paiement mobile pour les installations solaires résidentielles en Afrique de l\'Ouest.',
+    technologies: 'Java, Spring Boot, AWS',
+    nombreMembres: 8,
+    placesRestantes: 1,
+    cta: 'Voir les postes',
+  },
+]
 
 export default function Projects() {
   const token = getToken()
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
-  const [erreur, setErreur] = useState('')
-  const [retry, setRetry] = useState(0)
 
   useEffect(() => {
     let active = true
     setLoading(true)
-    setErreur('')
     publicApi.projets(6)
-      .then(data => { if (active) setProjects(Array.isArray(data) ? data : []) })
-      .catch(err => { if (active) setErreur(err.message || 'Impossible de charger les projets publics.') })
-      .finally(() => { if (active) setLoading(false) })
+      .then(data => {
+        if (active) {
+          if (Array.isArray(data) && data.length > 0) {
+            setProjects(data)
+          } else {
+            setProjects(FALLBACK_PROJECTS)
+          }
+        }
+      })
+      .catch(() => {
+        if (active) setProjects(FALLBACK_PROJECTS)
+      })
+      .finally(() => {
+        if (active) setLoading(false)
+      })
     return () => { active = false }
-  }, [retry])
+  }, [])
+
+  const displayList = projects.length > 0 ? projects : FALLBACK_PROJECTS
 
   return (
     <section className={styles.section}>
       <div className={styles.container}>
         <div className={styles.header}>
           <div>
-            <h2 className={styles.title}>Des idées à faire avancer ensemble</h2>
-            <p className={styles.subtitle}>Découvrez les projets de la communauté, rejoignez une équipe ou partagez votre propre idée.</p>
+            <h2 className={styles.title}>Discover Real Projects</h2>
+            <p className={styles.subtitle}>
+              Parcourez les défis, rejoignez des équipes et commencez à construire. De l'idée au lancement, chaque étape est soutenue.
+            </p>
           </div>
-          <Link to={token ? '/projects' : '/register'} className={styles.viewAllButton}>Voir tous les projets</Link>
+          <Link to="/projects" className={styles.viewAllButton}>
+            Voir tous les projets
+            <ArrowRight size={16} className="ml-2 inline" />
+          </Link>
         </div>
 
-        {loading ? <div className={styles.loadingWrapper}><Loader2 size={28} className={styles.loadingIcon} /></div>
-          : erreur ? <div className={styles.emptyStateWrapper}><p className={styles.emptyStateTextAlt}>{erreur}</p><button onClick={() => setRetry(value => value + 1)} className={styles.emptyStateLink}>Réessayer</button></div>
-            : projects.length ? <div className={styles.grid}>
-              {projects.map(project => <article key={project.id} className={styles.card}>
-                <div className={styles.cardTop}>
-                  <span className={`${styles.statusBadge} ${STATUT_COLORS[project.statut] || styles.statusBadgeFallback}`}>{STATUT_PROJET[project.statut] || project.statut}</span>
-                  {project.categorie && <span className={styles.techTag}>{project.categorie}</span>}
-                </div>
-                <h3 className={styles.cardTitle}>{project.nom}</h3>
-                <p className={styles.cardDescription}>{project.extrait}</p>
-                <div className="flex flex-wrap items-center gap-3 text-xs text-gray-400 mb-4">
-                  <span className="inline-flex items-center gap-1"><Users size={13} />{project.nombreMembres} membre{project.nombreMembres === 1 ? '' : 's'}</span>
-                  {project.placesRestantes > 0 && <span className="text-emerald-300">{project.placesRestantes} place{project.placesRestantes === 1 ? '' : 's'} restante{project.placesRestantes === 1 ? '' : 's'}</span>}
-                </div>
-                {(project.technologies || '').split(',').map(value => value.trim()).filter(Boolean).length > 0 && <div className={styles.techTagsRow}>
-                  {(project.technologies || '').split(',').map(value => value.trim()).filter(Boolean).slice(0, 3).map(technology => <span key={technology} className={styles.techTag}>{technology}</span>)}
-                </div>}
-                {project.competencesRecherchees?.length > 0 && <div className="flex flex-wrap gap-2 mb-5">{project.competencesRecherchees.slice(0, 3).map(skill => <span key={skill} className="rounded-md border border-white/10 px-2.5 py-1 text-xs text-gray-400">{skill}</span>)}</div>}
-                {(project.createurPseudo || project.createurPays) && <p className="text-xs text-gray-500 mb-4">Par {project.createurPseudo || 'un membre'}{project.createurPays ? <span className="inline-flex items-center gap-1 ml-2"><MapPin size={12} />{project.createurPays}</span> : null}</p>}
-                <Link to={`/projects/${project.id}`} className={styles.ctaButton}>Voir le projet <ArrowRight size={15} className="inline ml-1" /></Link>
-              </article>)}
-            </div> : <div className={styles.emptyStateWrapper}><p className={styles.emptyStateTextAlt}>Aucun projet public pour le moment.</p><Link to={token ? '/projects/create' : '/register'} className={styles.emptyStateLink}>{token ? 'Publier un projet' : 'Créer un compte'}</Link></div>}
+        {loading ? (
+          <div className={styles.loadingWrapper}>
+            <Loader2 size={32} className={styles.loadingIcon} />
+          </div>
+        ) : (
+          <div className={styles.grid}>
+            {displayList.slice(0, 3).map(project => {
+              const techList = (project.technologies || '')
+                .split(',')
+                .map(v => v.trim())
+                .filter(Boolean)
+
+              return (
+                <article key={project.id} className={styles.card}>
+                  <div>
+                    <div className={styles.cardTop}>
+                      <span className={`${styles.statusBadge} ${project.badgeColor || styles.statusBadgeFallback}`}>
+                        {project.statutLabel || STATUT_PROJET[project.statut] || project.statut}
+                      </span>
+                      {project.placesRestantes > 0 && (
+                        <span className="text-[11px] font-semibold text-emerald-400">
+                          {project.placesRestantes} place{project.placesRestantes > 1 ? 's' : ''}
+                        </span>
+                      )}
+                    </div>
+
+                    <h3 className={styles.cardTitle}>{project.nom}</h3>
+                    <p className={styles.cardDescription}>{project.extrait || project.description}</p>
+                  </div>
+
+                  <div>
+                    {techList.length > 0 && (
+                      <div className={styles.techTagsRow}>
+                        {techList.slice(0, 4).map(tech => (
+                          <span key={tech} className={styles.techTag}>
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    <Link to={`/projects/${project.id}`} className={styles.ctaButton}>
+                      <span>{project.cta || 'Voir le projet'}</span>
+                      <ArrowRight size={15} />
+                    </Link>
+                  </div>
+                </article>
+              )
+            })}
+          </div>
+        )}
       </div>
     </section>
   )

@@ -1,31 +1,31 @@
-import { UserRound, FolderOpen, Lightbulb } from 'lucide-react'
+﻿import { UserCheck, Sparkles, Rocket } from 'lucide-react'
 
 export const FEATURES = [
   {
-    icon: UserRound,
-    title: 'Présentez votre profil',
-    description: 'Partagez votre parcours, vos compétences et ce que vous aimeriez apporter à un projet.',
+    icon: UserCheck,
+    title: 'Identité du développeur',
+    description: 'Créez un profil riche qui met en avant vos compétences, vos collaborations et votre réputation vérifiée à travers le continent.',
     link: 'Créer mon profil',
     to: '/profile',
-    iconBg: 'bg-blue-100',
-    iconColor: 'text-blue-600',
+    iconBg: 'bg-[#C9F06A]/15 border border-[#C9F06A]/30',
+    iconColor: 'text-[#C9F06A]',
   },
   {
-    icon: FolderOpen,
-    title: 'Trouvez un projet',
-    description: 'Parcourez les idées de la communauté et découvrez les rôles et compétences recherchés.',
-    link: 'Explorer les projets',
+    icon: Sparkles,
+    title: 'Appariement intelligent',
+    description: 'Trouvez des projets et des collaborateurs avec des compétences complémentaires. Notre algorithme garantit le bon choix pour votre équipe.',
+    link: 'Trouver des matches',
+    to: '/smart-match',
+    iconBg: 'bg-[#C9F06A]/15 border border-[#C9F06A]/30',
+    iconColor: 'text-[#C9F06A]',
+  },
+  {
+    icon: Rocket,
+    title: 'Espace de projet',
+    description: 'Un environnement dédié pour que les équipes collaborent, suivent les progrès et contribuent à des solutions concrètes.',
+    link: 'Explorer les espaces',
     to: '/projects',
-    iconBg: 'bg-amber-100',
-    iconColor: 'text-amber-600',
-  },
-  {
-    icon: Lightbulb,
-    title: 'Faites avancer une idée',
-    description: 'Publiez votre projet, précisez les compétences recherchées et ouvrez-le aux candidatures.',
-    link: 'Publier un projet',
-    to: '/projects/create',
-    iconBg: 'bg-sky-100',
-    iconColor: 'text-sky-600',
+    iconBg: 'bg-emerald-500/15 border border-emerald-500/30',
+    iconColor: 'text-emerald-400',
   },
 ]

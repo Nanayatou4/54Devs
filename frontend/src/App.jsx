@@ -15,6 +15,11 @@ import Questions from './pages/Questions'
 import Challenges from './pages/Challenges'
 import Developers from './pages/Developers'
 import ProtectedRoute from './components/ProtectedRoute'
+import AppLayout from './components/AppLayout'
+import SmartMatch from './pages/SmartMatch'
+import CommunityHub from './pages/CommunityHub'
+import Mentorship from './pages/Mentorship'
+import JobBoard from './pages/JobBoard'
 
 export default function App() {
   return (
@@ -28,17 +33,23 @@ export default function App() {
         <Route element={<ProtectedRoute />}>
           <Route path="/onboarding/profile" element={<OnboardingProfile />} />
           <Route path="/onboarding/skills" element={<OnboardingSkills />} />
-          <Route path="/projects" element={<Projects />} />
-          <Route path="/projects/create" element={<ProjectCreate />} />
-          <Route path="/projects/:id" element={<ProjectDetail />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/questions" element={<Questions />} />
-          <Route path="/questions/:id" element={<Questions />} />
-          <Route path="/challenges" element={<Challenges />} />
-          <Route path="/challenges/:id" element={<Challenges />} />
-          <Route path="/developers" element={<Developers />} />
-          <Route path="/developers/:id" element={<Developers />} />
+          <Route element={<AppLayout />}>
+            <Route path="/projects" element={<Projects />} />
+            <Route path="/projects/create" element={<ProjectCreate />} />
+            <Route path="/projects/:id" element={<ProjectDetail />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/smart-match" element={<SmartMatch />} />
+            <Route path="/community" element={<CommunityHub />} />
+            <Route path="/mentorship" element={<Mentorship />} />
+            <Route path="/job-board" element={<JobBoard />} />
+            <Route path="/questions" element={<Questions />} />
+            <Route path="/questions/:id" element={<Questions />} />
+            <Route path="/challenges" element={<Challenges />} />
+            <Route path="/challenges/:id" element={<Challenges />} />
+            <Route path="/developers" element={<Developers />} />
+            <Route path="/developers/:id" element={<Developers />} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>

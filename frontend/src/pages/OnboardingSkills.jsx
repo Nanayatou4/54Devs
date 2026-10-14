@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { X, Check } from 'lucide-react'
 import { competencesApi, profilApi, getToken, getStoredUser } from '../api'
@@ -96,7 +96,7 @@ export default function OnboardingSkills() {
       {/* Header */}
       <div className={styles.header}>
         <Link to="/" className={styles.logo}>
-          <span className="text-gray-900">54<span className="font-extrabold">Devs</span></span>
+          <span className="text-white font-mono">&lt;/&gt; 54<span className="font-extrabold text-[#C9F06A]">Devs</span></span>
         </Link>
         <div className={styles.stepIndicatorWrapper}>
           <div className={styles.stepIndicatorBars}>
@@ -104,7 +104,7 @@ export default function OnboardingSkills() {
             <div className={styles.stepBarActive} />
             <div className={styles.stepBarActive} />
           </div>
-          <span className={styles.stepLabel}>Étape 3 sur 3</span>
+          <span className={styles.stepLabel}>Ã‰tape 3 sur 3</span>
         </div>
       </div>
 
@@ -112,7 +112,7 @@ export default function OnboardingSkills() {
       <div className={styles.content}>
         <h1 className={styles.title}>Partagez vos compétences</h1>
         <p className={styles.subtitle}>
-          Pour chaque compétence, indiquez si vous la maîtrisez, souhaitez l’apprendre ou pouvez l’enseigner.
+          Pour chaque compétence, indiquez si vous la maîtrisez, souhaitez lâ€™apprendre ou pouvez lâ€™enseigner.
         </p>
 
         <form onSubmit={handleComplete} className="space-y-8">
@@ -122,7 +122,7 @@ export default function OnboardingSkills() {
               <label className={styles.sectionLabel}>
                 Compétences principales
               </label>
-              <span className="text-[10px] text-gray-400 uppercase tracking-wider">8 compétences maximum</span>
+              <span className="text-[10px] text-white/40 uppercase tracking-wider font-mono">8 compétences maximum</span>
             </div>
             <div className={styles.skillInputWrapper}>
               {skills.map((skill) => (
@@ -132,11 +132,11 @@ export default function OnboardingSkills() {
                     aria-label={`Type de compétence pour ${skill.nom}`}
                     value={skill.type}
                     onChange={e => setSkills(current => current.map(item => item.nom === skill.nom ? { ...item, type: e.target.value } : item))}
-                    className="bg-transparent text-[10px] font-semibold text-blue-700 outline-none"
+                    className="bg-[#16221C] text-[10px] font-semibold text-[#C9F06A] outline-none border border-white/10 rounded px-1.5 py-0.5"
                   >
-                    {Object.entries(TYPE_COMPETENCE).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                    {Object.entries(TYPE_COMPETENCE).map(([value, label]) => <option key={value} value={value} className="bg-[#16221C] text-white">{label}</option>)}
                   </select>
-                  <button type="button" onClick={() => removeSkill(skill.nom)} aria-label={`Retirer ${skill.nom}`} className="text-gray-500 hover:text-gray-700">
+                  <button type="button" onClick={() => removeSkill(skill.nom)} aria-label={`Retirer ${skill.nom}`} className="text-white/40 hover:text-red-400 transition">
                     <X size={12} />
                   </button>
                 </span>

@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import {
   ArrowRight, Save, X, Loader2, Users, CheckCircle,
-  Rocket, ExternalLink,
+  Rocket, ExternalLink, Image as ImageIcon, Sparkles,
 } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { competencesApi, getToken, projetsApi } from '../api'
 import { styles } from './ProjectCreate.styles'
 import { CATEGORIES, STATUT_LABELS } from './ProjectCreate.data'
+import { COVER_PRESETS } from '../lib/projectImages'
 
 export default function ProjectCreate() {
   const navigate = useNavigate()
@@ -26,6 +27,7 @@ export default function ProjectCreate() {
     solution: '',
     categorie: '',
     technologies: '',
+    imageUrl: '',
     statut: 'IDEE',
     nombrePlacesRecherchees: 3,
     rolesRecherches: '',
@@ -86,6 +88,7 @@ export default function ProjectCreate() {
         solution: form.solution?.trim() || null,
         categorie: form.categorie?.trim() || null,
         technologies: form.technologies?.trim() || null,
+        imageUrl: form.imageUrl?.trim() || null,
         statut: form.statut,
         nombrePlacesRecherchees: Math.max(1, Number(form.nombrePlacesRecherchees) || 1),
         rolesRecherches: form.rolesRecherches?.trim() || null,
@@ -111,63 +114,66 @@ export default function ProjectCreate() {
 
     return (
       <div className={styles.page}>
-        <Navbar />
         <div className="max-w-3xl mx-auto px-4 py-10">
           <div className={styles.successBanner}>
-            <CheckCircle size={20} className="text-green shrink-0" />
-            <p className="text-green font-semibold text-sm">Projet créé avec succès ! Redirection automatique dans quelques secondes...</p>
+            <CheckCircle size={20} className="text-emerald-400 shrink-0" />
+            <p className="text-emerald-400 font-semibold text-sm">Projet créé avec succès ! Redirection automatique dans quelques secondes...</p>
           </div>
 
           <div className={styles.successCard}>
-            <div className={styles.successHeader}>
-              <Rocket size={48} className="text-primary/30" />
+            <div
+              className={styles.successHeader}
+              style={p.imageUrl ? { backgroundImage: `url(${p.imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}
+            >
+              {p.imageUrl && <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px]" />}
+              <Rocket size={48} className="text-[#C9F06A]/40 relative z-10" />
               {p.categorie && (
-                <span className={styles.successCategory}>
+                <span className={`${styles.successCategory} z-10`}>
                   {p.categorie}
                 </span>
               )}
-              <span className={styles.successStatus}>
+              <span className={`${styles.successStatus} z-10`}>
                 {STATUT_LABELS[p.statut] || p.statut}
               </span>
             </div>
 
             <div className={styles.successBody}>
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">{p.nom}</h1>
-              <p className="text-gray-500 leading-relaxed mb-6">{p.description}</p>
+              <h1 className="text-2xl font-bold text-white mb-2 font-display">{p.nom}</h1>
+              <p className="text-white/60 leading-relaxed mb-6 font-body">{p.description}</p>
 
               {p.probleme && (
                 <div className="mb-6">
-                  <h3 className="text-sm font-bold text-gray-900 mb-1">Problème</h3>
-                  <p className="text-gray-600 text-sm">{p.probleme}</p>
+                  <h3 className="text-sm font-bold text-[#C9F06A] mb-1 font-mono uppercase tracking-wider">Problème</h3>
+                  <p className="text-white/70 text-sm leading-relaxed">{p.probleme}</p>
                 </div>
               )}
 
               {p.solution && (
                 <div className="mb-6">
-                  <h3 className="text-sm font-bold text-gray-900 mb-1">Solution</h3>
-                  <p className="text-gray-600 text-sm">{p.solution}</p>
+                  <h3 className="text-sm font-bold text-[#C9F06A] mb-1 font-mono uppercase tracking-wider">Solution</h3>
+                  <p className="text-white/70 text-sm leading-relaxed">{p.solution}</p>
                 </div>
               )}
 
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
                 <div className={styles.statBox}>
-                  <Users size={18} className="text-primary mx-auto mb-1" />
-                  <span className="text-lg font-bold text-gray-900 block">{p.nombrePlacesRecherchees}</span>
-                  <span className="text-gray-400 text-[10px] uppercase tracking-wider font-bold">Places recherchées</span>
+                  <Users size={18} className="text-[#C9F06A] mx-auto mb-1" />
+                  <span className="text-lg font-bold text-white block font-display">{p.nombrePlacesRecherchees}</span>
+                  <span className="text-white/40 text-[10px] uppercase tracking-wider font-mono font-bold">Places recherchées</span>
                 </div>
                 <div className={styles.statBox}>
-                  <span className="text-lg font-bold text-primary block">{p.placesRestantes ?? p.nombrePlacesRecherchees}</span>
-                  <span className="text-gray-400 text-[10px] uppercase tracking-wider font-bold">Places restantes</span>
+                  <span className="text-lg font-bold text-[#C9F06A] block font-display">{p.placesRestantes ?? p.nombrePlacesRecherchees}</span>
+                  <span className="text-white/40 text-[10px] uppercase tracking-wider font-mono font-bold">Places restantes</span>
                 </div>
                 <div className={styles.statBox}>
-                  <span className="text-lg font-bold text-gray-900 block">{p.membres?.length || 1}</span>
-                  <span className="text-gray-400 text-[10px] uppercase tracking-wider font-bold">Membres</span>
+                  <span className="text-lg font-bold text-white block font-display">{p.membres?.length || 1}</span>
+                  <span className="text-white/40 text-[10px] uppercase tracking-wider font-mono font-bold">Membres</span>
                 </div>
               </div>
 
               {techs.length > 0 && (
                 <div className="mb-6">
-                  <h3 className="text-sm font-bold text-gray-900 mb-2">Technologies</h3>
+                  <h3 className="text-sm font-bold text-white mb-2 font-display">Technologies</h3>
                   <div className="flex flex-wrap gap-2">
                     {techs.map(t => (
                       <span key={t.trim()} className={styles.techTag}>{t.trim()}</span>
@@ -178,7 +184,7 @@ export default function ProjectCreate() {
 
               {p.rolesRecherches && (
                 <div className="mb-6">
-                  <h3 className="text-sm font-bold text-gray-900 mb-2">Rôles recherchés</h3>
+                  <h3 className="text-sm font-bold text-white mb-2 font-display">Rôles recherchés</h3>
                   <div className="flex flex-wrap gap-2">
                     {p.rolesRecherches.split(',').map(r => (
                       <span key={r.trim()} className={styles.roleTag}>{r.trim()}</span>
@@ -189,19 +195,19 @@ export default function ProjectCreate() {
 
               {p.conditionsEngagement && (
                 <div className="mb-6">
-                  <h3 className="text-sm font-bold text-gray-900 mb-2">Conditions d'engagement</h3>
-                  <p className="text-gray-600 text-sm">{p.conditionsEngagement}</p>
+                  <h3 className="text-sm font-bold text-white mb-2 font-display">Conditions d'engagement</h3>
+                  <p className="text-white/70 text-sm leading-relaxed">{p.conditionsEngagement}</p>
                 </div>
               )}
 
               {p.competencesRecherchees?.length > 0 && (
                 <div className="mb-6">
-                  <h3 className="text-sm font-bold text-gray-900 mb-2">Compétences recherchées</h3>
+                  <h3 className="text-sm font-bold text-white mb-2 font-display">Compétences recherchées</h3>
                   <div className="flex flex-wrap gap-2">
                     {p.competencesRecherchees.map(c => (
                       <span key={c.competenceId} className={styles.skillTag}>
                         {c.nom || `Compétence #${c.competenceId}`}
-                        {c.obligatoire && <span className="ml-1 text-red-500">*</span>}
+                        {c.obligatoire && <span className="ml-1 text-red-400">*</span>}
                       </span>
                     ))}
                   </div>
@@ -225,7 +231,7 @@ export default function ProjectCreate() {
   }
 
   // ---------- CREATION FORM ----------
-  const stepLabels = { 1: 'Informations', 2: 'Équipe & Technologies', 3: 'Récapitulatif' }
+  const stepLabels = { 1: 'Informations', 2: 'Ã‰quipe & Technologies', 3: 'Récapitulatif' }
 
   return (
     <div className={styles.page}>
@@ -233,7 +239,7 @@ export default function ProjectCreate() {
         <div className={styles.headerInner}>
           <Link to="/" className={styles.logo}>54<span className="font-extrabold">Devs</span></Link>
           <div className="flex items-center gap-4">
-            <span className={styles.stepLabel}>Étape {step} sur 3 : {stepLabels[step]}</span>
+            <span className={styles.stepLabel}>Ã‰tape {step} sur 3 : {stepLabels[step]}</span>
             <Link to="/projects" className={styles.closeButton}><X size={20} /></Link>
           </div>
         </div>
@@ -241,9 +247,9 @@ export default function ProjectCreate() {
 
       <div className={styles.inner}>
         <div className="max-w-2xl mx-auto text-center mb-8 md:mb-10">
-          <span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 mb-4">Nouveau projet</span>
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900">Faisons avancer votre idée</h1>
-          <p className="text-slate-500 mt-3 leading-relaxed">Présentez votre projet et les profils qui pourraient vous aider à le réaliser.</p>
+          <span className="inline-flex items-center rounded-full bg-[#C9F06A]/10 border border-[#C9F06A]/20 px-3 py-1 text-xs font-semibold text-[#C9F06A] font-mono mb-4">Nouveau projet</span>
+          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white font-display">Faisons avancer votre idée</h1>
+          <p className="text-white/60 mt-3 leading-relaxed font-body">Présentez votre projet et les profils qui pourraient vous aider à le réaliser.</p>
         </div>
         <div className={styles.stepperWrapper}>
           {[1, 2, 3].map((s, i) => (
@@ -284,19 +290,87 @@ export default function ProjectCreate() {
                 <p className="text-[10px] text-gray-400 text-right mt-1">{form.probleme.length} / 1000</p>
               </div>
 
-              <div className="mb-8">
+              <div className="mb-6">
                 <label className={styles.label}>Quelle solution proposez-vous ?</label>
                 <textarea value={form.solution} onChange={e => set('solution', e.target.value)}
                   placeholder="Expliquez comment votre projet résout ce problème..."
                   rows={3} maxLength={1000} className={`${styles.input} resize-none`} />
                 <p className="text-[10px] text-gray-400 text-right mt-1">{form.solution.length} / 1000</p>
               </div>
+
+              <div className="mb-8 pt-4 border-t border-white/10">
+                <label className={styles.label}>
+                  <span className="inline-flex items-center gap-1.5">
+                    <ImageIcon size={14} className="text-[#C9F06A]" />
+                    Image de couverture du projet (Optionnel)
+                  </span>
+                </label>
+                <p className="text-white/50 text-xs mb-3">
+                  Une belle illustration rend votre projet plus attractif. Choisissez une illustration rapide ou collez l'URL d'une image.
+                </p>
+
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {COVER_PRESETS.map(preset => {
+                    const isSelected = form.imageUrl === preset.url
+                    return (
+                      <button
+                        key={preset.label}
+                        type="button"
+                        onClick={() => set('imageUrl', isSelected ? '' : preset.url)}
+                        className={`text-xs px-3 py-1.5 rounded-xl border transition flex items-center gap-1.5 font-medium ${
+                          isSelected
+                            ? 'bg-[#C9F06A] text-black border-[#C9F06A] shadow-md font-bold'
+                            : 'bg-white/5 border-white/10 text-white/70 hover:border-white/30 hover:text-white'
+                        }`}
+                      >
+                        {preset.label}
+                      </button>
+                    )
+                  })}
+                </div>
+
+                <div className="flex gap-2">
+                  <input
+                    type="url"
+                    value={form.imageUrl}
+                    onChange={e => set('imageUrl', e.target.value)}
+                    placeholder="https://images.unsplash.com/... ou URL d'image directe"
+                    className={styles.input}
+                  />
+                  {form.imageUrl && (
+                    <button
+                      type="button"
+                      onClick={() => set('imageUrl', '')}
+                      className="px-3 rounded-xl border border-white/15 bg-white/5 text-white/50 hover:text-white hover:bg-white/10 text-xs font-mono"
+                      title="Effacer"
+                    >
+                      <X size={16} />
+                    </button>
+                  )}
+                </div>
+
+                {form.imageUrl && (
+                  <div className="mt-3 relative rounded-2xl overflow-hidden border border-white/15 h-44 bg-[#0E1511]">
+                    <img
+                      src={form.imageUrl}
+                      alt="Aperçu couverture"
+                      className="w-full h-full object-cover"
+                      onError={() => {}}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-4">
+                      <span className="text-xs font-mono font-bold text-white/90 bg-black/60 px-2.5 py-1 rounded-full border border-white/10">
+                        Aperçu de la couverture
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
           {step === 2 && (
             <div>
-              <h2 className={styles.cardTitle}>Équipe & Technologies</h2>
+              <h2 className={styles.cardTitle}>Ã‰quipe & Technologies</h2>
               <p className={styles.cardSubtitle}>Définissez vos besoins en termes d'équipe et d'outils.</p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6 mb-6">
@@ -364,58 +438,66 @@ export default function ProjectCreate() {
               <p className={styles.cardSubtitle}>Vérifiez les informations avant de publier votre projet.</p>
 
               <div className="space-y-4">
+                {form.imageUrl && (
+                  <div className="rounded-2xl overflow-hidden border border-white/10 h-36 relative">
+                    <img src={form.imageUrl} alt="Couverture" className="w-full h-full object-cover" />
+                    <span className="absolute bottom-2 left-2 bg-black/70 text-white text-[10px] font-mono px-2 py-0.5 rounded-full border border-white/10">
+                      Image de couverture choisie
+                    </span>
+                  </div>
+                )}
                 <div className={styles.reviewItem}>
                   <span className={styles.reviewItemLabel}>Nom du projet</span>
-                  <p className={styles.reviewItemValue}>{form.nom || '—'}</p>
+                  <p className={styles.reviewItemValue}>{form.nom || 'â€”'}</p>
                 </div>
                 <div className={styles.reviewItem}>
                   <span className={styles.reviewItemLabel}>Description</span>
-                  <p className="text-gray-600 text-sm mt-1">{form.description || '—'}</p>
+                  <p className="text-white/70 text-sm mt-1">{form.description || 'â€”'}</p>
                 </div>
                 {form.probleme && (
                   <div className={styles.reviewItem}>
                     <span className={styles.reviewItemLabel}>Problème</span>
-                    <p className="text-gray-600 text-sm mt-1">{form.probleme}</p>
+                    <p className="text-white/70 text-sm mt-1">{form.probleme}</p>
                   </div>
                 )}
                 {form.solution && (
                   <div className={styles.reviewItem}>
                     <span className={styles.reviewItemLabel}>Solution</span>
-                    <p className="text-gray-600 text-sm mt-1">{form.solution}</p>
+                    <p className="text-white/70 text-sm mt-1">{form.solution}</p>
                   </div>
                 )}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className={styles.reviewItem}>
                     <span className={styles.reviewItemLabel}>Catégorie</span>
-                    <p className="text-gray-900 mt-1">{form.categorie || '—'}</p>
+                    <p className="text-white font-medium mt-1">{form.categorie || 'â€”'}</p>
                   </div>
                   <div className={styles.reviewItem}>
                     <span className={styles.reviewItemLabel}>Avancement</span>
-                    <p className="text-gray-900 mt-1">{STATUT_LABELS[form.statut]}</p>
+                    <p className="text-[#C9F06A] font-medium mt-1 font-mono">{STATUT_LABELS[form.statut]}</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className={styles.reviewItem}>
                     <span className={styles.reviewItemLabel}>Personnes recherchées</span>
-                    <p className="text-gray-900 mt-1">{form.nombrePlacesRecherchees}</p>
+                    <p className="text-white font-medium mt-1 font-mono">{form.nombrePlacesRecherchees}</p>
                   </div>
                   {form.rolesRecherches && (
                     <div className={styles.reviewItem}>
                       <span className={styles.reviewItemLabel}>Rôles recherchés</span>
-                      <p className="text-gray-900 mt-1">{form.rolesRecherches}</p>
+                      <p className="text-white font-medium mt-1">{form.rolesRecherches}</p>
                     </div>
                   )}
                 </div>
                 {form.technologies && (
                   <div className={styles.reviewItem}>
                     <span className={styles.reviewItemLabel}>Technologies</span>
-                    <p className="text-gray-900 mt-1">{form.technologies}</p>
+                    <p className="text-white font-medium mt-1">{form.technologies}</p>
                   </div>
                 )}
                 {form.conditionsEngagement && (
                   <div className={styles.reviewItem}>
                     <span className={styles.reviewItemLabel}>Conditions d'engagement</span>
-                    <p className="text-gray-600 text-sm mt-1">{form.conditionsEngagement}</p>
+                    <p className="text-white/70 text-sm mt-1">{form.conditionsEngagement}</p>
                   </div>
                 )}
                 {form.competencesRecherchees.length > 0 && (
@@ -425,9 +507,9 @@ export default function ProjectCreate() {
                       {form.competencesRecherchees.map(s => {
                         const comp = catalogue.find(c => c.id === s.competenceId)
                         return (
-                          <span key={s.competenceId} className="bg-primary/10 text-primary text-xs px-2.5 py-1 rounded-lg font-medium">
+                          <span key={s.competenceId} className="bg-[#C9F06A]/10 border border-[#C9F06A]/20 text-[#C9F06A] text-xs px-2.5 py-1 rounded-lg font-medium">
                             {comp?.nom || `#${s.competenceId}`}
-                            {s.obligatoire && <span className="ml-1 text-red-500">*</span>}
+                            {s.obligatoire && <span className="ml-1 text-red-400">*</span>}
                           </span>
                         )
                       })}
@@ -451,7 +533,7 @@ export default function ProjectCreate() {
             {step < 3 ? (
               <button onClick={goToNextStep}
                 className={styles.nextButton}>
-                Suivant : {step === 1 ? 'Équipe & Technologies' : 'Récapitulatif'} <ArrowRight size={16} />
+                Suivant : {step === 1 ? 'Ã‰quipe & Technologies' : 'Récapitulatif'} <ArrowRight size={16} />
               </button>
             ) : (
               <button onClick={handleSubmit} disabled={saving || !form.nom}

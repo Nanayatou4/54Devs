@@ -1,31 +1,38 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { publicApi } from '../api'
-
-const METRICS = [
-  ['projets', 'Projets'],
-  ['developpeurs', 'Développeurs actifs'],
-  ['questions', 'Questions'],
-  ['challenges', 'Challenges'],
-]
 
 export default function PublicStats() {
   const [stats, setStats] = useState(null)
 
   useEffect(() => {
     let active = true
-    publicApi.statistiques().then(data => { if (active) setStats(data) }).catch(() => {})
+    publicApi.statistiques()
+      .then(data => { if (active && data) setStats(data) })
+      .catch(() => {})
     return () => { active = false }
   }, [])
 
-  if (!stats) return null
+  const metrics = [
+    { value: '54', label: 'Nations Africaines' },
+    { value: stats ? `${Number(stats.developpeurs ?? 0).toLocaleString('fr-FR')}` : '0', label: 'Développeurs Inscrits' },
+    { value: stats ? `${Number(stats.projets ?? 0).toLocaleString('fr-FR')}` : '0', label: 'Projets Publiés' },
+    { value: '100%', label: 'Panafricain' },
+  ]
 
   return (
-    <section aria-label="Statistiques de la communauté" className="bg-white border-y border-slate-100 py-10 sm:py-14">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-        {METRICS.map(([key, label]) => <div key={key} className="text-center">
-          <p className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">{Number(stats[key] || 0).toLocaleString('fr-FR')}</p>
-          <p className="mt-2 text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-500">{label}</p>
-        </div>)}
+    <section aria-label="Statistiques de la communauté 54Devs" className="bg-[#0C130F] border-y border-white/5 py-16 sm:py-24 relative overflow-hidden">
+      <div className="absolute inset-0 grid-bg opacity-15 pointer-events-none" />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 text-center relative z-10">
+        {metrics.map(m => (
+          <div key={m.label} className="group rounded-3xl border border-white/10 bg-[#16221C]/70 p-6 sm:p-8 backdrop-blur-md hover:border-[#C9F06A]/40 hover:bg-[#16171d] transition-all duration-300">
+            <p className="text-4xl sm:text-5xl lg:text-6xl font-black text-[#C9F06A] tracking-tight font-display mb-2 group-hover:scale-105 transition-transform font-mono">
+              {m.value}
+            </p>
+            <p className="text-[11px] sm:text-xs font-bold uppercase tracking-[0.2em] text-white/50 font-body">
+              {m.label}
+            </p>
+          </div>
+        ))}
       </div>
     </section>
   )

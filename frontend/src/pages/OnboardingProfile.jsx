@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+﻿import { useState, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Pencil } from 'lucide-react'
 import { styles } from './OnboardingProfile.styles'
@@ -33,7 +33,7 @@ export default function OnboardingProfile() {
       {/* Header */}
       <div className={styles.header}>
         <Link to="/" className={styles.logo}>
-          <span className="text-gray-900">54<span className="font-extrabold">Devs</span></span>
+          <span className="text-white font-mono">&lt;/&gt; 54<span className="font-extrabold text-[#C9F06A]">Devs</span></span>
         </Link>
         <div className={styles.stepIndicatorWrapper}>
           <div className={styles.stepIndicatorBars}>
@@ -41,7 +41,7 @@ export default function OnboardingProfile() {
             <div className={styles.stepBarActive} />
             <div className={styles.stepBarInactive} />
           </div>
-          <span className={styles.stepLabel}>Étape 2 sur 3</span>
+          <span className={styles.stepLabel}>Ã‰tape 2 sur 3</span>
         </div>
       </div>
 
@@ -49,7 +49,7 @@ export default function OnboardingProfile() {
       <div className={styles.content}>
         <h1 className={styles.title}>Présentez-vous</h1>
         <p className={styles.subtitle}>
-          Dites-nous d’où vous venez et ce que vous aimeriez apporter à la communauté.
+          Dites-nous dâ€™où vous venez et ce que vous aimeriez apporter à la communauté.
         </p>
 
         <form onSubmit={handleNext} className="space-y-8">
@@ -75,12 +75,12 @@ export default function OnboardingProfile() {
                 </div>
               )}
               <span className={styles.photoEditBadge}>
-                <Pencil size={12} className="text-white" />
+                <Pencil size={12} className="text-black" />
               </span>
             </button>
             <div>
-              <div className="text-sm font-bold text-gray-900">Photo de profil</div>
-              <p className="text-xs text-gray-500 mb-1">Ajoutez une photo pour aider la communauté à vous reconnaître.</p>
+              <div className="text-sm font-bold text-white">Photo de profil</div>
+              <p className="text-xs text-white/50 mb-1">Ajoutez une photo pour aider la communauté à vous reconnaître.</p>
               <button type="button" onClick={() => fileInputRef.current?.click()} className={styles.helpLink}>
                 Choisir une photo
               </button>
@@ -109,12 +109,12 @@ export default function OnboardingProfile() {
                 <option value="Maroc">Maroc</option>
                 <option value="Tunisie">Tunisie</option>
                 <option value="Algérie">Algérie</option>
-                <option value="Égypte">Égypte</option>
+                <option value="Ã‰gypte">Ã‰gypte</option>
                 <option value="Nigeria">Nigeria</option>
                 <option value="Ghana">Ghana</option>
                 <option value="Kenya">Kenya</option>
                 <option value="Rwanda">Rwanda</option>
-                <option value="Éthiopie">Éthiopie</option>
+                <option value="Ã‰thiopie">Ã‰thiopie</option>
                 <option value="Tanzanie">Tanzanie</option>
                 <option value="Afrique du Sud">Afrique du Sud</option>
                 <option value="RDC">RDC</option>
@@ -128,7 +128,7 @@ export default function OnboardingProfile() {
                 <option value="Tchad">Tchad</option>
                 <option value="Autre">Autre</option>
               </select>
-              <p className="text-[10px] text-gray-400 mt-1">La communauté est ouverte à tous les pays et à tous les parcours.</p>
+              <p className="text-[10px] text-white/40 mt-1">La communauté est ouverte à tous les pays et à tous les parcours.</p>
             </div>
             <div className="flex-1">
               <label className={styles.sectionLabel}>
@@ -176,7 +176,7 @@ export default function OnboardingProfile() {
             <textarea
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              placeholder="Présentez votre parcours, vos idées ou ce que vous aimeriez apprendre…"
+              placeholder="Présentez votre parcours, vos idées ou ce que vous aimeriez apprendreâ€¦"
               maxLength={250}
               rows={4}
               className={styles.bioTextarea}
@@ -197,13 +197,13 @@ export default function OnboardingProfile() {
               type="submit"
               className={styles.nextButton}
             >
-              Suivant : compétences et expérience →
+              Suivant : compétences et expérience â†’
             </button>
           </div>
         </form>
 
         <p className={styles.helpText}>
-          Besoin d’aide ? Consultez les informations de votre profil ou réessayez plus tard.
+          Besoin dâ€™aide ? Consultez les informations de votre profil ou réessayez plus tard.
         </p>
       </div>
     </div>

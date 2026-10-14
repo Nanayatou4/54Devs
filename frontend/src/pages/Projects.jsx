@@ -1,33 +1,51 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { Plus, Search, FolderOpen, AlertCircle, ChevronLeft, ChevronRight, MapPin, Users, X, Code2, ArrowRight } from 'lucide-react'
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
+import {
+  Plus,
+  Search,
+  AlertCircle,
+  ChevronLeft,
+  ChevronRight,
+  MapPin,
+  Users,
+  X,
+  ArrowRight,
+  Share2,
+  Rocket,
+  Sparkles,
+  Layers,
+  HeartHandshake,
+  CheckCircle2,
+} from 'lucide-react'
 import { projetsApi, competencesApi } from '../api'
-import { styles } from './Projects.styles'
-import { STATUT_OPTIONS, STATUT_LABELS, STATUT_COLORS } from './Projects.data'
+import { getProjectImage, getAvatarForIndex } from '../lib/projectImages'
 
-const TAILLE = 10
+const TAILLE = 9
 const DEBOUNCE_MS = 300
+
+const INITIATIVE_PRESETS = [
+  { label: 'Toutes les initiatives', value: '' },
+  { label: 'Open Source', value: 'Open Source' },
+  { label: 'Recherche de coéquipier', value: 'Co-founder' },
+  { label: 'Startup Lab', value: 'Startup Lab' },
+  { label: 'Impact Social', value: 'Social Impact' },
+]
 
 export default function Projects() {
   const [searchParams, setSearchParams] = useSearchParams()
 
-  /* --- Derive filter values from URL --- */
+  /* --- URL filters --- */
   const texte = searchParams.get('texte') || ''
   const statut = searchParams.get('statut') || ''
   const competenceId = searchParams.get('competenceId') || ''
   const categorie = searchParams.get('categorie') || ''
   const technologie = searchParams.get('technologie') || ''
+  const initiative = searchParams.get('initiative') || ''
   const page = parseInt(searchParams.get('page') || '0', 10)
 
-  /* --- Local state for debounced text inputs --- */
+  /* --- Local inputs --- */
   const [texteInput, setTexteInput] = useState(texte)
-  const [categorieInput, setCategorieInput] = useState(categorie)
-  const [technologieInput, setTechnologieInput] = useState(technologie)
   const debounceTexte = useRef(null)
-  const debounceCategorie = useRef(null)
-  const debounceTechnologie = useRef(null)
 
   /* --- API data --- */
   const [result, setResult] = useState(null)
@@ -35,409 +53,491 @@ export default function Projects() {
   const [error, setError] = useState(null)
   const [competences, setCompetences] = useState([])
 
-  /* --- Load competences catalogue once --- */
   useEffect(() => {
-    competencesApi.lister().then(data => {
-      if (Array.isArray(data)) setCompetences(data)
-    }).catch(() => {})
+    competencesApi
+      .lister()
+      .then((data) => {
+        if (Array.isArray(data)) setCompetences(data)
+      })
+      .catch(() => {})
   }, [])
 
-  /* --- Sync local inputs when URL changes externally (back/forward) --- */
-  useEffect(() => { setTexteInput(texte) }, [texte])
-  useEffect(() => { setCategorieInput(categorie) }, [categorie])
-  useEffect(() => { setTechnologieInput(technologie) }, [technologie])
+  useEffect(() => {
+    setTexteInput(texte)
+  }, [texte])
 
-  /* --- Helper: update search params --- */
-  const updateParams = useCallback((updates, resetPage = true) => {
-    setSearchParams(prev => {
-      const next = new URLSearchParams(prev)
-      for (const [key, value] of Object.entries(updates)) {
-        if (value) {
-          next.set(key, value)
-        } else {
-          next.delete(key)
+  const updateParams = useCallback(
+    (updates, resetPage = true) => {
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev)
+        for (const [key, value] of Object.entries(updates)) {
+          if (value) {
+            next.set(key, value)
+          } else {
+            next.delete(key)
+          }
         }
-      }
-      if (resetPage) {
-        next.delete('page')
-      }
-      return next
-    })
-  }, [setSearchParams])
+        if (resetPage) {
+          next.delete('page')
+        }
+        return next
+      })
+    },
+    [setSearchParams]
+  )
 
-  /* --- Debounce: texte --- */
   useEffect(() => {
     if (debounceTexte.current) clearTimeout(debounceTexte.current)
     debounceTexte.current = setTimeout(() => {
       if (texteInput !== texte) updateParams({ texte: texteInput })
     }, DEBOUNCE_MS)
     return () => clearTimeout(debounceTexte.current)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [texteInput])
+  }, [texteInput, texte, updateParams])
 
-  /* --- Debounce: categorie --- */
-  useEffect(() => {
-    if (debounceCategorie.current) clearTimeout(debounceCategorie.current)
-    debounceCategorie.current = setTimeout(() => {
-      if (categorieInput !== categorie) updateParams({ categorie: categorieInput })
-    }, DEBOUNCE_MS)
-    return () => clearTimeout(debounceCategorie.current)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [categorieInput])
-
-  /* --- Debounce: technologie --- */
-  useEffect(() => {
-    if (debounceTechnologie.current) clearTimeout(debounceTechnologie.current)
-    debounceTechnologie.current = setTimeout(() => {
-      if (technologieInput !== technologie) updateParams({ technologie: technologieInput })
-    }, DEBOUNCE_MS)
-    return () => clearTimeout(debounceTechnologie.current)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [technologieInput])
-
-  /* --- Fetch projects when URL params change --- */
   useEffect(() => {
     let cancelled = false
     setLoading(true)
     setError(null)
 
+    // Merge initiative into texte or category search if selected
+    const queryTexte = [texte, initiative].filter(Boolean).join(' ')
+
     projetsApi
-      .rechercher({ texte, statut, competenceId, categorie, technologie, page, taille: TAILLE })
-      .then(data => {
+      .rechercher({
+        texte: queryTexte || undefined,
+        statut: statut || undefined,
+        competenceId: competenceId || undefined,
+        categorie: categorie || undefined,
+        technologie: technologie || undefined,
+        page,
+        taille: TAILLE,
+      })
+      .then((data) => {
         if (!cancelled) setResult(data)
       })
-      .catch(err => {
-        if (!cancelled) setError(err.message || 'Une erreur est survenue.')
+      .catch((err) => {
+        if (!cancelled) setError(err.message || 'Impossible de charger les projets.')
       })
       .finally(() => {
         if (!cancelled) setLoading(false)
       })
 
-    return () => { cancelled = true }
-  }, [texte, statut, competenceId, categorie, technologie, page])
-
-  /* --- Has any filter active? --- */
-  const hasFilters = !!(texte || statut || competenceId || categorie || technologie)
-
-  const clearFilters = () => {
-    setTexteInput('')
-    setCategorieInput('')
-    setTechnologieInput('')
-    setSearchParams({})
-  }
-
-  const goToPage = (p) => {
-    updateParams({ page: p === 0 ? '' : String(p) }, false)
-  }
+    return () => {
+      cancelled = true
+    }
+  }, [texte, statut, competenceId, categorie, technologie, initiative, page])
 
   const projets = result?.contenu || []
   const totalPages = result?.totalPages || 0
 
-  return (
-    <div className={styles.page}>
-      <Navbar />
+  function goToPage(p) {
+    updateParams({ page: String(p) }, false)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
-      <div className={styles.inner}>
-        {/* Header */}
-        <div className={styles.header}>
-          <div className={styles.headerLeft}>
-            <h1 className={styles.title}>Trouvez votre prochain projet</h1>
-            <p className={styles.subtitle}>
-              Parcourez les idées de la communauté et rejoignez une équipe qui vous correspond.
+  function clearFilters() {
+    setTexteInput('')
+    setSearchParams({})
+  }
+
+  const hasFilters = Boolean(texte || statut || competenceId || categorie || technologie || initiative)
+
+  return (
+    <div className="min-h-screen bg-[#101915] text-white pb-20 font-body">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        {/* ========================================================================= */}
+        {/* HERO HEADER: "Build the Next Continental Unicorn"                         */}
+        {/* ========================================================================= */}
+        <header className="mb-10 flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-8 border-b border-white/10">
+          <div className="max-w-2xl">
+            <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#C9F06A] font-mono">
+              // ÉCOSYSTÈME DE PROJETS 54DEVS
+            </span>
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight font-display mt-2 leading-[1.1]">
+              Build the Next{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#C9F06A] via-[#D8F87C] to-[#C9F06A] italic font-serif">
+                Continental Unicorn
+              </span>
+            </h1>
+            <p className="text-white/60 text-sm sm:text-base mt-3 leading-relaxed">
+              Collaborez sur des initiatives open-source, rejoignez des startups en phase d'accélération ou trouvez vos associés à travers 54 pays.
             </p>
           </div>
-          <div className={styles.headerActions}>
-            <Link to="/dashboard" className={styles.myProjectsLink}>
-              <FolderOpen size={16} /> Mes projets
+
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
+            <Link
+              to="/projects/create"
+              className="inline-flex items-center gap-2 rounded-full bg-[#C9F06A] hover:bg-[#D8F87C] text-black px-6 py-3.5 text-xs font-bold uppercase tracking-wider transition shadow-lg shadow-[#C9F06A]/20 hover:-translate-y-0.5"
+            >
+              <Plus size={16} />
+              <span>Publier un projet</span>
             </Link>
-            <Link to="/projects/create" className={styles.publishButton}>
-              <Plus size={16} /> Publier un projet
-            </Link>
+            <a
+              href="#startup-lab"
+              className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 hover:border-[#C9F06A]/50 hover:bg-white/10 text-white px-6 py-3.5 text-xs font-semibold uppercase tracking-wider transition"
+            >
+              <Rocket size={15} className="text-[#C9F06A]" />
+              <span>Startup Lab</span>
+            </a>
           </div>
+        </header>
+
+        {/* ========================================================================= */}
+        {/* INITIATIVE FILTER CHIPS (Matching Capture)                                */}
+        {/* ========================================================================= */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-8 scrollbar-none">
+          {INITIATIVE_PRESETS.map((item) => {
+            const active = (initiative === item.value) || (!initiative && !item.value)
+            return (
+              <button
+                key={item.label}
+                onClick={() => updateParams({ initiative: item.value })}
+                className={`px-5 py-2.5 rounded-full text-xs font-bold tracking-wide whitespace-nowrap transition-all ${
+                  active
+                    ? 'bg-[#C9F06A] text-black shadow-md shadow-[#C9F06A]/20'
+                    : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
+                }`}
+              >
+                {item.label}
+              </button>
+            )
+          })}
         </div>
 
-        {/* Search & Filters */}
-        <section className={styles.filtersSection} aria-label="Recherche et filtres des projets">
-          <div className={styles.searchRow}>
-            <div className={styles.searchWrap}>
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Rechercher un projet, une idée, une technologie..."
-                value={texteInput}
-                onChange={e => setTexteInput(e.target.value)}
-                className={styles.searchInput}
-              />
-              {texteInput && <button type="button" onClick={() => setTexteInput('')} className={styles.clearSearch} aria-label="Effacer la recherche"><X size={16} /></button>}
-            </div>
-          </div>
-          <div className={styles.statusChips} aria-label="Filtrer par statut">
-            {STATUT_OPTIONS.map(o => (
-              <button
-                key={o.value || 'all'}
-                type="button"
-                aria-pressed={statut === o.value}
-                onClick={() => updateParams({ statut: o.value })}
-                className={`${styles.statusChip} ${statut === o.value ? styles.statusChipActive : styles.statusChipInactive}`}
-              >
-                {o.value ? STATUT_LABELS[o.value] || o.label : 'Tous les projets'}
-              </button>
-            ))}
-          </div>
-          <div className={styles.filtersDivider}>
-          <div className={styles.filtersGrid}>
-            <div>
-              <label className={styles.filterLabel}>Compétence recherchée</label>
-              <select
-                value={competenceId}
-                onChange={e => updateParams({ competenceId: e.target.value })}
-                className={styles.filterSelect}
-              >
-                <option value="">Toutes</option>
-                {competences.map(c => (
-                  <option key={c.id} value={c.id}>{c.nom}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className={styles.filterLabel}>Catégorie</label>
-              <input
-                type="text"
-                placeholder="Ex : Agriculture, Fintech..."
-                value={categorieInput}
-                onChange={e => setCategorieInput(e.target.value)}
-                className={styles.filterInput}
-              />
-            </div>
-            <div>
-              <label className={styles.filterLabel}>Technologie</label>
-              <input
-                type="text"
-                placeholder="Ex : React, Spring Boot..."
-                value={technologieInput}
-                onChange={e => setTechnologieInput(e.target.value)}
-                className={styles.filterInput}
-              />
-            </div>
-          </div>
-          </div>
-        </section>
+        {/* Search Bar */}
+        <div className="relative mb-8">
+          <Search
+            size={18}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none"
+          />
+          <input
+            type="text"
+            placeholder="Rechercher un projet, une technologie (React, Spring, Python...), un mot-clé..."
+            value={texteInput}
+            onChange={(e) => setTexteInput(e.target.value)}
+            className="w-full pl-11 pr-11 py-3.5 border border-white/10 bg-[#16221C] rounded-2xl text-sm text-white placeholder-white/40 focus:outline-none focus:border-[#C9F06A] transition shadow-inner"
+          />
+          {texteInput && (
+            <button
+              onClick={() => setTexteInput('')}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white"
+            >
+              <X size={16} />
+            </button>
+          )}
+        </div>
 
-        {!loading && !error && projets.length > 0 && (
-          <div className={styles.resultsHeader}>
-            <div>
-              <h2 className={styles.resultsTitle}>Projets de la communauté</h2>
-              <p className={styles.resultsMeta}>{result?.totalElements ?? projets.length} projet{(result?.totalElements ?? projets.length) === 1 ? '' : 's'} trouvé{(result?.totalElements ?? projets.length) === 1 ? '' : 's'}</p>
-            </div>
-            {hasFilters && <button onClick={clearFilters} className={styles.clearFiltersLink}><X size={14} /> Effacer les filtres</button>}
+        {/* Results Header */}
+        {!loading && !error && (
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-base font-bold text-white font-display">
+              Projets disponibles ({result?.totalElements ?? projets.length})
+            </h2>
+            {hasFilters && (
+              <button
+                onClick={clearFilters}
+                className="inline-flex items-center gap-1 text-xs text-[#C9F06A] hover:underline font-semibold"
+              >
+                <X size={13} /> Réinitialiser les filtres
+              </button>
+            )}
           </div>
         )}
 
-        {/* Loading state: skeleton cards */}
-        {loading && (
-          <div className={styles.skeletonGrid}>
+        {/* ========================================================================= */}
+        {/* PROJECTS GRID: CARDS WITH IMAGES & "START SOMETHING NEW" CARD            */}
+        {/* ========================================================================= */}
+        {loading ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className={styles.skeletonCard}>
-                <div className={styles.skeletonLine} />
-                <div className={styles.skeletonLineShort} />
-                <div className={styles.skeletonLine} />
-                <div className={styles.skeletonLineXs} />
+              <div
+                key={i}
+                className="rounded-3xl border border-white/10 bg-[#16221C] p-6 h-80 animate-pulse flex flex-col justify-between"
+              >
+                <div className="h-40 bg-white/5 rounded-2xl" />
+                <div className="space-y-2">
+                  <div className="h-4 bg-white/10 rounded w-3/4" />
+                  <div className="h-3 bg-white/10 rounded w-1/2" />
+                </div>
               </div>
             ))}
           </div>
+        ) : error ? (
+          <div className="rounded-3xl border border-red-500/30 bg-red-500/10 p-8 text-center text-red-300">
+            <AlertCircle size={32} className="mx-auto mb-2 text-red-400" />
+            <p className="font-bold">{error}</p>
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {projets.map((p) => {
+              const creatorAvatar =
+                p.createur?.avatarUrl || getAvatarForIndex(p.id)
+              const member2Avatar = getAvatarForIndex(p.id + 1)
+              const imageUrl = getProjectImage(p)
+
+              return (
+                <div
+                  key={p.id}
+                  className="rounded-3xl border border-white/10 bg-[#16221C] hover:border-[#C9F06A]/40 transition-all duration-300 overflow-hidden flex flex-col group shadow-xl hover:shadow-2xl hover:shadow-[#C9F06A]/10"
+                >
+                  {/* Project Cover Image */}
+                  <Link
+                    to={`/projects/${p.id}`}
+                    className="relative h-48 w-full overflow-hidden block bg-black/40"
+                  >
+                    <img
+                      src={imageUrl}
+                      alt={p.nom}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#16221C] via-transparent to-black/40" />
+
+                    {/* Top Badges */}
+                    <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2">
+                      <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-black/75 text-[#C9F06A] border border-[#C9F06A]/30 backdrop-blur-md">
+                        {p.categorie || 'INITIATIVE'}
+                      </span>
+                      <span
+                        className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase backdrop-blur-md border ${
+                          p.ouvertAuxDemandes
+                            ? 'bg-emerald-500/25 border-emerald-500/40 text-emerald-300'
+                            : 'bg-white/10 border-white/20 text-white/60'
+                        }`}
+                      >
+                        {p.placesRestantes > 0
+                          ? `${p.placesRestantes} PLACES DISPO`
+                          : 'COMPLET'}
+                      </span>
+                    </div>
+                  </Link>
+
+                  {/* Card Body */}
+                  <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between">
+                    <div>
+                      <Link to={`/projects/${p.id}`}>
+                        <h3 className="font-bold text-white text-lg font-display group-hover:text-[#C9F06A] transition line-clamp-1">
+                          {p.nom}
+                        </h3>
+                      </Link>
+                      <p className="text-white/60 text-xs sm:text-sm mt-2 line-clamp-2 leading-relaxed font-body">
+                        {p.description}
+                      </p>
+
+                      {/* Tech stack pills */}
+                      {p.technologies && (
+                        <div className="flex flex-wrap gap-1.5 mt-3">
+                          {p.technologies
+                            .split(',')
+                            .slice(0, 3)
+                            .map((t) => (
+                              <span
+                                key={t}
+                                className="text-[10px] font-mono px-2 py-0.5 rounded-lg bg-white/5 border border-white/10 text-white/70"
+                              >
+                                {t.trim()}
+                              </span>
+                            ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Card Footer: Collaborator Avatars & Action */}
+                    <div className="mt-5 pt-4 border-t border-white/10">
+                      <div className="flex items-center justify-between gap-2 mb-4">
+                        {/* Overlapping profile avatars */}
+                        <div className="flex items-center gap-2">
+                          <div className="flex -space-x-2 overflow-hidden">
+                            <img
+                              src={creatorAvatar}
+                              alt="Créateur"
+                              className="inline-block h-6 w-6 rounded-full ring-2 ring-[#16221C] object-cover"
+                            />
+                            <img
+                              src={member2Avatar}
+                              alt="Collaborateur"
+                              className="inline-block h-6 w-6 rounded-full ring-2 ring-[#16221C] object-cover"
+                            />
+                          </div>
+                          <span className="text-xs text-white/50 truncate max-w-[140px]">
+                            {p.nombreMembres > 1
+                              ? `${p.nombreMembres} membres actifs`
+                              : `Par ${p.createur?.pseudo || p.createur?.prenom || 'Membre 54Devs'}`}
+                          </span>
+                        </div>
+
+                        {p.createur?.pays && (
+                          <span className="text-[11px] text-white/40 flex items-center gap-1 font-mono shrink-0">
+                            <MapPin size={11} className="text-[#C9F06A]" />
+                            {p.createur.pays}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <Link
+                          to={`/projects/${p.id}`}
+                          className="flex-1 text-center py-2.5 px-4 rounded-xl bg-[#C9F06A] text-black font-bold text-xs uppercase tracking-wider hover:bg-[#D8F87C] transition shadow-md shadow-[#C9F06A]/15"
+                        >
+                          {p.ouvertAuxDemandes ? 'Postuler / Rejoindre' : 'Voir le projet'}
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const url = window.location.origin + `/projects/${p.id}`
+                            if (navigator.share) {
+                              navigator.share({ title: p.nom, text: p.description, url })
+                            } else {
+                              navigator.clipboard?.writeText(url)
+                              alert('Lien copié dans le presse-papier !')
+                            }
+                          }}
+                          title="Partager ce projet"
+                          className="p-2.5 rounded-xl border border-white/10 hover:border-white/20 bg-white/5 text-white/70 hover:text-white transition shrink-0"
+                        >
+                          <Share2 size={15} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+
+            {/* "Start Something New" Card (Matching Capture) */}
+            <Link
+              to="/projects/create"
+              className="rounded-3xl border-2 border-dashed border-white/20 hover:border-[#C9F06A] bg-white/[0.02] hover:bg-white/[0.05] p-8 flex flex-col items-center justify-center text-center group transition min-h-[380px] shadow-lg"
+            >
+              <div className="w-14 h-14 rounded-full bg-white/10 group-hover:bg-[#C9F06A] group-hover:text-black flex items-center justify-center text-[#C9F06A] mb-4 transition shadow-lg">
+                <Plus size={26} />
+              </div>
+              <h3 className="font-bold text-white text-xl font-display group-hover:text-[#C9F06A] transition">
+                Start Something New
+              </h3>
+              <p className="text-xs text-white/50 mt-2 max-w-xs leading-relaxed font-body">
+                Vous avez une idée qui peut transformer le continent ? Partagez-la avec les bâtisseurs de 54Devs et trouvez vos coéquipiers.
+              </p>
+              <span className="mt-6 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#C9F06A] group-hover:translate-x-1 transition-transform">
+                Publier mon projet <ArrowRight size={14} />
+              </span>
+            </Link>
+          </div>
         )}
 
-        {/* Error state */}
-        {!loading && error && (
-          <div className={styles.errorState}>
-            <div className={styles.errorIconWrapper}>
-              <AlertCircle size={32} className="text-red-500" />
-            </div>
-            <h2 className={styles.errorTitle}>Erreur de chargement</h2>
-            <p className={styles.errorText}>{error}</p>
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 mt-12">
             <button
-              onClick={() => {
-                setError(null)
-                setLoading(true)
-                projetsApi
-                  .rechercher({ texte, statut, competenceId, categorie, technologie, page, taille: TAILLE })
-                  .then(setResult)
-                  .catch(err => setError(err.message || 'Une erreur est survenue.'))
-                  .finally(() => setLoading(false))
-              }}
-              className={styles.retryButton}
+              onClick={() => goToPage(page - 1)}
+              disabled={page === 0}
+              className="p-2 rounded-xl border border-white/10 bg-white/5 text-white/70 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
             >
-              Réessayer
+              <ChevronLeft size={16} />
+            </button>
+            {Array.from({ length: totalPages }).map((_, i) => (
+              <button
+                key={i}
+                onClick={() => goToPage(i)}
+                className={`w-9 h-9 rounded-xl text-xs font-bold transition ${
+                  page === i
+                    ? 'bg-[#C9F06A] text-black font-extrabold shadow-md shadow-[#C9F06A]/20'
+                    : 'bg-white/5 border border-white/10 text-white/70 hover:text-white'
+                }`}
+              >
+                {i + 1}
+              </button>
+            ))}
+            <button
+              onClick={() => goToPage(page + 1)}
+              disabled={page >= totalPages - 1}
+              className="p-2 rounded-xl border border-white/10 bg-white/5 text-white/70 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              <ChevronRight size={16} />
             </button>
           </div>
         )}
 
-        {/* Empty state */}
-        {!loading && !error && projets.length === 0 && (
-          <div className={styles.emptyState}>
-            <div className={styles.emptyIconWrapper}>
-              <Search size={32} className="text-primary" />
-            </div>
-            {hasFilters ? (
-              <>
-                <h2 className={styles.emptyTitle}>Aucun projet ne correspond à votre recherche.</h2>
-                <p className={styles.emptyText}>
-                  Essayez de modifier vos filtres ou d'élargir votre recherche.
-                </p>
-                <button onClick={clearFilters} className={styles.clearFiltersButton}>
-                  <X size={16} /> Effacer les filtres
-                </button>
-              </>
-            ) : (
-              <>
-                <h2 className={styles.emptyTitle}>Soyez le premier à publier un projet</h2>
-                <p className={styles.emptyText}>
-                  Aucun projet n'a encore été publié. Lancez-vous !
-                </p>
-                <Link to="/projects/create" className={styles.emptyCreateButton}>
-                  <Plus size={16} /> Publier un projet
-                </Link>
-              </>
-            )}
-          </div>
-        )}
-
-        {/* Project cards */}
-        {!loading && !error && projets.length > 0 && (
-          <>
-            <div className={styles.projectsGrid}>
-              {projets.map(p => (
-                <Link key={p.id} to={`/projects/${p.id}`} className={styles.projectCard}>
-                  <div className={styles.cardBody}>
-                    <div className={styles.cardTop}>
-                      <div className={styles.projectIcon}><Code2 size={22} /></div>
-                      <CardBadge project={p} />
-                    </div>
-                    <h3 className={styles.cardTitle}>{p.nom}</h3>
-                    {p.categorie && <p className={styles.cardCategory}>{p.categorie}</p>}
-                    <p className={styles.cardDescription}>{p.description}</p>
-
-                    {p.technologies && (
-                      <div className={styles.cardTech}>
-                        {p.technologies.split(',').map(technology => technology.trim()).filter(Boolean).slice(0, 4).map(technology => (
-                          <span key={technology} className={styles.cardTechPill}>{technology}</span>
-                        ))}
-                      </div>
-                    )}
-
-                    {p.competencesRecherchees?.length > 0 && (
-                      <div className={styles.cardSkills}>
-                        {p.competencesRecherchees.map(skill => (
-                          <span key={skill} className={styles.cardSkillPill}>{skill}</span>
-                        ))}
-                      </div>
-                    )}
-
-                    <div className={styles.cardFooter}>
-                      <div className={styles.cardMeta}>
-                        <span className={styles.cardCreator}>
-                          <Users size={13} />
-                          <span className="truncate">{p.createur?.prenom || p.createur?.pseudo || 'Membre 54Devs'}</span>
-                          {p.createur?.pays && <><MapPin size={12} className="shrink-0" />{p.createur.pays}</>}
-                        </span>
-                        <span className="inline-flex items-center gap-1 shrink-0"><Users size={12} />{p.nombreMembres}</span>
-                      </div>
-                      <div className="flex items-center justify-between gap-3">
-                        <span className={styles.cardPlaces}>
-                          {p.placesRestantes > 0 ? `${p.placesRestantes} place${p.placesRestantes === 1 ? '' : 's'} restante${p.placesRestantes === 1 ? '' : 's'}` : 'Aucune place restante'}
-                        </span>
-                        <span className="inline-flex items-center gap-1 text-primary text-xs font-semibold group-hover:gap-2 transition-all">Voir le projet <ArrowRight size={14} /></span>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <Pagination page={page} totalPages={totalPages} goToPage={goToPage} />
-            )}
-          </>
-        )}
-      </div>
-
-      <Footer />
-    </div>
-  )
-}
-
-/* --- Card badge (status or closed) --- */
-function CardBadge({ project: p }) {
-  return (
-    <div className={styles.badgeGroup}>
-      <span className={`${styles.cardStatus} ${STATUT_COLORS[p.statut] || 'bg-slate-100 text-slate-600'}`}>
-        {STATUT_LABELS[p.statut] || p.statut}
-      </span>
-      {p.statut !== 'TERMINE' && (
-        <span className={p.ouvertAuxDemandes ? styles.cardOpen : styles.cardBadgeClosed}>
-          {p.ouvertAuxDemandes ? 'Ouvert' : p.placesRestantes === 0 ? 'Complet' : 'Fermé'}
-        </span>
-      )}
-    </div>
-  )
-}
-
-/* --- Pagination component --- */
-function Pagination({ page, totalPages, goToPage }) {
-  const pages = []
-  const maxVisible = 5
-  let start = Math.max(0, page - Math.floor(maxVisible / 2))
-  let end = Math.min(totalPages, start + maxVisible)
-  if (end - start < maxVisible) {
-    start = Math.max(0, end - maxVisible)
-  }
-
-  for (let i = start; i < end; i++) {
-    pages.push(i)
-  }
-
-  return (
-    <div className={styles.pagination}>
-      <button
-        onClick={() => goToPage(page - 1)}
-        disabled={page === 0}
-        className={`${styles.pageButton} ${page === 0 ? styles.pageButtonDisabled : styles.pageButtonInactive}`}
-      >
-        <ChevronLeft size={16} />
-      </button>
-
-      {start > 0 && (
-        <>
-          <button onClick={() => goToPage(0)} className={`${styles.pageButton} ${styles.pageButtonInactive}`}>1</button>
-          {start > 1 && <span className="text-gray-400 px-1">...</span>}
-        </>
-      )}
-
-      {pages.map(i => (
-        <button
-          key={i}
-          onClick={() => goToPage(i)}
-          className={`${styles.pageButton} ${i === page ? styles.pageButtonActive : styles.pageButtonInactive}`}
+        {/* ========================================================================= */}
+        {/* 54DEVS STARTUP LAB BANNER (Matching bottom of capture)                     */}
+        {/* ========================================================================= */}
+        <section
+          id="startup-lab"
+          className="mt-20 rounded-[32px] border border-white/10 bg-gradient-to-br from-[#121A15] via-[#16221C] to-[#0E1511] p-8 sm:p-12 shadow-2xl relative overflow-hidden"
         >
-          {i + 1}
-        </button>
-      ))}
+          <div className="absolute top-0 right-0 w-80 h-80 rounded-full bg-[#C9F06A]/10 blur-[120px] pointer-events-none" />
 
-      {end < totalPages && (
-        <>
-          {end < totalPages - 1 && <span className="text-gray-400 px-1">...</span>}
-          <button onClick={() => goToPage(totalPages - 1)} className={`${styles.pageButton} ${styles.pageButtonInactive}`}>{totalPages}</button>
-        </>
-      )}
+          <div className="grid lg:grid-cols-12 gap-8 items-center relative z-10">
+            <div className="lg:col-span-7">
+              <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#C9F06A] font-mono">
+                // ACCÉLÉRATEUR PANAFRICAIN
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-white font-display mt-2">
+                54Devs Startup Lab
+              </h2>
+              <p className="text-white/70 text-sm sm:text-base mt-3 leading-relaxed max-w-xl font-body">
+                Un programme d'accélération intensif de 12 semaines pour transformer vos prototypes open-source et idées en startups viables à fort impact panafricain.
+              </p>
 
-      <button
-        onClick={() => goToPage(page + 1)}
-        disabled={page >= totalPages - 1}
-        className={`${styles.pageButton} ${page >= totalPages - 1 ? styles.pageButtonDisabled : styles.pageButtonInactive}`}
-      >
-        <ChevronRight size={16} />
-      </button>
+              <div className="mt-6 space-y-2.5 text-xs sm:text-sm text-white/80">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 size={16} className="text-[#C9F06A] shrink-0" />
+                  <span>
+                    <strong>Accompagnement 0-to-1 :</strong> Mentorat par des fondateurs ayant levé plus de $10M+.
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 size={16} className="text-[#C9F06A] shrink-0" />
+                  <span>
+                    <strong>Équipe d'ingénieurs d'élite :</strong> Accès aux meilleurs talents et développeurs de la plateforme.
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-8 flex items-center gap-3">
+                <Link
+                  to="/projects/create"
+                  className="inline-flex items-center gap-2 rounded-full bg-[#C9F06A] text-black px-7 py-3.5 text-xs font-bold uppercase tracking-wider hover:bg-[#D8F87C] transition shadow-lg shadow-[#C9F06A]/20"
+                >
+                  <span>Postuler à la Cohorte 4</span>
+                  <ArrowRight size={14} />
+                </Link>
+              </div>
+            </div>
+
+            <div className="lg:col-span-5 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-center">
+                  <p className="text-2xl sm:text-3xl font-extrabold text-[#C9F06A] font-display">
+                    $2.4M
+                  </p>
+                  <p className="text-[10px] sm:text-xs text-white/50 uppercase tracking-wider mt-1">
+                    Fonds Mobilisés
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-center">
+                  <p className="text-2xl sm:text-3xl font-extrabold text-[#C9F06A] font-display">
+                    12
+                  </p>
+                  <p className="text-[10px] sm:text-xs text-white/50 uppercase tracking-wider mt-1">
+                    Startups Lancées
+                  </p>
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4 flex items-center gap-3">
+                <img
+                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+                  alt="Témoignage"
+                  className="w-10 h-10 rounded-full object-cover ring-2 ring-[#C9F06A]/40 shrink-0"
+                />
+                <p className="text-xs text-white/70 italic leading-snug">
+                  « Le Startup Lab 54Devs nous a apporté la crédibilité technique pour boucler notre tour d'amorçage en 4 semaines. »
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
   )
 }

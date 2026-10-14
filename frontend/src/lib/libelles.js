@@ -28,3 +28,21 @@ export const ROLE_MEMBRE = {
   CREATEUR: 'Créateur',
   MEMBRE: 'Membre',
 }
+
+export const STATUT_MENTORAT = {
+  EN_ATTENTE: 'En attente',
+  ACCEPTE: 'En cours',
+  REFUSE: 'Refusé',
+  TERMINE: 'Terminé',
+}
+
+export const ROLE_MENTORAT = {
+  MENTOR: 'Mentor',
+  MENTORE: 'Mentoré',
+}
+
+export const STATUT_SEANCE = {
+  PLANIFIEE: 'Planifiée',
+  REALISEE: 'Réalisée',
+  ANNULEE: 'Annulée',
+}

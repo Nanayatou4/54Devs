@@ -39,6 +39,9 @@ public class Projet {
     @Column(length = 255)
     private String technologies;
 
+    @Column(length = 500)
+    private String imageUrl;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private StatutProjet statut = StatutProjet.IDEE;

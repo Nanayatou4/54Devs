@@ -5,6 +5,6 @@ import com.cadev.backend.enumeration.StatutProjet;
 import java.util.List;
 
 public record ProjetResumeDto(
-        Long id, String nom, String description, String categorie, String technologies,
+        Long id, String nom, String description, String categorie, String technologies, String imageUrl,
         StatutProjet statut, int placesRestantes, boolean ouvertAuxDemandes, int nombreMembres,
         UtilisateurResumeDto createur, List<String> competencesRecherchees) {}

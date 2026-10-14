@@ -121,6 +121,7 @@ public class ProjetService {
         p.setSolution(req.solution());
         p.setCategorie(req.categorie() == null ? null : req.categorie().trim());
         p.setTechnologies(req.technologies());
+        p.setImageUrl(req.imageUrl());
         p.setStatut(req.statut());
         p.setNombrePlacesRecherchees(req.nombrePlacesRecherchees());
         p.setRolesRecherches(req.rolesRecherches());
@@ -169,7 +170,7 @@ public class ProjetService {
 
         return new ProjetDetailDto(
                 p.getId(), p.getNom(), p.getDescription(), p.getProbleme(), p.getSolution(),
-                p.getCategorie(), p.getTechnologies(), p.getStatut(),
+                p.getCategorie(), p.getTechnologies(), p.getImageUrl(), p.getStatut(),
                 p.getNombrePlacesRecherchees(), placesRestantes, estOuvertAuxDemandes(p, placesRestantes),
                 p.getRolesRecherches(), p.getConditionsEngagement(),p.getDateCreation(),
                 UtilisateurResumeDto.depuis(p.getCreateur()),

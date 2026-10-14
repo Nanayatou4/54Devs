@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, ArrowUpRight, Bell } from 'lucide-react'
 import { styles } from './Navbar.styles'
 import { NAV_LINKS } from './Navbar.data'
 
@@ -26,83 +26,203 @@ export default function Navbar() {
   const photo = localStorage.getItem('profile_photo')
 
   function isActive(path) {
-    return location.pathname.startsWith(path)
+    return location.pathname === path
   }
 
   return (
-    <nav className={styles.nav}>
-        <div className={styles.container}>
-          <Link to="/" className={styles.logo}>
-            <span className={styles.logoIcon}>&lt;/&gt;</span>{' '}
-            <span className="font-extrabold">54Devs</span>
-          </Link>
+    <>
+      {/* Top Banner */}
+      <div className={styles.announcement}>
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#C9F06A]/10 border border-[#C9F06A]/25 text-[#C9F06A] font-mono text-[10px] font-bold tracking-wider">
+          54 NATIONS
+        </span>
+        <span>L'écosystème technologique unifié des développeurs et mentors d'Afrique</span>
+      </div>
 
+      <nav className={styles.nav}>
+        <div className={styles.container}>
+          {/* Logo Brand */}
+          <div className={styles.logoGroup}>
+            <Link to="/" className={styles.logo}>
+              <div className={styles.logoIcon}>&lt;/&gt;</div>
+              <div className="flex flex-col">
+                <span className={styles.logoBrand}>
+                  54<span className="text-[#C9F06A]">DEVS</span>
+                </span>
+                <span className={styles.logoTagline}>Let's build Africa</span>
+              </div>
+            </Link>
+            <div className={styles.logoSubline}>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#C9F06A]" />
+              <span>54 NATIONS • DAKAR & PANAFRICAIN</span>
+            </div>
+          </div>
+
+          {/* Central Floating Capsule Navigation (Tech Micro-Beacon Dots) */}
           <div className={styles.desktopNav}>
-            {NAV_LINKS.map(l => {
-              const className = isActive(l.to) ? styles.linkActive : styles.linkInactive
+            {NAV_LINKS.map((l) => {
+              const active = isActive(l.to)
+              const linkClasses = `${styles.linkItem} ${active ? styles.linkActive : styles.linkInactive}`
+
+              const innerContent = (
+                <>
+                  <span className="relative flex h-1.5 w-1.5 items-center justify-center shrink-0">
+                    {active && (
+                      <span className="absolute inline-flex h-full w-full rounded-full bg-[#C9F06A] opacity-75 animate-ping" />
+                    )}
+                    <span
+                      className={`relative inline-flex h-1.5 w-1.5 rounded-full transition-all duration-200 ${
+                        active
+                          ? 'bg-[#C9F06A] shadow-[0_0_8px_#C9F06A]'
+                          : 'bg-white/25 group-hover:bg-[#C9F06A] group-hover:shadow-[0_0_6px_#C9F06A]'
+                      }`}
+                    />
+                  </span>
+                  <span>{l.label}</span>
+                </>
+              )
+
               return l.to.includes('#') ? (
-                <a key={l.to} href={l.to} className={className}>{l.label}</a>
+                <a key={l.to} href={l.to} className={linkClasses}>
+                  {innerContent}
+                </a>
               ) : (
-                <Link key={l.to} to={l.to} className={className}>{l.label}</Link>
+                <Link key={l.to} to={l.to} className={linkClasses}>
+                  {innerContent}
+                </Link>
               )
             })}
           </div>
 
+          {/* Right Action Buttons */}
           <div className={styles.desktopActions}>
             {utilisateur ? (
-              <>
-                <Link to="/profile">
-                  <div className={styles.avatarContainer}>
-                    {photo ? (
-                      <img src={photo} alt="" className={styles.avatarImg} />
-                    ) : initials}
+              <div className="flex items-center gap-3">
+                <Link
+                  to="/dashboard"
+                  title="Notifications"
+                  className="relative p-2 rounded-full text-white/70 hover:text-white hover:bg-white/5 transition"
+                >
+                  <Bell size={18} />
+                  <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#C9F06A]" />
+                </Link>
+                <Link to="/profile" title="Mon profil" className="group">
+                  <div className="w-9 h-9 rounded-full overflow-hidden ring-2 ring-[#C9F06A]/50 group-hover:ring-[#C9F06A] transition-all shadow-lg bg-[#16221C]">
+                    <img
+                      src={photo || utilisateur?.avatarUrl || `https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80`}
+                      alt="Avatar"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.onerror = null
+                        e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(initials || 'Dev')}&background=16221C&color=C9F06A&bold=true`
+                      }}
+                    />
                   </div>
                 </Link>
-              </>
+              </div>
             ) : (
-              <Link to="/register" className={styles.joinButton}>
-                Rejoindre la communauté
-              </Link>
+              <>
+                <Link to="/login" className={styles.darkPillButton}>
+                  Se connecter
+                </Link>
+                <Link to="/register" className={styles.orangePillButton}>
+                  <span>Rejoindre 54Devs</span>
+                  <ArrowUpRight size={15} className="stroke-[2.5]" />
+                </Link>
+              </>
             )}
           </div>
 
+          {/* Mobile Menu Trigger */}
           <button
             type="button"
-            aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'}
-            aria-expanded={open}
             className={styles.mobileMenuButton}
-            onClick={() => setOpen(!open)}
+            onClick={() => setOpen((prev) => !prev)}
+            aria-label="Menu principal"
           >
-            {open ? <X size={24} /> : <Menu size={24} />}
+            {open ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
 
+        {/* Mobile Dropdown */}
         {open && (
           <div className={styles.mobileMenu}>
-            {NAV_LINKS.map(l => {
-              const className = isActive(l.to) ? styles.mobileLinkActive : styles.mobileLinkInactive
+            {NAV_LINKS.map((l) => {
+              const active = isActive(l.to)
+              const linkClasses = active ? styles.mobileLinkActive : styles.mobileLinkInactive
+
+              const innerContent = (
+                <>
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                      active ? 'bg-[#C9F06A] shadow-[0_0_8px_#C9F06A]' : 'bg-white/30'
+                    }`}
+                  />
+                  <span>{l.label}</span>
+                </>
+              )
+
               return l.to.includes('#') ? (
-                <a key={l.to} href={l.to} onClick={() => setOpen(false)} className={className}>{l.label}</a>
+                <a
+                  key={l.to}
+                  href={l.to}
+                  onClick={() => setOpen(false)}
+                  className={linkClasses}
+                >
+                  {innerContent}
+                </a>
               ) : (
-                <Link key={l.to} to={l.to} onClick={() => setOpen(false)} className={className}>{l.label}</Link>
+                <Link
+                  key={l.to}
+                  to={l.to}
+                  onClick={() => setOpen(false)}
+                  className={linkClasses}
+                >
+                  {innerContent}
+                </Link>
               )
             })}
-            {utilisateur ? (
-              <Link to="/profile" onClick={() => setOpen(false)} className={styles.mobileAvatarRow}>
-                <div className={styles.mobileAvatarContainer}>
-                  {photo ? (
-                    <img src={photo} alt="" className={styles.avatarImg} />
-                  ) : initials}
-                </div>
-                <span className={styles.mobileUserName}>{utilisateur.prenom}</span>
-              </Link>
-            ) : (
-              <Link to="/register" onClick={() => setOpen(false)} className={styles.mobileJoinButton}>
-                Rejoindre la communauté
-              </Link>
-            )}
+
+            <div className="pt-3 border-t border-white/10 space-y-2">
+              {utilisateur ? (
+                <>
+                  <Link
+                    to="/dashboard"
+                    onClick={() => setOpen(false)}
+                    className="block py-2.5 text-center text-xs font-semibold text-white/80 hover:text-white"
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    to="/profile"
+                    onClick={() => setOpen(false)}
+                    className={styles.mobileJoinButton}
+                  >
+                    Mon profil
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    onClick={() => setOpen(false)}
+                    className="block py-2.5 text-center text-xs font-semibold text-white/80 hover:text-white"
+                  >
+                    Se connecter
+                  </Link>
+                  <Link
+                    to="/register"
+                    onClick={() => setOpen(false)}
+                    className={styles.mobileJoinButton}
+                  >
+                    Rejoindre 54Devs
+                  </Link>
+                </>
+              )}
+            </div>
           </div>
         )}
-    </nav>
+      </nav>
+    </>
   )
 }

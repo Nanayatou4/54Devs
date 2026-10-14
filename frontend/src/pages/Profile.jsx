@@ -4,8 +4,6 @@ import {
   MapPin, ArrowRight, Loader2, Award, CheckCircle2,
   Pencil, X, Save, Camera, ExternalLink, Link2, Globe,
 } from 'lucide-react'
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
 import {
   clearAuthSession,
   badgesApi,
@@ -19,6 +17,7 @@ import {
   ROLE_MEMBRE,
   STATUT_PROJET,
 } from '../api'
+import { getProjectImage } from '../lib/projectImages'
 import { styles } from './Profile.styles'
 import { NIVEAU_LABELS, NIVEAUX } from './Profile.data'
 import { TYPE_COMPETENCE } from '../lib/libelles'
@@ -166,9 +165,8 @@ export default function Profile() {
   if (loading) {
     return (
       <div className={styles.page}>
-        <Navbar />
         <div className="flex items-center justify-center py-32">
-          <Loader2 size={32} className="animate-spin text-primary" />
+          <Loader2 size={32} className="animate-spin text-[#C9F06A]" />
         </div>
       </div>
     )
@@ -185,7 +183,6 @@ export default function Profile() {
 
   return (
     <div className={styles.page}>
-      <Navbar />
       <div className={styles.inner}>
         <div className={styles.grid}>
 
@@ -214,7 +211,14 @@ export default function Profile() {
                     >
                       {photoPreview ? (
                         <img src={photoPreview} alt="" className="w-full h-full object-cover" />
-                      ) : initials}
+                      ) : (
+                        <img
+                          src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80"
+                          alt="Avatar"
+                          className="w-full h-full object-cover"
+                          onError={(e) => { e.currentTarget.style.display = 'none' }}
+                        />
+                      )}
                       <div className={styles.avatarOverlay}>
                         <Camera size={24} className="text-white" />
                       </div>
@@ -230,7 +234,14 @@ export default function Profile() {
                     <div className={styles.avatarDiv}>
                       {photoPreview ? (
                         <img src={photoPreview} alt="" className="w-full h-full object-cover" />
-                      ) : initials}
+                      ) : (
+                        <img
+                          src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80"
+                          alt="Avatar"
+                          className="w-full h-full object-cover"
+                          onError={(e) => { e.currentTarget.style.display = 'none' }}
+                        />
+                      )}
                     </div>
                   )}
                 </div>
@@ -271,12 +282,12 @@ export default function Profile() {
                     <div className={styles.locationInfo}>
                       {profil?.pays && (
                         <span className="flex items-center gap-1">
-                          <MapPin size={12} className="text-primary" /> {profil.ville ? `${profil.ville}, ` : ''}{profil.pays}
+                          <MapPin size={12} className="text-[#C9F06A]" /> {profil.ville ? `${profil.ville}, ` : ''}{profil.pays}
                         </span>
                       )}
-                      <span className="text-xs text-gray-500">Membre de 54Devs</span>
+                      <span className="text-xs text-white/40">Membre de 54Devs</span>
                     </div>
-                    {profil?.disponibilite && <span className="inline-flex mt-3 rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-primary">{profil.disponibilite}</span>}
+                    {profil?.disponibilite && <span className="inline-flex mt-3 rounded-full bg-[#C9F06A]/10 border border-[#C9F06A]/20 px-3 py-1 text-xs font-semibold text-[#C9F06A]">{profil.disponibilite}</span>}
 
                   </>
                 )}
@@ -286,7 +297,7 @@ export default function Profile() {
             {/* Links (edit mode) */}
             {editing && (
               <div className={styles.linksCard}>
-                <h3 className="font-bold text-gray-900 mb-2">Liens</h3>
+                <h3 className="font-bold text-white mb-2 font-display">Liens</h3>
                 <div>
                   <label className={styles.label}><ExternalLink size={12} className="inline mr-1" />GitHub</label>
                   <input value={form.github} onChange={e => set('github', e.target.value)} placeholder="https://github.com/..." className={styles.input} />
@@ -305,15 +316,15 @@ export default function Profile() {
             {/* Engagement Card */}
             {!editing && (
               <div className={styles.engagementCard}>
-                <h3 className="font-bold text-gray-900 mb-4">Engagement</h3>
+                <h3 className="font-bold text-white mb-4 font-display">Engagement</h3>
                 <div className="grid grid-cols-2 gap-3">
                   <div className={styles.statBox}>
-                    <span className="text-xl font-bold text-gray-900">{myProjects.length}</span>
-                    <p className="text-gray-500 text-[10px] uppercase tracking-wider font-bold mt-0.5">Projets</p>
+                    <span className="text-xl font-bold text-white font-display">{myProjects.length}</span>
+                    <p className="text-white/40 text-[10px] uppercase tracking-wider font-mono font-bold mt-0.5">Projets</p>
                   </div>
                   <div className={styles.statBox}>
-                    <span className="text-xl font-bold text-gray-900">{competences.length}</span>
-                    <p className="text-gray-500 text-[10px] uppercase tracking-wider font-bold mt-0.5">Compétences</p>
+                    <span className="text-xl font-bold text-white font-display">{competences.length}</span>
+                    <p className="text-white/40 text-[10px] uppercase tracking-wider font-mono font-bold mt-0.5">Compétences</p>
                   </div>
                 </div>
               </div>
@@ -322,7 +333,7 @@ export default function Profile() {
             {/* Social Links */}
             {!editing && (profil?.github || profil?.linkedin || profil?.portfolio) && (
               <div className={styles.socialLinksCard}>
-                <h3 className="font-bold text-gray-900 mb-3">Mes liens</h3>
+                <h3 className="font-bold text-white mb-3 font-display">Mes liens</h3>
                 <div className="space-y-2">
                   {profil.github && (
                     <a href={profil.github} target="_blank" rel="noreferrer" className={styles.socialLink}>
@@ -353,9 +364,9 @@ export default function Profile() {
             {/* Save / Cancel bar (edit mode) */}
             {editing && (
               <div className={styles.saveBar}>
-                <span className="text-sm font-semibold text-gray-900">Modification du profil</span>
+                <span className="text-sm font-semibold text-white">Modification du profil</span>
                 <div className="flex items-center gap-3">
-                  {saveError && <span className="text-red-500 text-sm">{saveError}</span>}
+                  {saveError && <span className="text-red-400 text-sm">{saveError}</span>}
                   <button onClick={cancelEditing} className={styles.cancelButton}>
                     <X size={16} /> Annuler
                   </button>
@@ -365,7 +376,7 @@ export default function Profile() {
                     className={styles.saveButton}
                   >
                     {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-                    {saving ? 'Enregistrement…' : 'Enregistrer'}
+                    {saving ? 'Enregistrementâ€¦' : 'Enregistrer'}
                   </button>
                 </div>
               </div>
@@ -373,12 +384,12 @@ export default function Profile() {
 
             {/* About Me */}
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-3">À propos</h2>
+              <h2 className="text-2xl font-bold text-white mb-3 font-display">Ã€ propos</h2>
               {editing ? (
                 <textarea
                   value={form.bio}
                   onChange={e => set('bio', e.target.value)}
-                  placeholder="Présentez-vous à la communauté…"
+                  placeholder="Présentez-vous à la communautéâ€¦"
                   rows={4}
                   maxLength={1000}
                   className={`${styles.input} resize-none`}
@@ -392,7 +403,7 @@ export default function Profile() {
 
             {/* Expertise */}
             <div>
-              <h3 className="text-lg font-bold text-gray-900 mb-3">Compétences</h3>
+              <h3 className="text-lg font-bold text-white mb-3 font-display">Compétences</h3>
               {editing ? (
                 <div>
                   <p className="text-gray-500 text-sm mb-3">Choisissez vos compétences dans le catalogue :</p>
@@ -413,12 +424,12 @@ export default function Profile() {
                   </div>
                   {editCompetences.length > 0 && (
                     <div className="mt-4 space-y-2">
-                      <p className="text-gray-500 text-xs font-bold uppercase tracking-wider">Sélectionnées ({editCompetences.length})</p>
+                      <p className="text-white/40 text-xs font-bold uppercase tracking-wider font-mono">Sélectionnées ({editCompetences.length})</p>
                       {editCompetences.map(ec => {
                         const info = catalogue.find(c => c.id === ec.competenceId)
                         return (
                           <div key={ec.competenceId} className={styles.competenceRow}>
-                            <span className="text-sm font-medium text-gray-900 flex-1">{info?.nom || `#${ec.competenceId}`}</span>
+                            <span className="text-sm font-medium text-white flex-1">{info?.nom || `#${ec.competenceId}`}</span>
                             <select
                               aria-label={`Type de compétence pour ${info?.nom || `#${ec.competenceId}`}`}
                               value={ec.type || 'MAITRISE'}
@@ -427,7 +438,7 @@ export default function Profile() {
                               ))}
                               className={styles.competenceSelect}
                             >
-                              {Object.entries(TYPE_COMPETENCE).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                              {Object.entries(TYPE_COMPETENCE).map(([value, label]) => <option key={value} value={value} className="bg-[#16221C] text-white">{label}</option>)}
                             </select>
                             <select
                               aria-label={`Niveau pour ${info?.nom || `#${ec.competenceId}`}`}
@@ -437,13 +448,13 @@ export default function Profile() {
                               ))}
                               className={styles.competenceSelect}
                             >
-                              {NIVEAUX.map(n => <option key={n} value={n}>{NIVEAU_LABELS[n]}</option>)}
+                              {NIVEAUX.map(n => <option key={n} value={n} className="bg-[#16221C] text-white">{NIVEAU_LABELS[n]}</option>)}
                             </select>
                             <button
                               type="button"
                               aria-label={`Retirer ${info?.nom || `la compétence ${ec.competenceId}`}`}
                               onClick={() => toggleCompetence(ec.competenceId)}
-                              className="text-gray-400 hover:text-red-500 transition"
+                              className="text-white/40 hover:text-red-400 transition"
                             >
                               <X size={14} />
                             </button>
@@ -458,12 +469,12 @@ export default function Profile() {
                   {competences.map(c => (
                     <span key={c.competenceId} className={`${styles.expertiseTag} inline-flex flex-col items-start`}>
                       {c.nom}
-                      <span className="text-[10px] font-medium text-slate-500">{TYPE_COMPETENCE[c.type] || TYPE_COMPETENCE.MAITRISE}</span>
+                      <span className="text-[10px] font-medium text-[#C9F06A] font-mono">{TYPE_COMPETENCE[c.type] || TYPE_COMPETENCE.MAITRISE}</span>
                     </span>
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-400 text-sm">Aucune compétence ajoutée pour le moment.</p>
+                <p className="text-white/40 text-sm">Aucune compétence ajoutée pour le moment.</p>
               )}
             </div>
 
@@ -473,30 +484,30 @@ export default function Profile() {
                 <section className={`${styles.badgesCard} mb-8`}>
                   <div className="flex items-start justify-between gap-4 mb-5">
                     <div>
-                      <h3 className="text-lg font-bold text-gray-900">Badges</h3>
-                      <p className="text-sm text-gray-500 mt-1">Vos étapes et votre progression dans la communauté.</p>
+                      <h3 className="text-lg font-bold text-white font-display">Badges</h3>
+                      <p className="text-sm text-white/50 mt-1">Vos étapes et votre progression dans la communauté.</p>
                     </div>
-                    <span className="shrink-0 rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">{badges.filter(b => b.obtenu).length} / {badges.length} obtenus</span>
+                    <span className="shrink-0 rounded-full bg-[#C9F06A]/10 border border-[#C9F06A]/20 px-3 py-1 text-xs font-bold text-[#C9F06A] font-mono">{badges.filter(b => b.obtenu).length} / {badges.length} obtenus</span>
                   </div>
-                  {badgesError ? <p className="text-sm text-red-600">{badgesError}</p> : badges.length ? (
+                  {badgesError ? <p className="text-sm text-red-400">{badgesError}</p> : badges.length ? (
                     <div className="grid sm:grid-cols-2 gap-3">
                       {badges.map(badge => {
                         const progress = badge.progression
                         const ratio = progress?.objectif > 0 ? Math.min(100, Math.round((progress.actuel / progress.objectif) * 100)) : 0
                         return (
                           <article key={badge.code} className={`${styles.badgeItem} ${badge.obtenu ? styles.badgeEarned : styles.badgePending}`}>
-                            <div className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${badge.obtenu ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-400'}`}>
+                            <div className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${badge.obtenu ? 'bg-[#C9F06A]/20 text-[#C9F06A]' : 'bg-white/5 text-white/40'}`}>
                               {badge.obtenu ? <CheckCircle2 size={19} /> : <Award size={19} />}
                             </div>
                             <div className="min-w-0 flex-1">
-                              <h4 className="font-bold text-sm text-slate-900">{badge.nom}</h4>
-                              <p className="text-xs text-slate-500 leading-relaxed mt-1">{badge.description}</p>
+                              <h4 className="font-bold text-sm text-white">{badge.nom}</h4>
+                              <p className="text-xs text-white/60 leading-relaxed mt-1">{badge.description}</p>
                               {badge.obtenu ? (
-                                badge.dateObtention && <p className="text-[11px] font-medium text-emerald-700 mt-2">Obtenu le {new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium' }).format(new Date(badge.dateObtention))}</p>
+                                badge.dateObtention && <p className="text-[11px] font-medium text-[#C9F06A] font-mono mt-2">Obtenu le {new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium' }).format(new Date(badge.dateObtention))}</p>
                               ) : progress && (
                                 <div className="mt-3">
-                                  <div className="flex justify-between text-[11px] text-slate-500 mb-1"><span>Progression</span><span>{progress.actuel} / {progress.objectif}</span></div>
-                                  <div className="h-1.5 rounded-full bg-slate-200 overflow-hidden"><div className="h-full rounded-full bg-blue-600 transition-all" style={{ width: `${ratio}%` }} /></div>
+                                  <div className="flex justify-between text-[11px] text-white/40 font-mono mb-1"><span>Progression</span><span>{progress.actuel} / {progress.objectif}</span></div>
+                                  <div className="h-1.5 rounded-full bg-white/10 overflow-hidden"><div className="h-full rounded-full bg-[#C9F06A] transition-all" style={{ width: `${ratio}%` }} /></div>
                                 </div>
                               )}
                             </div>
@@ -504,15 +515,15 @@ export default function Profile() {
                         )
                       })}
                     </div>
-                  ) : <p className="text-sm text-gray-500">Aucun badge à afficher pour le moment.</p>}
+                  ) : <p className="text-sm text-white/50">Aucun badge à afficher pour le moment.</p>}
                 </section>
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold text-gray-900">Mes projets</h3>
-                  <Link to="/projects" className="text-primary text-sm font-semibold hover:underline">Voir tout</Link>
+                  <h3 className="text-lg font-bold text-white font-display">Mes projets</h3>
+                  <Link to="/projects" className="text-[#C9F06A] text-sm font-semibold hover:underline">Voir tout</Link>
                 </div>
                 {projectsError ? (
                   <div className={styles.emptyState}>
-                    <p className="text-red-500 text-sm">{projectsError}</p>
+                    <p className="text-red-400 text-sm">{projectsError}</p>
                   </div>
                 ) : myProjects.length > 0 ? (
                   <div className="grid md:grid-cols-2 gap-4">
@@ -520,38 +531,55 @@ export default function Profile() {
                       <Link
                         key={p.id}
                         to={`/projects/${p.id}`}
-                        className={styles.projectCard}
+                        className={`${styles.projectCard} overflow-hidden p-0 flex flex-col group`}
                       >
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="w-10 h-10 bg-dark rounded-xl flex items-center justify-center">
-                            <span className="text-white text-sm font-bold">{p.nom?.[0]?.toUpperCase() || '?'}</span>
+                        <div className="relative h-28 w-full overflow-hidden border-b border-white/10 bg-[#0E1511]">
+                          <img
+                            src={getProjectImage(p)}
+                            alt={p.nom}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#16221C] via-transparent to-transparent" />
+                          <div className="absolute top-2.5 left-2.5">
+                            <span className="bg-black/75 backdrop-blur-md border border-[#C9F06A]/30 text-[#C9F06A] text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-full">
+                              {p.categorie || 'PROJET'}
+                            </span>
                           </div>
-                          <span className={p.roleMembre === 'CREATEUR' ? styles.projectRoleLead : styles.projectRoleContributor}>
-                            {ROLE_MEMBRE[p.roleMembre] || p.roleMembre}
-                          </span>
-                        </div>
-                        <h4 className="font-bold text-gray-900 mb-1">{p.nom}</h4>
-                        <p className="text-gray-500 text-sm line-clamp-2 mb-4">{p.description}</p>
-
-                        <div className="mb-4 flex items-center justify-between text-[11px]">
-                          <span className="text-gray-400 font-semibold uppercase tracking-wider">
-                            {STATUT_PROJET[p.statut] || p.statut}
-                          </span>
-                          <span className="text-gray-500 font-medium">
-                            {p.nombreMembres} membre{p.nombreMembres > 1 ? 's' : ''}
-                          </span>
+                          <div className="absolute top-2.5 right-2.5">
+                            <span className={p.roleMembre === 'CREATEUR' ? styles.projectRoleLead : styles.projectRoleContributor}>
+                              {ROLE_MEMBRE[p.roleMembre] || p.roleMembre}
+                            </span>
+                          </div>
                         </div>
 
-                        <span className="text-primary text-sm font-semibold inline-flex items-center gap-1 group-hover:gap-2 transition-all">
-                          Voir le projet <ArrowRight size={14} />
-                        </span>
+                        <div className="p-4 flex-1 flex flex-col justify-between">
+                          <div>
+                            <h4 className="font-bold text-white mb-1 font-display group-hover:text-[#C9F06A] transition">{p.nom}</h4>
+                            <p className="text-white/60 text-sm line-clamp-2 mb-3">{p.description}</p>
+                          </div>
+
+                          <div>
+                            <div className="mb-3 flex items-center justify-between text-[11px]">
+                              <span className="text-white/40 font-semibold uppercase tracking-wider font-mono">
+                                {STATUT_PROJET[p.statut] || p.statut}
+                              </span>
+                              <span className="text-white/50 font-medium font-mono">
+                                {p.nombreMembres} membre{p.nombreMembres > 1 ? 's' : ''}
+                              </span>
+                            </div>
+
+                            <span className="text-[#C9F06A] text-xs font-semibold inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+                              Voir le projet <ArrowRight size={13} />
+                            </span>
+                          </div>
+                        </div>
                       </Link>
                     ))}
                   </div>
                 ) : (
                   <div className={styles.emptyState}>
-                    <p className="text-gray-400 text-sm">Vous ne participez à aucun projet.</p>
-                    <Link to="/projects/create" className="text-primary text-sm font-semibold hover:underline mt-2 inline-block">
+                    <p className="text-white/50 text-sm">Vous ne participez à aucun projet.</p>
+                    <Link to="/projects/create" className="text-[#C9F06A] text-sm font-semibold hover:underline mt-2 inline-block">
                       Publier un projet
                     </Link>
                   </div>
@@ -562,7 +590,6 @@ export default function Profile() {
           </div>
         </div>
       </div>
-      <Footer />
     </div>
   )
 }

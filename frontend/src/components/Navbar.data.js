@@ -1,7 +1,8 @@
 export const NAV_LINKS = [
-  { to: '/projects', label: 'Projets' },
-  { to: '/questions', label: 'Questions & réponses' },
-  { to: '/challenges', label: 'Challenges' },
+  { to: '/#mentors-adn', label: 'Mentors' },
+  { to: '/#carte-afrique', label: '54 États' },
+  { to: '/#projets-publies', label: 'Projets Publiés' },
+  { to: '/projects', label: 'Explorer' },
   { to: '/developers', label: 'Développeurs' },
-  { to: '/#fonctionnement', label: 'Comment ça marche' },
+  { to: '/questions', label: 'Q&A' },
 ]

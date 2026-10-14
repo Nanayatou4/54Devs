@@ -1,4 +1,4 @@
-import { LayoutDashboard, MessageCircle, Rocket, Trophy, UsersRound } from 'lucide-react'
+﻿import { LayoutDashboard, MessageCircle, Rocket, Trophy, UsersRound } from 'lucide-react'
 
 export const navItems = [
   { key: 'dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
@@ -43,7 +43,7 @@ export const STATUT_DEMANDE_LABELS = {
 }
 
 export const STATUT_DEMANDE_COLORS = {
-  EN_ATTENTE: 'bg-amber-50 text-amber-700 border-amber-200',
+  EN_ATTENTE: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/25',
   ACCEPTEE: 'bg-green-50 text-green-700 border-green-200',
   REFUSEE: 'bg-red-50 text-red-700 border-red-200',
 }

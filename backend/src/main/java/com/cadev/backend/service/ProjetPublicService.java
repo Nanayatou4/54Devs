@@ -40,7 +40,7 @@ public class ProjetPublicService {
             resultat.add(new ProjetPublicDto(
                     p.getId(), p.getNom(),
                     description.length() > 150 ? description.substring(0, 150) + "…" : description,
-                    p.getCategorie(), p.getTechnologies(), p.getStatut(), places, (int) nb,
+                    p.getCategorie(), p.getTechnologies(), p.getImageUrl(), p.getStatut(), places, (int) nb,
                     p.getCompetencesRecherchees().stream().map(cp -> cp.getCompetence().getNom()).toList(),
                     createur.pseudo(), createur.pays()));
         }
