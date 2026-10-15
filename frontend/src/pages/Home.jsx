@@ -24,13 +24,13 @@ export default function Home() {
         {/* Capture 1: L'ADN de 54Devs & Défilement Orbital des Développeurs Mentors */}
         <MentorsOrbitalTurntable />
 
-        {/* Capture 2: Le Collectif 54Devs, Carte Lumineuse d'Afrique & Défilement des 54 Ã‰tats */}
+        {/* Capture 2: Le Collectif 54Devs, Carte Lumineuse d'Afrique & Défilement des 54 États */}
         <AfricaMapSection />
 
         {/* Capture 3: Coverflow 3D Perspective des Projets Publiés */}
         <ProjectsCoverflow />
 
-        {/* Ã‰cosystème Central & Piliers */}
+        {/* Écosystème Central & Piliers */}
         <Features />
 
         {/* Approbation collaborative du plan */}

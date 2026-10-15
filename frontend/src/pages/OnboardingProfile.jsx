@@ -1,4 +1,4 @@
-﻿import { useState, useRef } from 'react'
+import { useState, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Pencil } from 'lucide-react'
 import { styles } from './OnboardingProfile.styles'
@@ -41,7 +41,7 @@ export default function OnboardingProfile() {
             <div className={styles.stepBarActive} />
             <div className={styles.stepBarInactive} />
           </div>
-          <span className={styles.stepLabel}>Ã‰tape 2 sur 3</span>
+          <span className={styles.stepLabel}>Étape 2 sur 3</span>
         </div>
       </div>
 
@@ -49,7 +49,7 @@ export default function OnboardingProfile() {
       <div className={styles.content}>
         <h1 className={styles.title}>Présentez-vous</h1>
         <p className={styles.subtitle}>
-          Dites-nous dâ€™où vous venez et ce que vous aimeriez apporter à la communauté.
+          Dites-nous d'où vous venez et ce que vous aimeriez apporter à la communauté.
         </p>
 
         <form onSubmit={handleNext} className="space-y-8">
@@ -109,12 +109,12 @@ export default function OnboardingProfile() {
                 <option value="Maroc">Maroc</option>
                 <option value="Tunisie">Tunisie</option>
                 <option value="Algérie">Algérie</option>
-                <option value="Ã‰gypte">Ã‰gypte</option>
+                <option value="Égypte">Égypte</option>
                 <option value="Nigeria">Nigeria</option>
                 <option value="Ghana">Ghana</option>
                 <option value="Kenya">Kenya</option>
                 <option value="Rwanda">Rwanda</option>
-                <option value="Ã‰thiopie">Ã‰thiopie</option>
+                <option value="Éthiopie">Éthiopie</option>
                 <option value="Tanzanie">Tanzanie</option>
                 <option value="Afrique du Sud">Afrique du Sud</option>
                 <option value="RDC">RDC</option>
@@ -176,7 +176,7 @@ export default function OnboardingProfile() {
             <textarea
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              placeholder="Présentez votre parcours, vos idées ou ce que vous aimeriez apprendreâ€¦"
+              placeholder="Présentez votre parcours, vos idées ou ce que vous aimeriez apprendre..."
               maxLength={250}
               rows={4}
               className={styles.bioTextarea}
@@ -197,13 +197,13 @@ export default function OnboardingProfile() {
               type="submit"
               className={styles.nextButton}
             >
-              Suivant : compétences et expérience â†’
+              Suivant : compétences et expérience →
             </button>
           </div>
         </form>
 
         <p className={styles.helpText}>
-          Besoin dâ€™aide ? Consultez les informations de votre profil ou réessayez plus tard.
+          Besoin d'aide ? Consultez les informations de votre profil ou réessayez plus tard.
         </p>
       </div>
     </div>

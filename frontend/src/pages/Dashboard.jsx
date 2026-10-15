@@ -23,7 +23,7 @@ const COMPATIBILITY_STYLES = {
   MOYEN: 'bg-blue-500/15 text-blue-400 border border-blue-500/25',
   FAIBLE: 'bg-slate-800 text-slate-400 border border-white/10',
 }
-const COMPATIBILITY_LABELS = { ELEVE: 'Ã‰levée', MOYEN: 'Moyenne', FAIBLE: 'Faible' }
+const COMPATIBILITY_LABELS = { ELEVE: 'Élevée', MOYEN: 'Moyenne', FAIBLE: 'Faible' }
 
 function personName(person) {
   return person?.pseudo || [person?.prenom, person?.nom].filter(Boolean).join(' ') || 'Membre 54Devs'
@@ -60,8 +60,8 @@ function Compatibility({ value }) {
   if (!value) return null
   const groups = [
     ['correspondantes', 'Correspondances', 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/25'],
-    ['aApprendre', 'Ã€ apprendre', 'bg-blue-500/15 text-blue-400 border border-blue-500/25'],
-    ['manquantes', 'Ã€ acquérir', 'bg-slate-800 text-slate-400 border border-white/10'],
+    ['aApprendre', 'À apprendre', 'bg-blue-500/15 text-blue-400 border border-blue-500/25'],
+    ['manquantes', 'À acquérir', 'bg-slate-800 text-slate-400 border border-white/10'],
   ].filter(([field]) => value[field]?.length)
 
   return (
@@ -346,7 +346,7 @@ function DashboardContent({ data }) {
             <Lightbulb size={20} />
           </div>
           <div>
-            <h2 className="font-semibold text-sm text-white">Pas de challenge programmé aujourdâ€™hui</h2>
+            <h2 className="font-semibold text-sm text-white">Pas de challenge programmé aujourd'hui</h2>
             <Link to="/challenges" className="text-xs text-[#C9F06A] font-semibold hover:underline">
               Voir tous les challenges disponibles
             </Link>
@@ -476,10 +476,10 @@ function DashboardContent({ data }) {
         )}
 
         <section className={`${styles.card} h-fit`}>
-          <SectionTitle icon={BookOpenCheck} title="Ã‰changes de compétences" to="/developers" linkLabel="Trouver des développeurs" />
+          <SectionTitle icon={BookOpenCheck} title="Échanges de compétences" to="/developers" linkLabel="Trouver des développeurs" />
           {exchanges.total > 0 ? (
             <>
-              <p className="text-xs text-slate-400 -mt-2 mb-4">Ã‰changes réciproques trouvés : {exchanges.total}</p>
+              <p className="text-xs text-slate-400 -mt-2 mb-4">Échanges réciproques trouvés : {exchanges.total}</p>
               <div className="space-y-3">
                 {(exchanges.exemples || []).slice(0, 3).map(exchange => (
                   <Link
@@ -564,7 +564,7 @@ export default function Dashboard() {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
         <Loader2 size={32} className="animate-spin text-[#C9F06A]" />
-        <span className="ml-3 text-sm text-slate-400">Chargement de votre tableau de bordâ€¦</span>
+        <span className="ml-3 text-sm text-slate-400">Chargement de votre tableau de bord...</span>
       </div>
     )
   }

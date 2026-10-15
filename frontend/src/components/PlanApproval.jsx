@@ -50,7 +50,7 @@ export default function PlanApproval() {
             </div>
             
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#C9F06A] mb-2 font-mono">
-              // GOUVERNANCE & QUALITÃ‰ LOGICIELLE
+              // GOUVERNANCE & QUALITÉ LOGICIELLE
             </p>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight font-display mb-5">
               Validation collaborative des architectures
@@ -109,7 +109,7 @@ export default function PlanApproval() {
                         ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
                         : 'bg-[#C9F06A]/15 text-[#C9F06A] border border-[#C9F06A]/30'
                     }`}>
-                      {approved ? 'VALIDÃ‰ PAR LES MENTORS' : (latestProject.statut || 'EN COURS DE REVUE')}
+                      {approved ? 'VALIDÉ PAR LES MENTORS' : (latestProject.statut || 'EN COURS DE REVUE')}
                     </span>
                   </div>
 

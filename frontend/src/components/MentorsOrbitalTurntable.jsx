@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, GraduationCap, Users, ChevronLeft, ChevronRight, Loader2, Sparkles, PlusCircle } from 'lucide-react'
 import { developpeursApi, mentorsApi } from '../api'
@@ -102,22 +102,17 @@ export default function MentorsOrbitalTurntable() {
 
             <div className="mt-6 space-y-4 text-base leading-relaxed text-white/60">
               <p>
-                Les données ci-contre proviennent directement de votre base de données : chaque développeur ayant indiqué des compétences à transmettre apparaît dans ce carrousel orbital.
-              </p>
-              <p className="text-white/80 font-medium">
-                Vous avez la main complète pour enregistrer, modifier et certifier les profils des mentors depuis votre backend et votre espace profil.
+                Des ingénieurs seniors et leads techniques partagent leurs méthodes, guident les talents émergents et construisent les licornes technologiques de demain.
               </p>
             </div>
 
             {/* Mission Box */}
             <div className="mt-8 rounded-2xl border border-white/10 bg-[#14161C]/80 p-6 md:p-7 backdrop-blur-md">
               <p className="text-xs font-bold tracking-[0.25em] text-[#C9F06A] uppercase mb-2">
-                // Synchronisation Backend
+                // Mentorat Panafricain
               </p>
               <p className="text-sm leading-relaxed text-white/85 sm:text-base">
-                {total > 0
-                  ? `${total} mentor${total > 1 ? 's' : ''} enregistré${total > 1 ? 's' : ''} dans le backend avec des compétences à transmettre.`
-                  : "Aucun profil mentor n'est encore enregistré avec des compétences à transmettre. Enregistrez un utilisateur avec le type 'ENSEIGNER' pour l'afficher ici."}
+                Transmission de compétences, revues de code et accompagnement sur des projets réels pour propulser les ingénieurs africains vers les standards internationaux.
               </p>
             </div>
 
@@ -129,7 +124,7 @@ export default function MentorsOrbitalTurntable() {
               >
                 <span>Espace Mentorat</span>
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-black/15 text-xs transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
-                  â†—
+                  ↗
                 </span>
               </Link>
               <Link
@@ -211,7 +206,7 @@ export default function MentorsOrbitalTurntable() {
                   <div className="absolute inset-0 rounded-full border border-white/10 animate-ping opacity-25" />
                 </div>
                 <p className="mt-2 text-[10px] font-bold tracking-[0.3em] uppercase text-white/40">
-                  Ã‰cosystème Backend
+                  Écosystème Panafricain
                 </p>
               </div>
 
@@ -278,7 +273,7 @@ export default function MentorsOrbitalTurntable() {
                           )}
                           {activeMentor.pays && (
                             <span className="absolute -bottom-1 -right-1 text-xs bg-black/80 px-1 py-0.5 rounded-full border border-white/10">
-                              ðŸŒ
+                              🌍
                             </span>
                           )}
                         </div>
@@ -407,30 +402,22 @@ export default function MentorsOrbitalTurntable() {
                 </div>
               )}
 
-              {/* 3 Metric Capsules dynamically reflecting backend count */}
-              <div className="grid grid-cols-3 gap-2 sm:gap-3">
-                <div className="rounded-xl border border-white/10 bg-black/50 px-2 py-2 text-center backdrop-blur-sm sm:px-3 sm:py-2.5">
+              {/* Qualitative Metric Capsules */}
+              <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                <div className="rounded-xl border border-white/10 bg-black/50 px-3 py-2 text-center backdrop-blur-sm sm:px-4 sm:py-2.5">
                   <p className="text-xs sm:text-sm font-extrabold tracking-wider text-[#C9F06A]">
                     54
                   </p>
                   <p className="text-[9px] sm:text-[10px] text-white/50 uppercase tracking-widest mt-0.5">
-                    Nations
+                    Nations Panafricaines
                   </p>
                 </div>
-                <div className="rounded-xl border border-white/10 bg-black/50 px-2 py-2 text-center backdrop-blur-sm sm:px-3 sm:py-2.5">
+                <div className="rounded-xl border border-white/10 bg-black/50 px-3 py-2 text-center backdrop-blur-sm sm:px-4 sm:py-2.5">
                   <p className="text-xs sm:text-sm font-extrabold tracking-wider text-[#C9F06A]">
-                    {total}
+                    Mentorat Tech
                   </p>
                   <p className="text-[9px] sm:text-[10px] text-white/50 uppercase tracking-widest mt-0.5">
-                    Mentor{total > 1 ? 's' : ''} Enregistré{total > 1 ? 's' : ''}
-                  </p>
-                </div>
-                <div className="rounded-xl border border-white/10 bg-black/50 px-2 py-2 text-center backdrop-blur-sm sm:px-3 sm:py-2.5">
-                  <p className="text-xs sm:text-sm font-extrabold tracking-wider text-[#C9F06A]">
-                    100%
-                  </p>
-                  <p className="text-[9px] sm:text-[10px] text-white/50 uppercase tracking-widest mt-0.5">
-                    Backend Live
+                    Accompagnement d'Experts
                   </p>
                 </div>
               </div>

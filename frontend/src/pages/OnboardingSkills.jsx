@@ -1,4 +1,4 @@
-﻿import { useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { X, Check } from 'lucide-react'
 import { competencesApi, profilApi, getToken, getStoredUser } from '../api'
@@ -104,7 +104,7 @@ export default function OnboardingSkills() {
             <div className={styles.stepBarActive} />
             <div className={styles.stepBarActive} />
           </div>
-          <span className={styles.stepLabel}>Ã‰tape 3 sur 3</span>
+          <span className={styles.stepLabel}>Étape 3 sur 3</span>
         </div>
       </div>
 
@@ -112,7 +112,7 @@ export default function OnboardingSkills() {
       <div className={styles.content}>
         <h1 className={styles.title}>Partagez vos compétences</h1>
         <p className={styles.subtitle}>
-          Pour chaque compétence, indiquez si vous la maîtrisez, souhaitez lâ€™apprendre ou pouvez lâ€™enseigner.
+          Pour chaque compétence, indiquez si vous la maîtrisez, souhaitez l'apprendre ou pouvez l'enseigner.
         </p>
 
         <form onSubmit={handleComplete} className="space-y-8">

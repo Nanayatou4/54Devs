@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Loader2, MapPin, Search, UserPlus, Users } from 'lucide-react'
 import { developpeursApi } from '../api'
@@ -43,7 +43,7 @@ export default function CommunityHub() {
       <header className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-8">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#C9F06A] mb-2 font-mono">
-            // COMMUNAUTÃ‰ 54DEVS
+            // COMMUNAUTÉ 54DEVS
           </p>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white font-display">
             Connectez-vous à l'élite <span className="text-[#C9F06A]">tech panafricaine</span>

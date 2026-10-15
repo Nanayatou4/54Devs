@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Search, ChevronLeft, ChevronRight, Play, Pause, MapPin, Users, FolderGit2, Sparkles, Globe2, PlusCircle } from 'lucide-react'
 import { AFRICAN_COUNTRIES } from '../data/africanCountries.data'
@@ -121,7 +121,7 @@ export default function AfricaMapSection() {
             // LE COLLECTIF 54DEVS
           </p>
           <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight font-display">
-            54 Ã‰tats. Une Seule Impulsion.
+            54 États. Une Seule Impulsion.
           </h2>
           <p className="mt-5 text-base sm:text-lg text-white/70 leading-relaxed font-body">
             Nous créons. Nous testons. Nous améliorons. Nous industrialisons. Nous répliquons. Chaque initiative du collectif répond à cette même dynamique : transformer une idée en solution, une solution en produit, un produit en modèle réplicable pour l'Afrique.
@@ -200,14 +200,14 @@ export default function AfricaMapSection() {
                   Créativité
                 </span>
                 <span className="block text-sm sm:text-base font-bold text-white">
-                  âˆž
+                  ∞
                 </span>
               </div>
 
             </div>
 
             <p className="mt-4 text-[10px] sm:text-xs tracking-[0.35em] text-[#C9F06A] uppercase font-bold">
-              Afrique â€¢ 54 Ã‰tats Souverains
+              Afrique • 54 États Souverains
             </p>
 
           </div>
@@ -274,7 +274,7 @@ export default function AfricaMapSection() {
                   </span>
                 </div>
                 <p className="text-xs text-white/50 mt-0.5">
-                  Capitale : <strong className="text-white/80">{activeCountry.capitale}</strong> â€¢ Région : <strong className="text-white/80">{activeCountry.region}</strong>
+                  Capitale : <strong className="text-white/80">{activeCountry.capitale}</strong> • Région : <strong className="text-white/80">{activeCountry.region}</strong>
                 </p>
               </div>
             </div>
@@ -289,36 +289,20 @@ export default function AfricaMapSection() {
             </div>
           </div>
 
-          {/* Real Backend Metrics for this country */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-5">
-            <div className="rounded-xl border border-white/10 bg-white/5 p-3">
-              <div className="flex items-center gap-2 text-white/50 text-xs mb-1">
-                <Users size={14} className="text-[#C9F06A]" />
-                <span>Développeurs inscrits</span>
+          {/* Orientation Tech for this country */}
+          <div className="mt-5">
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-5 flex items-start sm:items-center gap-3.5 backdrop-blur-md">
+              <div className="p-2.5 rounded-xl bg-[#C9F06A]/10 border border-[#C9F06A]/20 text-[#C9F06A] shrink-0 mt-0.5 sm:mt-0">
+                <Sparkles size={18} />
               </div>
-              <p className="text-lg sm:text-xl font-bold font-mono text-white">
-                {realDevsCount}
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-white/10 bg-white/5 p-3">
-              <div className="flex items-center gap-2 text-white/50 text-xs mb-1">
-                <FolderGit2 size={14} className="text-[#C9F06A]" />
-                <span>Projets enregistrés</span>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs text-[#C9F06A] uppercase tracking-wider font-mono font-bold mb-1">
+                  Orientation tech & Spécialités d'innovation
+                </p>
+                <p className="text-sm font-semibold text-white/90 leading-relaxed">
+                  {activeCountry.specialite}
+                </p>
               </div>
-              <p className="text-lg sm:text-xl font-bold font-mono text-white">
-                {realProjsCount}
-              </p>
-            </div>
-
-            <div className="col-span-2 sm:col-span-1 rounded-xl border border-white/10 bg-white/5 p-3">
-              <div className="flex items-center gap-2 text-white/50 text-xs mb-1">
-                <Sparkles size={14} className="text-[#C9F06A]" />
-                <span>Orientation tech</span>
-              </div>
-              <p className="text-xs text-white/80 line-clamp-2">
-                {activeCountry.specialite}
-              </p>
             </div>
           </div>
 
@@ -326,7 +310,7 @@ export default function AfricaMapSection() {
           <div className="mt-6 pt-5 border-t border-white/10">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
               <p className="text-xs font-bold tracking-wider text-white/60 uppercase">
-                Défilement parmi les 54 Ã‰tats :
+                Défilement parmi les 54 États :
               </p>
               
               {/* Region filter pills */}

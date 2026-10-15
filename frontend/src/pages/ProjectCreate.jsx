@@ -231,7 +231,7 @@ export default function ProjectCreate() {
   }
 
   // ---------- CREATION FORM ----------
-  const stepLabels = { 1: 'Informations', 2: 'Ã‰quipe & Technologies', 3: 'Récapitulatif' }
+  const stepLabels = { 1: 'Informations', 2: 'Équipe & Technologies', 3: 'Récapitulatif' }
 
   return (
     <div className={styles.page}>
@@ -239,7 +239,7 @@ export default function ProjectCreate() {
         <div className={styles.headerInner}>
           <Link to="/" className={styles.logo}>54<span className="font-extrabold">Devs</span></Link>
           <div className="flex items-center gap-4">
-            <span className={styles.stepLabel}>Ã‰tape {step} sur 3 : {stepLabels[step]}</span>
+            <span className={styles.stepLabel}>Étape {step} sur 3 : {stepLabels[step]}</span>
             <Link to="/projects" className={styles.closeButton}><X size={20} /></Link>
           </div>
         </div>
@@ -370,7 +370,7 @@ export default function ProjectCreate() {
 
           {step === 2 && (
             <div>
-              <h2 className={styles.cardTitle}>Ã‰quipe & Technologies</h2>
+              <h2 className={styles.cardTitle}>Équipe & Technologies</h2>
               <p className={styles.cardSubtitle}>Définissez vos besoins en termes d'équipe et d'outils.</p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6 mb-6">
@@ -448,11 +448,11 @@ export default function ProjectCreate() {
                 )}
                 <div className={styles.reviewItem}>
                   <span className={styles.reviewItemLabel}>Nom du projet</span>
-                  <p className={styles.reviewItemValue}>{form.nom || 'â€”'}</p>
+                  <p className={styles.reviewItemValue}>{form.nom || '—'}</p>
                 </div>
                 <div className={styles.reviewItem}>
                   <span className={styles.reviewItemLabel}>Description</span>
-                  <p className="text-white/70 text-sm mt-1">{form.description || 'â€”'}</p>
+                  <p className="text-white/70 text-sm mt-1">{form.description || '—'}</p>
                 </div>
                 {form.probleme && (
                   <div className={styles.reviewItem}>
@@ -469,7 +469,7 @@ export default function ProjectCreate() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className={styles.reviewItem}>
                     <span className={styles.reviewItemLabel}>Catégorie</span>
-                    <p className="text-white font-medium mt-1">{form.categorie || 'â€”'}</p>
+                    <p className="text-white font-medium mt-1">{form.categorie || '—'}</p>
                   </div>
                   <div className={styles.reviewItem}>
                     <span className={styles.reviewItemLabel}>Avancement</span>
@@ -533,7 +533,7 @@ export default function ProjectCreate() {
             {step < 3 ? (
               <button onClick={goToNextStep}
                 className={styles.nextButton}>
-                Suivant : {step === 1 ? 'Ã‰quipe & Technologies' : 'Récapitulatif'} <ArrowRight size={16} />
+                Suivant : {step === 1 ? 'Équipe & Technologies' : 'Récapitulatif'} <ArrowRight size={16} />
               </button>
             ) : (
               <button onClick={handleSubmit} disabled={saving || !form.nom}

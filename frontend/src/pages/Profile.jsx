@@ -376,7 +376,7 @@ export default function Profile() {
                     className={styles.saveButton}
                   >
                     {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-                    {saving ? 'Enregistrementâ€¦' : 'Enregistrer'}
+                    {saving ? 'Enregistrement...' : 'Enregistrer'}
                   </button>
                 </div>
               </div>
@@ -384,12 +384,12 @@ export default function Profile() {
 
             {/* About Me */}
             <div>
-              <h2 className="text-2xl font-bold text-white mb-3 font-display">Ã€ propos</h2>
+              <h2 className="text-2xl font-bold text-white mb-3 font-display">À propos</h2>
               {editing ? (
                 <textarea
                   value={form.bio}
                   onChange={e => set('bio', e.target.value)}
-                  placeholder="Présentez-vous à la communautéâ€¦"
+                  placeholder="Présentez-vous à la communauté..."
                   rows={4}
                   maxLength={1000}
                   className={`${styles.input} resize-none`}

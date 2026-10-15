@@ -1,10 +1,10 @@
-﻿import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { ArrowRight, Briefcase, MapPin, Plus } from 'lucide-react'
 
 const SAMPLE_ROLES = [
-  { title: 'Senior Fullstack Engineer', company: 'FinTech Hub Dakar', location: 'Dakar · Sénégal ðŸ‡¸ðŸ‡³', tag: 'Temps plein' },
-  { title: 'Backend Architect (Spring / Go)', company: 'HealthTech Platform', location: 'Nairobi · Kenya ðŸ‡°ðŸ‡ª', tag: 'Hybride' },
-  { title: 'Lead Mobile (Flutter)', company: 'Logistique & Mobilité', location: 'Abidjan · Côte d\'Ivoire ðŸ‡¨ðŸ‡®', tag: 'Remote' },
+  { title: 'Senior Fullstack Engineer', company: 'FinTech Hub Dakar', location: 'Dakar · Sénégal 🇸🇳', tag: 'Temps plein' },
+  { title: 'Backend Architect (Spring / Go)', company: 'HealthTech Platform', location: 'Nairobi · Kenya 🇰🇪', tag: 'Hybride' },
+  { title: 'Lead Mobile (Flutter)', company: 'Logistique & Mobilité', location: 'Abidjan · Côte d\'Ivoire 🇨🇮', tag: 'Remote' },
 ]
 
 export default function JobBoard() {
@@ -13,7 +13,7 @@ export default function JobBoard() {
       <header className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#C9F06A] mb-2 font-mono">
-            // ESPACE RECRUTEMENT & CARRIÃˆRE
+            // ESPACE RECRUTEMENT & CARRIÈRE
           </p>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white font-display">
             Opportunités à travers le continent
@@ -26,14 +26,14 @@ export default function JobBoard() {
           type="button"
           disabled
           className="inline-flex items-center justify-center gap-2 rounded-full bg-[#C9F06A] px-6 py-3 text-xs font-bold uppercase tracking-wider text-black opacity-60 cursor-not-allowed shadow-lg"
-          title="Module en cours de déploiement backend"
+          title="Module en cours de déploiement"
         >
           <Plus size={16} /> Publier une offre
         </button>
       </header>
 
       <div className="rounded-2xl border border-[#C9F06A]/30 bg-[#C9F06A]/10 p-4 mb-8 text-xs sm:text-sm text-[#C9F06A] font-mono">
-        ðŸ’¡ Mode synchronisation â€” les offres d'emploi seront directement alimentées par le module de recrutement de votre backend.
+        💡 Espace Carrières — Les opportunités d'emploi et de recrutement sont publiées régulièrement par notre réseau de partenaires.
       </div>
 
       <div className="space-y-3">

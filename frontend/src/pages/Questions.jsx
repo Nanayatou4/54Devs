@@ -1,8 +1,8 @@
-﻿import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
   ArrowLeft, ArrowRight, Check, CheckCircle2, ChevronLeft, ChevronRight,
-  CircleHelp, MessageCircle, Plus, Search, Send, SlidersHorizontal,
+  CircleHelp, MessageCircle, Plus, Search, Send, SlidersHorizontal, X,
 } from 'lucide-react'
 import { questionsApi } from '../api'
 import { styles } from './Questions.styles'
@@ -45,7 +45,7 @@ function QuestionModal({ onClose, onCreated }) {
       const question = await questionsApi.creer({ titre: titre.trim(), contenu: contenu.trim(), categorie: categorie.trim() || null })
       onCreated(question)
     } catch (err) {
-      setError(err.message || 'La question nâ€™a pas pu être publiée.')
+      setError(err.message || 'La question n\'a pas pu être publiée.')
       setSaving(false)
     }
   }
@@ -59,20 +59,20 @@ function QuestionModal({ onClose, onCreated }) {
             <h2 id="question-modal-title" className="text-2xl font-bold mt-1 text-white font-display">Poser une question</h2>
             <p className="text-sm text-white/60 mt-2">Donnez assez de contexte pour recevoir des réponses utiles.</p>
           </div>
-          <button type="button" onClick={onClose} aria-label="Fermer" className="h-9 w-9 rounded-xl text-white/40 hover:text-white hover:bg-white/10 transition">Ã—</button>
+          <button type="button" onClick={onClose} aria-label="Fermer" className="h-9 w-9 rounded-xl text-white/40 hover:text-white hover:bg-white/10 transition flex items-center justify-center"><X size={18} /></button>
         </div>
         {error && <p className="rounded-xl bg-red-500/10 border border-red-500/30 px-4 py-3 text-sm text-red-400 mb-4">{error}</p>}
         <label className="block text-xs font-bold uppercase tracking-wider text-[#C9F06A] font-mono mb-2" htmlFor="question-title">Titre</label>
         <input id="question-title" className={`${styles.field} mb-5`} value={titre} onChange={event => setTitre(event.target.value)} minLength={5} maxLength={150} placeholder="Ex. Comment sécuriser une API Spring Boot ?" required />
         <label className="block text-xs font-bold uppercase tracking-wider text-[#C9F06A] font-mono mb-2" htmlFor="question-content">Votre question</label>
-        <textarea id="question-content" className={`${styles.field} resize-y mb-1`} value={contenu} onChange={event => setContenu(event.target.value)} minLength={10} maxLength={5000} rows={6} placeholder="Expliquez ce que vous cherchez à faire, ce que vous avez essayé et ce qui bloqueâ€¦" required />
+        <textarea id="question-content" className={`${styles.field} resize-y mb-1`} value={contenu} onChange={event => setContenu(event.target.value)} minLength={10} maxLength={5000} rows={6} placeholder="Expliquez ce que vous cherchez à faire, ce que vous avez essayé et ce qui bloque..." required />
         <p className="text-xs text-white/40 font-mono text-right mb-5">{contenu.length} / 5000</p>
         <label className="block text-xs font-bold uppercase tracking-wider text-[#C9F06A] font-mono mb-2" htmlFor="question-category">Catégorie <span className="font-normal text-white/40">(facultatif)</span></label>
-        <input id="question-category" className={`${styles.field} mb-6`} list="question-categories" value={categorie} onChange={event => setCategorie(event.target.value)} maxLength={100} placeholder="Ex. Java, Déploiement, UXâ€¦" />
+        <input id="question-category" className={`${styles.field} mb-6`} list="question-categories" value={categorie} onChange={event => setCategorie(event.target.value)} maxLength={100} placeholder="Ex. Java, Déploiement, UX..." />
         <datalist id="question-categories">{categories.map(category => <option key={category} value={category} />)}</datalist>
         <div className="flex justify-end gap-3 border-t border-white/10 pt-5">
           <button type="button" onClick={onClose} className="px-4 py-3 text-xs font-bold uppercase tracking-wider text-white/60 hover:text-white transition">Annuler</button>
-          <button type="submit" disabled={saving} className={styles.primaryButton}>{saving ? 'Publicationâ€¦' : <><Send size={16} /> Publier la question</>}</button>
+          <button type="submit" disabled={saving} className={styles.primaryButton}>{saving ? 'Publication...' : <><Send size={16} /> Publier la question</>}</button>
         </div>
       </form>
     </div>
@@ -133,7 +133,7 @@ function QuestionsList({ onAsk }) {
           <form onSubmit={submitSearch} className={styles.toolbar}>
             <div className="relative flex-1">
               <Search size={17} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/40" />
-              <input className={styles.search} value={query} onChange={event => setQuery(event.target.value)} placeholder="Rechercher une questionâ€¦" aria-label="Rechercher une question" />
+              <input className={styles.search} value={query} onChange={event => setQuery(event.target.value)} placeholder="Rechercher une question..." aria-label="Rechercher une question" />
             </div>
             <select className={styles.select} value={sort} onChange={event => { setSort(event.target.value); setPage(0) }} aria-label="Trier les questions">
               <option value="recentes" className="bg-[#16221C] text-white">Plus récentes</option>
@@ -142,7 +142,7 @@ function QuestionsList({ onAsk }) {
           </form>
 
           <div className={styles.filters} aria-label="Filtrer par statut">
-            {[['', 'Toutes'], ['non-resolues', 'Ã€ résoudre'], ['resolues', 'Résolues']].map(([value, label]) => (
+            {[['', 'Toutes'], ['non-resolues', 'À résoudre'], ['resolues', 'Résolues']].map(([value, label]) => (
               <button key={value} onClick={() => { setStatus(value); setPage(0) }} className={`${styles.filter} ${status === value ? styles.filterActive : styles.filterInactive}`}>{label}</button>
             ))}
             {categories.length > 0 && <label className="ml-auto flex items-center gap-2 text-xs text-white/40 font-mono"><SlidersHorizontal size={14} /><select className="bg-transparent py-2 text-xs font-medium outline-none text-[#C9F06A]" value={category} onChange={event => { setCategory(event.target.value); setPage(0) }} aria-label="Filtrer par catégorie"><option value="" className="bg-[#16221C] text-white">Toutes les catégories</option>{categories.map(item => <option key={item} value={item} className="bg-[#16221C] text-white">{item}</option>)}</select></label>}
@@ -151,12 +151,12 @@ function QuestionsList({ onAsk }) {
           {error ? (
             <div className="p-10 text-center"><p className="text-sm text-red-400">{error}</p><button onClick={() => setRetryCount(count => count + 1)} className="mt-3 text-sm font-semibold text-[#C9F06A] hover:underline">Réessayer</button></div>
           ) : loading ? (
-            <div className="p-12 text-center text-sm text-white/40 font-mono">Chargement des questionsâ€¦</div>
+            <div className="p-12 text-center text-sm text-white/40 font-mono">Chargement des questions...</div>
           ) : questions.length === 0 ? (
             <div className="p-10 sm:p-14 text-center">
               <div className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-[#C9F06A]/10 border border-[#C9F06A]/20 text-[#C9F06A]"><CircleHelp size={23} /></div>
               <h2 className="font-bold text-white font-display text-lg">Aucune question pour le moment</h2>
-              <p className="text-sm text-white/60 mt-2">Essayez dâ€™autres filtres ou lancez la première discussion.</p>
+              <p className="text-sm text-white/60 mt-2">Essayez d'autres filtres ou lancez la première discussion.</p>
               <button onClick={onAsk} className={`${styles.askButton} mt-5`}><Plus size={16} /> Poser une question</button>
             </div>
           ) : (
@@ -231,14 +231,14 @@ function QuestionDetail({ id }) {
 
   async function submitAnswer(event) {
     event.preventDefault()
-    if (answer.trim().length < 1) return setFormError('Ã‰crivez votre réponse avant de lâ€™envoyer.')
+    if (answer.trim().length < 1) return setFormError('Écrivez votre réponse avant de l\'envoyer.')
     setSaving(true)
     setFormError('')
     try {
       await questionsApi.repondre(id, answer.trim())
       setAnswer('')
       loadQuestion()
-    } catch (err) { setFormError(err.message || 'Votre réponse nâ€™a pas pu être publiée.') }
+    } catch (err) { setFormError(err.message || 'Votre réponse n\'a pas pu être publiée.') }
     finally { setSaving(false) }
   }
 
@@ -249,7 +249,7 @@ function QuestionDetail({ id }) {
     } catch (err) { setFormError(err.message || 'Impossible de marquer cette réponse comme solution.') }
   }
 
-  if (loading) return <div className={`${styles.panel} p-12 text-center text-sm text-white/40 font-mono`}>Chargement de la questionâ€¦</div>
+  if (loading) return <div className={`${styles.panel} p-12 text-center text-sm text-white/40 font-mono`}>Chargement de la question...</div>
   if (error || !question) return <div className={`${styles.panel} p-10 text-center`}><p className="text-sm text-red-400">{error || 'Question introuvable.'}</p><button onClick={() => navigate('/questions')} className="mt-4 text-sm font-semibold text-[#C9F06A] hover:underline">Retour aux questions</button></div>
 
   return (
@@ -289,8 +289,8 @@ function QuestionDetail({ id }) {
       {!question.resolue && <form onSubmit={submitAnswer} className={`${styles.panel} p-5 sm:p-6 mt-6`}>
         <h2 className="font-bold text-white font-display mb-3 text-lg">Votre réponse</h2>
         {formError && <p className="mb-3 text-sm text-red-400">{formError}</p>}
-        <textarea className={`${styles.field} resize-y`} rows={4} maxLength={5000} value={answer} onChange={event => setAnswer(event.target.value)} placeholder="Partagez une réponse claire et bienveillanteâ€¦" />
-        <div className="mt-4 flex justify-end"><button disabled={saving || !answer.trim()} className={styles.primaryButton}>{saving ? 'Envoiâ€¦' : <><Send size={16} /> Publier ma réponse</>}</button></div>
+        <textarea className={`${styles.field} resize-y`} rows={4} maxLength={5000} value={answer} onChange={event => setAnswer(event.target.value)} placeholder="Partagez une réponse claire et bienveillante..." />
+        <div className="mt-4 flex justify-end"><button disabled={saving || !answer.trim()} className={styles.primaryButton}>{saving ? 'Envoi...' : <><Send size={16} /> Publier ma réponse</>}</button></div>
       </form>}
     </>
   )

@@ -100,27 +100,17 @@ export default function Hero() {
           </Link>
         </div>
 
-        {/* Floating Glass Pill for Live Backend Stats */}
-        <div className="inline-flex flex-wrap items-center justify-center gap-6 sm:gap-10 rounded-full border border-white/10 bg-[#16221C]/80 px-8 py-3.5 backdrop-blur-xl shadow-2xl text-xs sm:text-sm text-white/70">
+        {/* Floating Glass Pill */}
+        <div className="inline-flex items-center justify-center gap-3 sm:gap-4 rounded-full border border-[#C9F06A]/30 bg-[#16221C]/80 px-6 sm:px-8 py-3 backdrop-blur-xl shadow-2xl text-xs sm:text-sm text-white/80">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#C9F06A]" />
+            <span className="w-2 h-2 rounded-full bg-[#C9F06A] animate-pulse" />
             <span className="text-white font-bold font-mono">54</span>
-            <span className="text-white/60">Nations Souveraines</span>
+            <span className="text-white/80 font-medium">Nations Souveraines d'Afrique</span>
           </div>
           <span className="text-white/20 hidden sm:inline">•</span>
-          <div className="flex items-center gap-2">
-            <span className="text-[#C9F06A] font-bold font-mono">
-              {stats ? Number(stats.developpeurs ?? 0).toLocaleString('fr-FR') : '0'}
-            </span>
-            <span className="text-white/60">Développeurs Inscrits</span>
-          </div>
-          <span className="text-white/20 hidden sm:inline">•</span>
-          <div className="flex items-center gap-2">
-            <span className="text-[#C9F06A] font-bold font-mono">
-              {stats ? Number(stats.projets ?? 0).toLocaleString('fr-FR') : '0'}
-            </span>
-            <span className="text-white/60">Projets Publiés</span>
-          </div>
+          <span className="text-[#C9F06A] font-mono text-xs hidden sm:inline font-semibold">
+            Écosystème Tech Continental
+          </span>
         </div>
       </div>
 

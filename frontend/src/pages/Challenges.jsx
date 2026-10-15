@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
   ArrowLeft, ArrowRight, Award, CheckCircle2, Clock3, Code2, Flame,
@@ -20,7 +20,7 @@ function nameOf(user) {
 }
 
 function dateLabel(date) {
-  if (!date) return 'â€”'
+  if (!date) return '—'
   const parsed = new Date(`${date}T12:00:00`)
   return Number.isNaN(parsed.getTime()) ? date : new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' }).format(parsed)
 }
@@ -49,7 +49,7 @@ function ChallengeCard({ challenge }) {
           <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-xs text-white/40 font-mono">
             <span className="inline-flex items-center gap-1.5"><Award size={14} className="text-[#C9F06A]" />{challenge.points} points</span>
             <span className="inline-flex items-center gap-1.5"><CheckCircle2 size={14} />{challenge.nombreReussites} réussite{challenge.nombreReussites === 1 ? '' : 's'}</span>
-            <span className="inline-flex items-center gap-1.5"><Clock3 size={14} />Jusquâ€™au {dateLabel(challenge.dateFin)}</span>
+            <span className="inline-flex items-center gap-1.5"><Clock3 size={14} />Jusqu'au {dateLabel(challenge.dateFin)}</span>
             {challenge.maParticipation && <span>{statusLabel(challenge.maParticipation)}</span>}
           </div>
         </div>
@@ -99,7 +99,7 @@ function DailyChallenge() {
       <div className="absolute -right-10 -top-24 h-64 w-64 rounded-full bg-[#C9F06A]/10 blur-3xl" />
       <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-6">
         <div className="max-w-2xl">
-          <p className="inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.16em] font-mono font-bold text-[#C9F06A]"><Flame size={14} /> Ã€ relever aujourdâ€™hui</p>
+          <p className="inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.16em] font-mono font-bold text-[#C9F06A]"><Flame size={14} /> À relever aujourd'hui</p>
           <h2 className="text-2xl sm:text-3xl font-extrabold mt-3 text-white font-display">{challenge.titre}</h2>
           <p className="text-sm text-white/60 mt-2 font-body">{TYPE_LABELS[challenge.type] || challenge.type} · {DIFFICULTY_LABELS[challenge.difficulte] || challenge.difficulte} · {challenge.points} points</p>
         </div>
@@ -156,14 +156,14 @@ function ChallengeList() {
             </select>
           </div>
           {error ? <div className="p-10 text-center"><p className="text-sm text-red-400">{error}</p><button onClick={() => setRetryCount(count => count + 1)} className="mt-3 text-sm font-semibold text-[#C9F06A] hover:underline">Réessayer</button></div>
-            : loading ? <div className="p-12 text-center text-sm text-white/40 font-mono">Chargement des challengesâ€¦</div>
+            : loading ? <div className="p-12 text-center text-sm text-white/40 font-mono">Chargement des challenges...</div>
               : challenges.length ? <>
                 {challenges.map(challenge => <ChallengeCard key={challenge.id} challenge={challenge} />)}
                 <div className="px-5 py-4 border-t border-white/10 flex items-center justify-between gap-4">
                   <span className="text-xs text-white/40 font-mono">{total} challenge{total === 1 ? '' : 's'}</span>
                   <div className="flex items-center gap-3"><button disabled={page === 0} onClick={() => setPage(page - 1)} className="text-sm font-semibold text-[#C9F06A] disabled:opacity-30">Précédent</button><span className="text-xs text-white/40 font-mono">{page + 1} / {Math.max(totalPages, 1)}</span><button disabled={page + 1 >= totalPages} onClick={() => setPage(page + 1)} className="text-sm font-semibold text-[#C9F06A] disabled:opacity-30">Suivant</button></div>
                 </div>
-              </> : <div className="p-10 text-center"><div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-[#C9F06A]/10 border border-[#C9F06A]/20 text-[#C9F06A] mb-4"><Lightbulb size={22} /></div><h2 className="font-bold text-white font-display text-lg">Aucun challenge trouvé</h2><p className="text-sm text-white/60 mt-2">Essayez dâ€™autres filtres ou revenez plus tard.</p></div>}
+              </> : <div className="p-10 text-center"><div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-[#C9F06A]/10 border border-[#C9F06A]/20 text-[#C9F06A] mb-4"><Lightbulb size={22} /></div><h2 className="font-bold text-white font-display text-lg">Aucun challenge trouvé</h2><p className="text-sm text-white/60 mt-2">Essayez d'autres filtres ou revenez plus tard.</p></div>}
         </section>
 
         <aside className="space-y-5">
@@ -171,7 +171,7 @@ function ChallengeList() {
           <section className={`${styles.panel} p-5`}>
             <div className="mb-3 grid h-10 w-10 place-items-center rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400"><ShieldCheck size={19} /></div>
             <h2 className="font-bold text-sm text-white font-display">Comment ça marche</h2>
-            <p className="text-sm leading-relaxed text-white/60 mt-2">Chaque challenge a un nombre dâ€™essais limité. Les points sont attribués lorsque la réponse est correcte.</p>
+            <p className="text-sm leading-relaxed text-white/60 mt-2">Chaque challenge a un nombre d'essais limité. Les points sont attribués lorsque la réponse est correcte.</p>
           </section>
         </aside>
       </div>
@@ -201,18 +201,18 @@ function ChallengeDetail({ id }) {
   async function submit(event) {
     event.preventDefault()
     setError('')
-    if (!answer.trim()) return setError('Saisissez votre réponse avant de lâ€™envoyer.')
+    if (!answer.trim()) return setError('Saisissez votre réponse avant de l\'envoyer.')
     setSaving(true)
     try {
       const outcome = await challengesApi.repondre(id, answer.trim())
       setResult(outcome)
       setAnswer('')
       await load(false)
-    } catch (err) { setError(err.message || 'Votre réponse nâ€™a pas pu être envoyée.') }
+    } catch (err) { setError(err.message || 'Votre réponse n\'a pas pu être envoyée.') }
     finally { setSaving(false) }
   }
 
-  if (loading) return <div className={`${styles.panel} p-12 text-center text-sm text-white/40 font-mono`}><LoaderCircle size={20} className="inline animate-spin mr-2 text-[#C9F06A]" />Chargement du challengeâ€¦</div>
+  if (loading) return <div className={`${styles.panel} p-12 text-center text-sm text-white/40 font-mono`}><LoaderCircle size={20} className="inline animate-spin mr-2 text-[#C9F06A]" />Chargement du challenge...</div>
   if (error && !challenge) return <div className={`${styles.panel} p-10 text-center`}><p className="text-sm text-red-400">{error}</p><button onClick={() => navigate('/challenges')} className="mt-4 text-sm font-semibold text-[#C9F06A] hover:underline">Retour aux challenges</button></div>
   if (!challenge) return null
 
@@ -237,7 +237,7 @@ function ChallengeDetail({ id }) {
             <span className="inline-flex items-center gap-1.5"><CheckCircle2 size={14} />{challenge.nombreReussites} réussite{challenge.nombreReussites === 1 ? '' : 's'}</span>
           </div>
 
-          <h2 className="font-bold mt-6 mb-2 text-white font-display text-lg">Ã‰noncé</h2>
+          <h2 className="font-bold mt-6 mb-2 text-white font-display text-lg">Énoncé</h2>
           <p className="whitespace-pre-wrap text-sm text-white/80 leading-7 font-body">{challenge.enonce}</p>
           {challenge.extraitCode && <div className="mt-5"><div className="text-xs text-white/40 font-mono mb-2">{challenge.langage || 'Extrait de code'}</div><pre className={styles.code}><code>{challenge.extraitCode}</code></pre></div>}
 
@@ -248,15 +248,15 @@ function ChallengeDetail({ id }) {
 
           {error && challenge && <div className="mt-5 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">{error}</div>}
           {result && <div className={`mt-5 rounded-2xl border p-4 ${result.correct ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300' : 'border-amber-500/30 bg-amber-500/10 text-amber-300'}`}>
-            <div className="font-bold">{result.correct ? 'Bonne réponse !' : result.essaisRestants > 0 ? 'Ce nâ€™est pas encore la bonne réponse.' : 'Vous avez utilisé tous vos essais.'}</div>
+            <div className="font-bold">{result.correct ? 'Bonne réponse !' : result.essaisRestants > 0 ? 'Ce n\'est pas encore la bonne réponse.' : 'Vous avez utilisé tous vos essais.'}</div>
             <p className="text-sm mt-1">{result.correct ? `Vous gagnez ${result.score} points.` : `${result.essaisRestants} essai${result.essaisRestants === 1 ? '' : 's'} restant${result.essaisRestants === 1 ? '' : 's'}.`}</p>
           </div>}
 
           {canAnswer ? <form onSubmit={submit} className="mt-6 border-t border-white/10 pt-6">
             <label htmlFor="challenge-answer" className="block text-xs font-bold text-[#C9F06A] font-mono uppercase mb-2">Votre réponse</label>
-            <div className="flex flex-col sm:flex-row gap-3"><input id="challenge-answer" value={answer} onChange={event => setAnswer(event.target.value)} maxLength={500} className={styles.field} placeholder="Saisissez votre réponseâ€¦" /><button disabled={saving || !answer.trim()} className={`${styles.button} shrink-0`}>{saving ? 'Vérificationâ€¦' : <><Send size={16} /> Envoyer</>}</button></div>
+            <div className="flex flex-col sm:flex-row gap-3"><input id="challenge-answer" value={answer} onChange={event => setAnswer(event.target.value)} maxLength={500} className={styles.field} placeholder="Saisissez votre réponse..." /><button disabled={saving || !answer.trim()} className={`${styles.button} shrink-0`}>{saving ? 'Vérification...' : <><Send size={16} /> Envoyer</>}</button></div>
             <p className="mt-2 text-xs text-white/40 font-mono">Il vous reste {participation?.essaisRestants ?? challenge.nombreEssaisMax} essai{(participation?.essaisRestants ?? challenge.nombreEssaisMax) === 1 ? '' : 's'}.</p>
-          </form> : <p className="mt-6 border-t border-white/10 pt-5 text-sm text-white/50">{challenge.ouvert ? 'Votre participation est terminée.' : 'Ce challenge nâ€™accepte plus de réponses.'}</p>}
+          </form> : <p className="mt-6 border-t border-white/10 pt-5 text-sm text-white/50">{challenge.ouvert ? 'Votre participation est terminée.' : 'Ce challenge n\'accepte plus de réponses.'}</p>}
 
           {visibleExplanation && <section className="mt-6 rounded-2xl border border-[#C9F06A]/20 bg-[#C9F06A]/10 p-5"><h2 className="font-bold text-[#C9F06A] font-display">Explication</h2><p className="whitespace-pre-wrap text-sm text-white/80 leading-6 mt-2">{visibleExplanation}</p></section>}
         </article>

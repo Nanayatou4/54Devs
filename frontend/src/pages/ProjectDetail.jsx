@@ -660,7 +660,7 @@ export default function ProjectDetail() {
                       <input
                         value={newMessage}
                         onChange={e => setNewMessage(e.target.value.slice(0, 1000))}
-                        placeholder="Ã‰crire un message..."
+                        placeholder="Écrire un message..."
                         className={styles.messageInput}
                       />
                       <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-gray-400">
@@ -687,7 +687,7 @@ export default function ProjectDetail() {
                         <p className="font-semibold text-white text-sm">
                           {d.prenom} {d.nom}
                         </p>
-                        <p className="text-white/70 text-sm mt-1">Motif : {d.motif || 'â€”'}</p>
+                        <p className="text-white/70 text-sm mt-1">Motif : {d.motif || '—'}</p>
                         <p className="text-white/40 text-xs mt-1">
                           {d.dateDepart && new Date(d.dateDepart).toLocaleDateString('fr-FR')}
                           {' · '}
@@ -868,7 +868,7 @@ export default function ProjectDetail() {
 
             <p className="text-sm text-gray-600 mb-4">
               {showMotifModal.utilisateurId === currentUser?.id
-                ? 'ÃŠtes-vous sûr de vouloir quitter ce projet ?'
+                ? 'Êtes-vous sûr de vouloir quitter ce projet ?'
                 : `Retirer ${showMotifModal.prenom} ${showMotifModal.nom} du projet ?`}
             </p>
 

@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import {
   ChevronLeft,
@@ -155,13 +155,13 @@ export default function ProjectsCoverflow() {
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-14">
           <p className="inline-block text-xs font-bold tracking-[0.25em] text-[#C9F06A] uppercase mb-3">
-            // Ã‰COSYSTÃˆME & PORTFOLIO
+            // ÉCOSYSTÈME & PORTFOLIO
           </p>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight font-display">
-            Les Projets Publiés dans le Backend
+            Les Projets Publiés de la Communauté
           </h2>
           <p className="mt-5 text-base sm:text-lg text-white/65 leading-relaxed font-body">
-            Chaque entité ci-dessous est un projet réellement enregistré dans votre base de données â€” dès que vous ou vos utilisateurs publiez un projet, il apparaît en direct dans ce carrousel 3D.
+            Chaque entité ci-dessous est un projet réellement enregistré dans l'écosystème — dès qu'un projet est publié, il apparaît en direct dans ce carrousel 3D.
           </p>
         </div>
 
@@ -419,7 +419,7 @@ export default function ProjectsCoverflow() {
                       className="inline-flex items-center gap-2 rounded-full bg-[#C9F06A] px-6 py-3 text-xs font-bold uppercase tracking-wider text-black shadow-[0_8px_24px_-6px_rgba(201, 240, 106,0.55)] transition hover:bg-[#D8F87C]"
                     >
                       <span>Voir la fiche complète</span>
-                      <span>â†—</span>
+                      <span>↗</span>
                     </Link>
 
                     <Link
