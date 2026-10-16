@@ -5,8 +5,8 @@ import {
   LoaderCircle, MapPin, Search, Users,
 } from 'lucide-react'
 import { competencesApi, developpeursApi, ROLE_MEMBRE, STATUT_PROJET } from '../api'
-import { getAvatarForIndex } from '../lib/projectImages'
 import { styles } from './Developers.styles'
+import Avatar from '../components/Avatar'
 
 const LEVELS = [['DEBUTANT', 'Débutant'], ['INTERMEDIAIRE', 'Intermédiaire'], ['AVANCE', 'Avancé']]
 const LEVEL_LABELS = Object.fromEntries(LEVELS)
@@ -34,12 +34,7 @@ function DeveloperCard({ developer }) {
     <Link to={`/developers/${developer.utilisateurId}`} className={`${styles.card} block group`}>
       <div className="flex items-start gap-4">
         <div className="w-12 h-12 rounded-2xl overflow-hidden border border-[#C9F06A]/40 shrink-0 bg-[#C9F06A] text-black flex items-center justify-center font-bold text-sm shadow-md ring-2 ring-[#C9F06A]/20">
-          <img
-            src={getAvatarForIndex(developer.utilisateurId || 0)}
-            alt={displayName(developer)}
-            className="w-full h-full object-cover"
-            onError={(e) => { e.currentTarget.style.display = 'none' }}
-          />
+          <Avatar src={developer.avatarUrl} name={displayName(developer)} className="w-full h-full" />
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
@@ -164,12 +159,7 @@ function DeveloperDetail({ id }) {
       <aside className={`${styles.panel} p-6 text-center`}>
         <div className="h-24 rounded-2xl bg-gradient-to-r from-[#18251E] via-[#2a2214] to-[#16221C] -mx-6 -mt-6 mb-[-2.75rem] border-b border-white/5" />
         <div className="relative mx-auto h-24 w-24 rounded-3xl overflow-hidden border-2 border-[#C9F06A]/50 ring-4 ring-[#101915] bg-[#C9F06A] text-black shadow-2xl flex items-center justify-center font-bold text-xl">
-          <img
-            src={getAvatarForIndex(developer.utilisateurId || 0)}
-            alt={displayName(developer)}
-            className="w-full h-full object-cover"
-            onError={(e) => { e.currentTarget.style.display = 'none' }}
-          />
+          <Avatar src={developer.avatarUrl} name={displayName(developer)} className="w-full h-full" />
         </div>
         <h1 className="text-xl font-bold mt-4 text-white font-display">{displayName(developer)}</h1>
         {developer.niveau && <p className="text-sm text-white/40 font-mono mt-1">{LEVEL_LABELS[developer.niveau] || developer.niveau}</p>}

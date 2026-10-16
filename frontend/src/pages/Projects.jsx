@@ -18,7 +18,8 @@ import {
   CheckCircle2,
 } from 'lucide-react'
 import { projetsApi, competencesApi } from '../api'
-import { getProjectImage, getAvatarForIndex } from '../lib/projectImages'
+import { getProjectImage } from '../lib/projectImages'
+import Avatar from '../components/Avatar'
 
 const TAILLE = 9
 const DEBOUNCE_MS = 300
@@ -271,8 +272,7 @@ export default function Projects() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {projets.map((p) => {
               const creatorAvatar =
-                p.createur?.avatarUrl || getAvatarForIndex(p.id)
-              const member2Avatar = getAvatarForIndex(p.id + 1)
+                p.createur?.avatarUrl || null
               const imageUrl = getProjectImage(p)
 
               return (
@@ -347,16 +347,7 @@ export default function Projects() {
                         {/* Overlapping profile avatars */}
                         <div className="flex items-center gap-2">
                           <div className="flex -space-x-2 overflow-hidden">
-                            <img
-                              src={creatorAvatar}
-                              alt="Créateur"
-                              className="inline-block h-6 w-6 rounded-full ring-2 ring-[#16221C] object-cover"
-                            />
-                            <img
-                              src={member2Avatar}
-                              alt="Collaborateur"
-                              className="inline-block h-6 w-6 rounded-full ring-2 ring-[#16221C] object-cover"
-                            />
+                            <Avatar src={creatorAvatar} name={p.createur?.pseudo || [p.createur?.prenom, p.createur?.nom].filter(Boolean).join(' ') || 'Membre'} className="h-6 w-6 ring-2 ring-[#16221C]" textClassName="text-[9px]" />
                           </div>
                           <span className="text-xs text-white/50 truncate max-w-[140px]">
                             {p.nombreMembres > 1

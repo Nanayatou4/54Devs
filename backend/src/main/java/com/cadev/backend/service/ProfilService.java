@@ -54,6 +54,8 @@ public class ProfilService {
         p.setGithub(req.github());
         p.setLinkedin(req.linkedin());
         p.setPortfolio(req.portfolio());
+        String avatar = req.avatarUrl();
+        p.setAvatarUrl(avatar == null || avatar.isBlank() ? null : avatar.trim());
         return ProfilDto.depuis(p); // enregistré automatiquement à la fin de la transaction
     }
 

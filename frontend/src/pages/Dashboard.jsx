@@ -6,9 +6,10 @@ import {
   Sparkles, Trophy, Users, UsersRound,
 } from 'lucide-react'
 import { dashboardApi, getStoredUser, getToken } from '../api'
-import { getProjectImage, getAvatarForIndex } from '../lib/projectImages'
+import { getProjectImage } from '../lib/projectImages'
 import { styles } from './Dashboard.styles'
 import { ROLE_LABELS, STATUT_LABELS } from './Dashboard.data'
+import Avatar from '../components/Avatar'
 
 const MISSING_LABELS = {
   BIO: 'Ajouter une présentation',
@@ -190,12 +191,7 @@ function DeveloperSuggestion({ item }) {
     <div className="rounded-3xl border border-white/10 bg-[#141E19]/90 p-5 shadow-xl backdrop-blur-md">
       <div className="flex items-center gap-3">
         <div className="w-11 h-11 shrink-0 rounded-2xl overflow-hidden border border-[#C9F06A]/40 bg-[#C9F06A] text-black shadow-md flex items-center justify-center font-bold text-xs ring-2 ring-[#C9F06A]/20">
-          <img
-            src={getAvatarForIndex(developer.utilisateurId || 0)}
-            alt={personName(developer)}
-            className="w-full h-full object-cover"
-            onError={(e) => { e.currentTarget.style.display = 'none' }}
-          />
+          <Avatar src={developer.avatarUrl} name={personName(developer)} className="w-full h-full" />
         </div>
         <div className="min-w-0 flex-1">
           <Link to={`/developers/${developer.utilisateurId}`} className="font-bold text-sm text-white hover:text-[#C9F06A] transition font-display">

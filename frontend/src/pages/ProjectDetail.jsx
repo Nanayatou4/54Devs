@@ -6,7 +6,8 @@ import {
   Image as ImageIcon,
 } from 'lucide-react'
 import { getToken, getStoredUser, projetsApi, competencesApi } from '../api'
-import { getProjectImage, getAvatarForIndex, COVER_PRESETS } from '../lib/projectImages'
+import { getProjectImage, COVER_PRESETS } from '../lib/projectImages'
+import Avatar from '../components/Avatar'
 import { styles } from './ProjectDetail.styles'
 import {
   STATUT_LABELS, STATUT_COLORS, ALL_STATUTS, NIVEAU_LABELS,
@@ -514,12 +515,7 @@ export default function ProjectDetail() {
                   <div key={m.utilisateurId} className={styles.memberItem}>
                     <div className="flex items-center gap-3">
                       <div className="w-11 h-11 rounded-full overflow-hidden border border-[#C9F06A]/40 shrink-0 bg-[#C9F06A] text-black flex items-center justify-center font-bold text-xs shadow-md">
-                        <img
-                          src={getAvatarForIndex(idx)}
-                          alt={`${m.prenom} ${m.nom}`}
-                          className="w-full h-full object-cover"
-                          onError={(e) => { e.currentTarget.style.display = 'none' }}
-                        />
+                        <Avatar src={m.avatarUrl} name={`${m.prenom || ''} ${m.nom || ''}`} className="w-full h-full" />
                       </div>
                       <div>
                         <p className="font-semibold text-white text-sm">{m.prenom} {m.nom}</p>
@@ -562,12 +558,7 @@ export default function ProjectDetail() {
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-full overflow-hidden border border-[#C9F06A]/40 shrink-0 bg-[#C9F06A] text-black flex items-center justify-center font-bold text-xs shadow-md">
-                                <img
-                                  src={getAvatarForIndex(d.demandeur?.id || d.id || 0)}
-                                  alt={d.demandeur?.pseudo || 'Demandeur'}
-                                  className="w-full h-full object-cover"
-                                  onError={(e) => { e.currentTarget.style.display = 'none' }}
-                                />
+                                <Avatar src={d.demandeur?.avatarUrl} name={d.demandeur?.pseudo || [d.demandeur?.prenom, d.demandeur?.nom].filter(Boolean).join(' ') || 'Demandeur'} className="w-full h-full" />
                               </div>
                               <div>
                                 <p className="font-semibold text-white text-sm">
@@ -738,12 +729,7 @@ export default function ProjectDetail() {
               {projet.membres?.map((m, idx) => (
                 <div key={m.utilisateurId} className="flex items-center gap-3 mb-3">
                   <div className="w-9 h-9 rounded-full overflow-hidden border border-[#C9F06A]/40 shrink-0 bg-[#C9F06A] text-black flex items-center justify-center font-bold text-xs shadow-md">
-                    <img
-                      src={getAvatarForIndex(idx)}
-                      alt={m.prenom}
-                      className="w-full h-full object-cover"
-                      onError={(e) => { e.currentTarget.style.display = 'none' }}
-                    />
+                    <Avatar src={m.avatarUrl} name={`${m.prenom || ''} ${m.nom || ''}`} className="w-full h-full" />
                   </div>
                   <div>
                     <p className="text-white text-sm font-semibold">{m.prenom} {m.nom?.[0]}.</p>

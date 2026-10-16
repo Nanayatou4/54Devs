@@ -42,7 +42,8 @@ public class DeveloppeurService {
                 p.getPays(), p.getVille(), p.getNiveau(), p.getDisponibilite(), extrait(p.getBio()),
                 noms(comps, TypeCompetence.MAITRISE),
                 noms(comps, TypeCompetence.ENSEIGNER),
-                noms(comps, TypeCompetence.APPRENDRE));
+                noms(comps, TypeCompetence.APPRENDRE),
+                p.getAvatarUrl());
     }
 
     @Transactional(readOnly = true)
@@ -87,7 +88,8 @@ public class DeveloppeurService {
 
         return new DeveloppeurDetailDto(u.getId(), u.getPrenom(), u.getNom(), p.getPseudo(),
                 p.getPays(), p.getVille(), p.getNiveau(), p.getDisponibilite(), p.getBio(),
-                p.getGithub(), p.getLinkedin(), p.getPortfolio(), competences, projets,badges.badgesObtenus(utilisateurId));
+                p.getGithub(), p.getLinkedin(), p.getPortfolio(), competences, projets, badges.badgesObtenus(utilisateurId),
+                p.getAvatarUrl());
     }
 
     private static List<String> noms(List<CompetenceUtilisateur> liste, TypeCompetence type) {

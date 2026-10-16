@@ -36,4 +36,8 @@ public class Profil {
     private String linkedin;
     private String portfolio;
 
+    // URL ou image encodee (data:image/...;base64) choisie par l'utilisateur ; null = avatar a initiales
+    @Column(columnDefinition = "TEXT")
+    private String avatarUrl;
+
 }

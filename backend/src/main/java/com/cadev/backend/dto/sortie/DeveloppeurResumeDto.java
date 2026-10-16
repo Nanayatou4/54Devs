@@ -8,4 +8,5 @@ public record DeveloppeurResumeDto(Long utilisateurId, String prenom, String nom
                                    String pays, String ville, Niveau niveau, String disponibilite, String bio,
                                    List<String> competencesMaitrisees,
                                    List<String> competencesAEnseigner,
-                                   List<String> competencesAApprendre) {}
+                                   List<String> competencesAApprendre,
+                                   String avatarUrl) {}

@@ -42,7 +42,7 @@ public class ProjetPublicService {
                     description.length() > 150 ? description.substring(0, 150) + "…" : description,
                     p.getCategorie(), p.getTechnologies(), p.getImageUrl(), p.getStatut(), places, (int) nb,
                     p.getCompetencesRecherchees().stream().map(cp -> cp.getCompetence().getNom()).toList(),
-                    createur.pseudo(), createur.pays()));
+                    createur.pseudo(), createur.pays(), createur.avatarUrl()));
         }
         return resultat;
     }

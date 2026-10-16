@@ -14,6 +14,14 @@ import {
   Users,
 } from 'lucide-react'
 import { publicApi, projetsApi, STATUT_PROJET } from '../api'
+import { getProjectImage } from '../lib/projectImages'
+import Avatar from './Avatar'
+
+function creatorOf(p) {
+  const c = p?.createur || {}
+  const name = [c.prenom, c.nom].filter(Boolean).join(' ') || c.nomComplet || p?.createurPseudo || p?.createurNom || ''
+  return { name, avatar: c.avatarUrl || p?.createurAvatarUrl || null }
+}
 
 // Palette of dynamic glowing gradients for backend projects
 const PALETTES = [
@@ -259,29 +267,35 @@ export default function ProjectsCoverflow() {
                       )}
                     </div>
 
-                    {/* Centered Brand Box */}
+                    {/* Cover image */}
                     <div className="relative z-10 flex flex-1 items-center justify-center my-3">
-                      <div className="w-full h-28 rounded-xl bg-black/40 border border-white/5 flex flex-col items-center justify-center p-3 group-hover:scale-105 transition-transform text-center">
-                        <div
-                          className="w-12 h-12 rounded-xl flex items-center justify-center mb-2 shadow-inner"
-                          style={{ backgroundColor: `${palette.accent}25` }}
-                        >
-                          <Code2 size={24} style={{ color: palette.accent }} />
-                        </div>
-                        <span className="text-base sm:text-lg font-black text-white font-display tracking-wide truncate max-w-full px-2">
-                          {proj.nom || proj.titre}
-                        </span>
+                      <div className="relative w-full h-36 sm:h-44 rounded-xl overflow-hidden border border-white/10">
+                        <img
+                          src={getProjectImage(proj)}
+                          alt={proj.nom || proj.titre}
+                          loading="lazy"
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
                       </div>
                     </div>
 
                     {/* Bottom Info */}
-                    <div className="relative z-10 pt-2 border-t border-white/10">
-                      <p className="text-sm sm:text-base font-bold text-white font-display truncate">
-                        {proj.nom || proj.titre}
-                      </p>
-                      <p className="text-[10px] font-mono tracking-[0.2em] text-white/50 uppercase truncate">
-                        {proj.categorie || 'TECHNOLOGIE'}
-                      </p>
+                    <div className="relative z-10 pt-3 border-t border-white/10 flex items-center gap-3">
+                      <Avatar
+                        src={creatorOf(proj).avatar}
+                        name={creatorOf(proj).name || 'Créateur'}
+                        className="h-9 w-9 ring-2"
+                        style={{ '--tw-ring-color': palette.accent }}
+                      />
+                      <div className="min-w-0">
+                        <p className="text-sm sm:text-base font-bold text-white font-display truncate">
+                          {proj.nom || proj.titre}
+                        </p>
+                        <p className="text-[10px] font-mono tracking-[0.2em] text-white/50 uppercase truncate">
+                          {creatorOf(proj).name ? `par ${creatorOf(proj).name}` : (proj.categorie || 'TECHNOLOGIE')}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 )
@@ -335,8 +349,18 @@ export default function ProjectsCoverflow() {
               <div className="mt-12 max-w-4xl mx-auto rounded-3xl border border-white/15 bg-[#16221C]/90 p-6 sm:p-9 backdrop-blur-xl shadow-2xl relative">
                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 pb-6 border-b border-white/10">
                   <div className="flex items-start gap-4">
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center shrink-0 border border-white/10 bg-[#C9F06A]/15 text-[#C9F06A]">
-                      <Code2 size={32} />
+                    <div className="relative w-16 h-16 sm:w-20 sm:h-20 shrink-0">
+                      <img
+                        src={getProjectImage(activeProject)}
+                        alt={activeProject.nom || activeProject.titre}
+                        className="w-full h-full rounded-2xl object-cover border border-white/10"
+                      />
+                      <Avatar
+                        src={creatorOf(activeProject).avatar}
+                        name={creatorOf(activeProject).name || 'Créateur'}
+                        className="absolute -bottom-2 -right-2 h-8 w-8 ring-2 ring-[#16221C]"
+                        textClassName="text-[10px]"
+                      />
                     </div>
 
                     <div>

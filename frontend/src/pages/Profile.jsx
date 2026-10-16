@@ -18,6 +18,7 @@ import {
   STATUT_PROJET,
 } from '../api'
 import { getProjectImage } from '../lib/projectImages'
+import Avatar from '../components/Avatar'
 import { styles } from './Profile.styles'
 import { NIVEAU_LABELS, NIVEAUX } from './Profile.data'
 import { TYPE_COMPETENCE } from '../lib/libelles'
@@ -63,7 +64,11 @@ export default function Profile() {
         return []
       }),
     ]).then(([p, c, userBadges, projects]) => {
-      if (p) setProfil(p)
+      if (p) {
+        setProfil(p)
+        setPhotoPreview(p.avatarUrl || null)
+        setProfilePhoto(p.avatarUrl || null)
+      }
       setCompetences(c || [])
       setBadges(Array.isArray(userBadges) ? userBadges : [])
       setMyProjects(Array.isArray(projects) ? projects : [])
@@ -108,7 +113,7 @@ export default function Profile() {
 
   function cancelEditing() {
     setEditing(false)
-    setPhotoPreview(getProfilePhoto())
+    setPhotoPreview(profil?.avatarUrl || null)
     setSaveError('')
   }
 
@@ -116,11 +121,25 @@ export default function Profile() {
     setForm(prev => ({ ...prev, [field]: value }))
   }
 
+  // Redimensionne la photo (carré 256px, JPEG) pour qu'elle reste légère en base
   function handlePhotoChange(e) {
     const file = e.target.files?.[0]
-    if (!file) return
+    e.target.value = ''
+    if (!file || !file.type.startsWith('image/')) return
     const reader = new FileReader()
-    reader.onload = () => setPhotoPreview(reader.result)
+    reader.onload = () => {
+      const img = new Image()
+      img.onload = () => {
+        const size = 256
+        const side = Math.min(img.width, img.height)
+        const canvas = document.createElement('canvas')
+        canvas.width = size
+        canvas.height = size
+        canvas.getContext('2d').drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, size, size)
+        setPhotoPreview(canvas.toDataURL('image/jpeg', 0.82))
+      }
+      img.src = reader.result
+    }
     reader.readAsDataURL(file)
   }
 
@@ -146,13 +165,14 @@ export default function Profile() {
         github: form.github || null,
         linkedin: form.linkedin || null,
         portfolio: form.portfolio || null,
+        avatarUrl: photoPreview || null,
       })
       setProfil(updated)
 
       const updatedComp = await profilApi.replaceMesCompetences(editCompetences)
       setCompetences(updatedComp)
 
-      if (photoPreview) setProfilePhoto(photoPreview)
+      setProfilePhoto(updated?.avatarUrl || null)
 
       setEditing(false)
     } catch (err) {
@@ -204,21 +224,14 @@ export default function Profile() {
               <div className={styles.cardBody}>
                 <div className="relative inline-block -mt-16">
                   {editing ? (
+                    <>
                     <button
                       type="button"
                       onClick={() => fileRef.current?.click()}
                       className={styles.avatarButton}
+                      title="Changer la photo"
                     >
-                      {photoPreview ? (
-                        <img src={photoPreview} alt="" className="w-full h-full object-cover" />
-                      ) : (
-                        <img
-                          src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80"
-                          alt="Avatar"
-                          className="w-full h-full object-cover"
-                          onError={(e) => { e.currentTarget.style.display = 'none' }}
-                        />
-                      )}
+                      <Avatar src={photoPreview} name={displayName} className="w-full h-full" textClassName="text-3xl" />
                       <div className={styles.avatarOverlay}>
                         <Camera size={24} className="text-white" />
                       </div>
@@ -230,18 +243,19 @@ export default function Profile() {
                         onChange={handlePhotoChange}
                       />
                     </button>
+                    {photoPreview && (
+                      <button
+                        type="button"
+                        onClick={() => setPhotoPreview(null)}
+                        className="block mx-auto mt-2 text-[11px] text-white/50 hover:text-red-300 transition"
+                      >
+                        Retirer la photo
+                      </button>
+                    )}
+                    </>
                   ) : (
                     <div className={styles.avatarDiv}>
-                      {photoPreview ? (
-                        <img src={photoPreview} alt="" className="w-full h-full object-cover" />
-                      ) : (
-                        <img
-                          src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80"
-                          alt="Avatar"
-                          className="w-full h-full object-cover"
-                          onError={(e) => { e.currentTarget.style.display = 'none' }}
-                        />
-                      )}
+                      <Avatar src={photoPreview} name={displayName} className="w-full h-full" textClassName="text-3xl" />
                     </div>
                   )}
                 </div>

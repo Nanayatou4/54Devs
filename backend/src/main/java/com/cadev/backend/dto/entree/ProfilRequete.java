@@ -13,5 +13,6 @@ public record ProfilRequete(
         @Size(max = 255) String disponibilite,
         @Size(max = 255) String github,
         @Size(max = 255) String linkedin,
-        @Size(max = 255) String portfolio) {}
+        @Size(max = 255) String portfolio,
+        @Size(max = 60000) String avatarUrl) {}
 

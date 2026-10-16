@@ -9,4 +9,5 @@ public record DeveloppeurDetailDto(Long utilisateurId, String prenom, String nom
                                    String github, String linkedin, String portfolio,
                                    List<CompetenceUtilisateurDto> competences,
                                    List<ProjetDeDeveloppeurDto> projets,
-                                   List<BadgeObtenuDto> badges) {}
+                                   List<BadgeObtenuDto> badges,
+                                   String avatarUrl) {}

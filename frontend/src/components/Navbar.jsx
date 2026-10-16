@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { Menu, X, ArrowUpRight, Bell } from 'lucide-react'
 import { styles } from './Navbar.styles'
 import { NAV_LINKS } from './Navbar.data'
+import Avatar from './Avatar'
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
@@ -108,14 +109,11 @@ export default function Navbar() {
                 </Link>
                 <Link to="/profile" title="Mon profil" className="group">
                   <div className="w-9 h-9 rounded-full overflow-hidden ring-2 ring-[#C9F06A]/50 group-hover:ring-[#C9F06A] transition-all shadow-lg bg-[#16221C]">
-                    <img
-                      src={photo || utilisateur?.avatarUrl || `https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80`}
-                      alt="Avatar"
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.target.onerror = null
-                        e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(initials || 'Dev')}&background=16221C&color=C9F06A&bold=true`
-                      }}
+                    <Avatar
+                      src={photo || utilisateur?.avatarUrl}
+                      name={[utilisateur?.prenom, utilisateur?.nom].filter(Boolean).join(' ') || initials || 'Membre'}
+                      className="w-full h-full"
+                      textClassName="text-xs"
                     />
                   </div>
                 </Link>
