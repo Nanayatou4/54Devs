@@ -9,6 +9,7 @@ import PlanApproval from '../components/PlanApproval'
 import PublicStats from '../components/PublicStats'
 import CTA from '../components/CTA'
 import Footer from '../components/Footer'
+import AfricanAmbientPlayer from '../components/AfricanAmbientPlayer'
 
 export default function Home() {
   return (
@@ -43,6 +44,9 @@ export default function Home() {
         <CTA />
       </main>
       <Footer />
+
+      {/* Lecteur flottant d'accueil musical traditionnel africain (Kora) */}
+      <AfricanAmbientPlayer />
     </div>
   )
 }

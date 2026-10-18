@@ -1,13 +1,10 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, Sparkles, Terminal, Code2, Play, Pause, Volume2, VolumeX, Shield, Globe2 } from 'lucide-react'
+import { ArrowRight, Sparkles, Terminal, Code2, Shield, Globe2 } from 'lucide-react'
 import { publicApi } from '../api'
 
 export default function Hero() {
   const [stats, setStats] = useState(null)
-  const [isPlaying, setIsPlaying] = useState(true)
-  const [isMuted, setIsMuted] = useState(true)
-  const videoRef = useRef(null)
 
   useEffect(() => {
     let active = true
@@ -22,29 +19,11 @@ export default function Hero() {
     }
   }, [])
 
-  function togglePlay() {
-    if (!videoRef.current) return
-    if (videoRef.current.paused) {
-      videoRef.current.play()
-      setIsPlaying(true)
-    } else {
-      videoRef.current.pause()
-      setIsPlaying(false)
-    }
-  }
-
-  function toggleMute() {
-    if (!videoRef.current) return
-    videoRef.current.muted = !videoRef.current.muted
-    setIsMuted(videoRef.current.muted)
-  }
-
   return (
     <section className="relative bg-[#101915] overflow-hidden pt-24 pb-28 md:pt-36 md:pb-40 border-b border-white/5 font-body flex flex-col justify-center min-h-[85vh]">
       {/* Background Video Layer with Deep Contrast Gradients */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         <video
-          ref={videoRef}
           autoPlay
           loop
           muted
@@ -112,28 +91,6 @@ export default function Hero() {
             Écosystème Tech Continental
           </span>
         </div>
-      </div>
-
-      {/* Discrete Ambient Video Controls (Bottom Right) */}
-      <div className="absolute bottom-6 right-6 z-20 hidden sm:flex items-center gap-2 p-2 rounded-2xl bg-black/60 backdrop-blur-md border border-white/10 text-xs">
-        <button
-          type="button"
-          onClick={togglePlay}
-          className="p-2 rounded-xl bg-white/10 hover:bg-[#C9F06A] hover:text-black text-white transition pointer-events-auto"
-          title={isPlaying ? 'Mettre en pause la vidéo' : 'Lire la vidéo'}
-          aria-label={isPlaying ? 'Mettre en pause' : 'Lire'}
-        >
-          {isPlaying ? <Pause size={14} /> : <Play size={14} />}
-        </button>
-        <button
-          type="button"
-          onClick={toggleMute}
-          className="p-2 rounded-xl bg-white/10 hover:bg-[#C9F06A] hover:text-black text-white transition pointer-events-auto"
-          title={isMuted ? 'Activer le son' : 'Couper le son'}
-          aria-label={isMuted ? 'Activer le son' : 'Couper le son'}
-        >
-          {isMuted ? <VolumeX size={14} /> : <Volume2 size={14} />}
-        </button>
       </div>
     </section>
   )
