@@ -281,10 +281,10 @@ export default function AfricaMapSection() {
 
             <div className="text-left sm:text-right">
               <span className="text-[10px] font-bold tracking-widest text-[#C9F06A] uppercase block">
-                Statut Backend
+                Réseau 54Devs
               </span>
               <span className="text-xs font-mono text-white/80">
-                {realDevsCount > 0 ? `${realDevsCount} membre(s) actif(s)` : 'En attente d\'inscriptions'}
+                Hub Connecté
               </span>
             </div>
           </div>

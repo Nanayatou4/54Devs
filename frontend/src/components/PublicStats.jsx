@@ -1,21 +1,8 @@
-﻿import { useEffect, useState } from 'react'
-import { publicApi } from '../api'
-
 export default function PublicStats() {
-  const [stats, setStats] = useState(null)
-
-  useEffect(() => {
-    let active = true
-    publicApi.statistiques()
-      .then(data => { if (active && data) setStats(data) })
-      .catch(() => {})
-    return () => { active = false }
-  }, [])
-
   const metrics = [
     { value: '54', label: 'Nations Africaines' },
-    { value: stats ? `${Number(stats.developpeurs ?? 0).toLocaleString('fr-FR')}` : '0', label: 'Développeurs Inscrits' },
-    { value: stats ? `${Number(stats.projets ?? 0).toLocaleString('fr-FR')}` : '0', label: 'Projets Publiés' },
+    { value: 'Code', label: 'Open Source & Collectif' },
+    { value: 'Tech', label: 'Orientation & Innovation' },
     { value: '100%', label: 'Panafricain' },
   ]
 

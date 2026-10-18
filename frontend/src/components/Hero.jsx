@@ -1,23 +1,7 @@
-import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Sparkles, Terminal, Code2, Shield, Globe2 } from 'lucide-react'
-import { publicApi } from '../api'
 
 export default function Hero() {
-  const [stats, setStats] = useState(null)
-
-  useEffect(() => {
-    let active = true
-    publicApi
-      .statistiques()
-      .then((data) => {
-        if (active && data) setStats(data)
-      })
-      .catch(() => {})
-    return () => {
-      active = false
-    }
-  }, [])
 
   return (
     <section className="relative bg-[#101915] overflow-hidden pt-24 pb-28 md:pt-36 md:pb-40 border-b border-white/5 font-body flex flex-col justify-center min-h-[85vh]">
