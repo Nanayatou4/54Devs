@@ -191,7 +191,7 @@ export default function ProjectsCoverflow() {
               Aucun projet publié dans la base de données
             </h3>
             <p className="text-sm text-white/65 mt-2.5 leading-relaxed">
-              Vous avez la main totale : enregistrez un projet via le formulaire ou l'API backend, et il s'affichera immédiatement dans ce carrousel 3D Coverflow.
+              Publiez un projet via le formulaire pour qu'il s'affiche immédiatement dans ce carrousel 3D Coverflow.
             </p>
             <div className="mt-7 flex flex-wrap justify-center gap-3">
               <Link
@@ -365,7 +365,7 @@ export default function ProjectsCoverflow() {
 
                     <div>
                       <p className="text-xs font-bold tracking-[0.2em] text-[#C9F06A] uppercase mb-1">
-                        // Projet Actif Backend #{activeProject.id}
+                        // Projet Actif #{activeProject.id}
                       </p>
                       <div className="flex flex-wrap items-center gap-3">
                         <h3 className="text-2xl sm:text-3xl font-extrabold text-white font-display">

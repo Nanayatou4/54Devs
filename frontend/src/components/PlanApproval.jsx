@@ -63,7 +63,7 @@ export default function PlanApproval() {
             <ul className="space-y-4 mb-8">
               <li className="flex items-start gap-3 text-white/80 text-sm">
                 <CheckCircle2 size={18} className="text-[#C9F06A] shrink-0 mt-0.5" />
-                <span>Indicateurs de statut synchronisés en temps réel avec le backend</span>
+                <span>Indicateurs de statut synchronisés en temps réel</span>
               </li>
               <li className="flex items-start gap-3 text-white/80 text-sm">
                 <CheckCircle2 size={18} className="text-[#C9F06A] shrink-0 mt-0.5" />

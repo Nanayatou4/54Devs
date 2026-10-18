@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, GraduationCap, Users, ChevronLeft, ChevronRight, Loader2, Sparkles, PlusCircle } from 'lucide-react'
 import { developpeursApi, mentorsApi } from '../api'
@@ -162,7 +162,7 @@ export default function MentorsOrbitalTurntable() {
               <div className="flex items-center gap-2">
                 <span className="flex h-2 w-2 rounded-full bg-[#C9F06A] animate-ping" />
                 <span className="text-[11px] font-bold tracking-[0.2em] uppercase text-[#C9F06A]">
-                  Mentors du Backend ({total})
+                  Mentors de la Communauté
                 </span>
               </div>
 
@@ -228,7 +228,7 @@ export default function MentorsOrbitalTurntable() {
                     Aucun mentor enregistré pour le moment
                   </h3>
                   <p className="text-xs sm:text-sm text-white/60 mt-2 leading-relaxed">
-                    Dès que vous enregistrez un développeur avec des compétences à transmettre (via votre API backend ou la page Profil), il défilera automatiquement dans cette scène orbitale 3D.
+                    Dès qu'un développeur renseigne des compétences à transmettre dans son profil, il apparaît automatiquement dans cette scène orbitale 3D.
                   </p>
                   <div className="mt-5 flex justify-center gap-3">
                     <Link
