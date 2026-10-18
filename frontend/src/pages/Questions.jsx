@@ -196,15 +196,26 @@ function QuestionRow({ question }) {
     <Link to={`/questions/${question.id}`} className={`${styles.questionRow} group`}>
       <div className="flex flex-wrap items-center gap-2 mb-3">
         {question.categorie && <span className={styles.category}>{question.categorie}</span>}
-        {question.resolue && <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 px-2.5 py-1 text-[11px] font-semibold"><Check size={12} /> Résolue</span>}
+        {question.resolue && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 px-2.5 py-1 text-[11px] font-semibold">
+            <Check size={12} /> Résolue
+          </span>
+        )}
       </div>
       <h2 className={styles.title}>{question.titre}</h2>
       <p className={styles.excerpt}>{question.extrait}</p>
       <div className={styles.metadata}>
-        <span className="inline-flex items-center gap-2"><span className={styles.avatar}>{initials(question.auteur)}</span><span className="font-medium text-slate-700">{authorName(question.auteur)}</span></span>
-        <span>{formatDate(question.dateCreation)}</span>
-        <span className="inline-flex items-center gap-1"><MessageCircle size={14} /> {question.nombreReponses} réponse{question.nombreReponses === 1 ? '' : 's'}</span>
-        <span className="ml-auto inline-flex items-center gap-1 font-semibold text-blue-600 opacity-0 group-hover:opacity-100 transition">Lire <ArrowRight size={14} /></span>
+        <span className="inline-flex items-center gap-2">
+          <span className={styles.avatar}>{initials(question.auteur)}</span>
+          <span className="font-medium text-white/80">{authorName(question.auteur)}</span>
+        </span>
+        <span className="font-mono text-white/40">{formatDate(question.dateCreation)}</span>
+        <span className="inline-flex items-center gap-1 text-white/50">
+          <MessageCircle size={14} className="text-[#C9F06A]" /> {question.nombreReponses} réponse{question.nombreReponses === 1 ? '' : 's'}
+        </span>
+        <span className="ml-auto inline-flex items-center gap-1 font-semibold text-[#C9F06A] opacity-0 group-hover:opacity-100 transition">
+          Lire <ArrowRight size={14} />
+        </span>
       </div>
     </Link>
   )

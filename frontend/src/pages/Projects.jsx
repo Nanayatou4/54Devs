@@ -155,9 +155,9 @@ export default function Projects() {
               // ÉCOSYSTÈME DE PROJETS 54DEVS
             </span>
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight font-display mt-2 leading-[1.1]">
-              Build the Next{' '}
+              Construire les Projets de{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#C9F06A] via-[#D8F87C] to-[#C9F06A] italic font-serif">
-                Continental Unicorn
+                Demain
               </span>
             </h1>
             <p className="text-white/60 text-sm sm:text-base mt-3 leading-relaxed">
@@ -403,10 +403,10 @@ export default function Projects() {
                 <Plus size={26} />
               </div>
               <h3 className="font-bold text-white text-xl font-display group-hover:text-[#C9F06A] transition">
-                Start Something New
+                Lancer un nouveau projet
               </h3>
               <p className="text-xs text-white/50 mt-2 max-w-xs leading-relaxed font-body">
-                Vous avez une idée qui peut transformer le continent ? Partagez-la avec les bâtisseurs de 54Devs et trouvez vos coéquipiers.
+                Vous avez une idée qui peut transformer le continent ? Partagez-la avec les développeurs de 54Devs et trouvez vos coéquipiers.
               </p>
               <span className="mt-6 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#C9F06A] group-hover:translate-x-1 transition-transform">
                 Publier mon projet <ArrowRight size={14} />

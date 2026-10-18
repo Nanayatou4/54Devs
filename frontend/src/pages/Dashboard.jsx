@@ -254,6 +254,69 @@ function DashboardContent({ data }) {
         </Link>
       </header>
 
+      {/* 3 Raccourcis d'action immédiate */}
+      <section className="grid sm:grid-cols-3 gap-4 mb-8" aria-label="Actions rapides">
+        <Link
+          to="/projects"
+          className="group rounded-2xl border border-white/10 bg-[#141E19]/80 hover:bg-[#16221C] hover:border-[#C9F06A]/40 p-5 transition-all shadow-lg flex flex-col justify-between"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <div className="w-10 h-10 rounded-xl bg-[#C9F06A]/15 text-[#C9F06A] flex items-center justify-center group-hover:scale-110 transition-transform">
+              <Rocket size={20} />
+            </div>
+            <ArrowRight size={16} className="text-white/40 group-hover:text-[#C9F06A] group-hover:translate-x-1 transition-all" />
+          </div>
+          <div>
+            <h3 className="font-bold text-white text-base font-display group-hover:text-[#C9F06A] transition">
+              Explorer les Projets
+            </h3>
+            <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+              Découvrez les initiatives panafricaines ou rejoignez une équipe.
+            </p>
+          </div>
+        </Link>
+
+        <Link
+          to="/developers"
+          className="group rounded-2xl border border-white/10 bg-[#141E19]/80 hover:bg-[#16221C] hover:border-[#C9F06A]/40 p-5 transition-all shadow-lg flex flex-col justify-between"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <Users size={20} />
+            </div>
+            <ArrowRight size={16} className="text-white/40 group-hover:text-[#C9F06A] group-hover:translate-x-1 transition-all" />
+          </div>
+          <div>
+            <h3 className="font-bold text-white text-base font-display group-hover:text-[#C9F06A] transition">
+              Trouver des Collaborateurs
+            </h3>
+            <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+              Connectez-vous avec des développeurs et mentors des 54 pays.
+            </p>
+          </div>
+        </Link>
+
+        <Link
+          to="/questions"
+          className="group rounded-2xl border border-white/10 bg-[#141E19]/80 hover:bg-[#16221C] hover:border-[#C9F06A]/40 p-5 transition-all shadow-lg flex flex-col justify-between"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <div className="w-10 h-10 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <CircleHelp size={20} />
+            </div>
+            <ArrowRight size={16} className="text-white/40 group-hover:text-[#C9F06A] group-hover:translate-x-1 transition-all" />
+          </div>
+          <div>
+            <h3 className="font-bold text-white text-base font-display group-hover:text-[#C9F06A] transition">
+              Entraide & Questions
+            </h3>
+            <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+              Posez une question technique ou partagez vos connaissances.
+            </p>
+          </div>
+        </Link>
+      </section>
+
       {/* Demandes de mentorat en attente */}
       {mentorshipRequests > 0 && (
         <section className="mb-8 rounded-3xl border border-[#C9F06A]/30 bg-emerald-500/10 p-5 backdrop-blur-md">
@@ -329,7 +392,7 @@ function DashboardContent({ data }) {
             </div>
             <Link
               to={`/challenges/${challenge.id}`}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#C9F06A] to-emerald-400 px-6 py-3 text-sm font-bold text-white hover:from-[#C9F06A] hover:to-emerald-500 transition shadow-lg shadow-[#C9F06A]/20"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#C9F06A] to-emerald-400 px-6 py-3 text-sm font-bold text-black hover:from-[#C9F06A] hover:to-emerald-500 transition shadow-lg shadow-[#C9F06A]/20"
             >
               {challenge.maParticipation?.statut === 'REUSSIE' ? 'Revoir le challenge' : 'Relever le défi'}
               <ArrowRight size={16} />

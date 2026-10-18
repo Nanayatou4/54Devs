@@ -50,7 +50,10 @@ function DeveloperCard({ developer }) {
             {(developer.competencesAApprendre || []).length > 0 && <span className="text-white/40">Souhaite apprendre : <span className="text-white/70">{developer.competencesAApprendre.slice(0, 2).join(', ')}</span></span>}
           </div>
         </div>
-        <ArrowRight size={18} className="hidden sm:block mt-1 text-white/30 group-hover:text-[#C9F06A] transition" />
+        <div className="hidden sm:flex flex-col items-end justify-between self-stretch shrink-0">
+          <span className="text-xs text-[#C9F06A] opacity-0 group-hover:opacity-100 transition-opacity font-semibold">Voir le profil &rarr;</span>
+          <ArrowRight size={18} className="mt-1 text-white/30 group-hover:text-[#C9F06A] group-hover:translate-x-1 transition" />
+        </div>
       </div>
     </Link>
   )
@@ -97,6 +100,16 @@ function DevelopersList() {
 
   function setDraftField(field, value) { setDraft(current => ({ ...current, [field]: value })) }
 
+  const hasActiveFilters = Boolean(
+    filters.texte || filters.competenceId || filters.type || filters.pays || filters.niveau || filters.disponibilite
+  )
+
+  function resetFilters() {
+    setDraft({ texte: '', competenceId: '', type: '', pays: '', niveau: '', disponibilite: '' })
+    setFilters({})
+    setPage(0)
+  }
+
   return (
     <>
       <header className={styles.hero}>
@@ -115,7 +128,20 @@ function DevelopersList() {
               <input className={styles.field} value={draft.pays} onChange={event => setDraftField('pays', event.target.value)} placeholder="Pays (ex. Sénégal)" aria-label="Pays" />
               <input className={styles.field} value={draft.disponibilite} onChange={event => setDraftField('disponibilite', event.target.value)} placeholder="Disponibilité" aria-label="Disponibilité" />
             </div>
-            <div className="px-4 sm:px-5 py-3 border-b border-white/10 flex justify-end"><button type="submit" className={styles.primaryButton}><Search size={16} /> Rechercher</button></div>
+            <div className="px-4 sm:px-5 py-3 border-b border-white/10 flex items-center justify-between">
+              {hasActiveFilters ? (
+                <button
+                  type="button"
+                  onClick={resetFilters}
+                  className="text-xs text-[#C9F06A] hover:underline font-semibold"
+                >
+                  &times; Réinitialiser les filtres
+                </button>
+              ) : (
+                <span className="text-xs text-white/40 font-mono">Filtrez selon vos critères</span>
+              )}
+              <button type="submit" className={styles.primaryButton}><Search size={16} /> Rechercher</button>
+            </div>
           </form>
           {error ? <div className="p-10 text-center"><p className="text-sm text-red-400">{error}</p><button onClick={() => setRetryCount(count => count + 1)} className="mt-3 text-sm font-semibold text-[#C9F06A] hover:underline">Réessayer</button></div>
             : loading ? <div className="p-12 text-center text-sm text-white/40 font-mono"><LoaderCircle size={18} className="inline animate-spin mr-2 text-[#C9F06A]" />Chargement des profils...</div>
