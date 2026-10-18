@@ -13,7 +13,7 @@ export default function Footer() {
               <span>54Devs</span>
             </Link>
             <p className={styles.description}>
-              L'écosystème panafricain de développement par excellence. Mettre en relation des talents de 54 nations pour la Coupe d'Afrique des Développeurs 2026.
+              L'écosystème panafricain de développement par excellence. Mettre en relation les talents et bâtisseurs de 54 nations pour construire ensemble des solutions technologiques innovantes.
             </p>
             <div className={styles.socialRow}>
               {/* Twitter / X */}
