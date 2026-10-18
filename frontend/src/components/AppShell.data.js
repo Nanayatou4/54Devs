@@ -1,5 +1,4 @@
 import {
-  Briefcase,
   GraduationCap,
   HelpCircle,
   LayoutDashboard,
@@ -18,6 +17,5 @@ export const appNavItems = [
   { key: 'questions', label: 'Questions & Entraide', icon: HelpCircle, path: '/questions' },
   { key: 'mentorship', label: 'Mentorat', icon: GraduationCap, path: '/mentorship' },
   { key: 'challenges', label: 'Défis & Compétitions', icon: Trophy, path: '/challenges' },
-  { key: 'job-board', label: 'Opportunités & Emploi', icon: Briefcase, path: '/job-board' },
   { key: 'profile', label: 'Mon Profil & Compétences', icon: User, path: '/profile' },
 ]

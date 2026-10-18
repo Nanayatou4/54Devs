@@ -56,7 +56,6 @@ export default function Footer() {
               <li><Link to="/challenges" className={styles.link}>Défis & Compétitions</Link></li>
               <li><Link to="/developers" className={styles.link}>Annuaire des Développeurs</Link></li>
               <li><Link to="/community" className={styles.link}>Hub Communautaire</Link></li>
-              <li><Link to="/job-board" className={styles.link}>Offres & Opportunités</Link></li>
             </ul>
           </div>
         </div>
