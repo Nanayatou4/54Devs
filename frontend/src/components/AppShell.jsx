@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { LogOut, Menu, X, PlusCircle } from 'lucide-react'
+import { LogOut, Menu, X, PlusCircle, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { clearAuthSession, getStoredUser } from '../api'
 import { styles } from '../pages/Dashboard.styles'
 import { appNavItems } from './AppShell.data'
@@ -15,6 +15,13 @@ export default function AppShell({ children, user }) {
   const location = useLocation()
   const stored = user || getStoredUser()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem('54devs_sidebar_collapsed') === 'true'
+    } catch {
+      return false
+    }
+  })
 
   const activeKey =
     appNavItems.find((item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`))
@@ -28,6 +35,16 @@ export default function AppShell({ children, user }) {
   function handleNav(path) {
     navigate(path)
     setMobileMenuOpen(false)
+  }
+
+  function toggleSidebar() {
+    setSidebarCollapsed((prev) => {
+      const next = !prev
+      try {
+        localStorage.setItem('54devs_sidebar_collapsed', String(next))
+      } catch {}
+      return next
+    })
   }
 
   return (
@@ -50,30 +67,60 @@ export default function AppShell({ children, user }) {
         </button>
       </div>
 
-      {/* Sidebar (Desktop always visible, Mobile toggleable) */}
+      {/* Bouton flottant pour réafficher la barre latérale sur desktop */}
+      {sidebarCollapsed && (
+        <button
+          type="button"
+          onClick={toggleSidebar}
+          className="hidden md:flex fixed top-4 left-4 z-40 items-center gap-2 px-3.5 py-2 rounded-xl bg-[#0B0D11]/90 hover:bg-[#16221C] border border-white/15 text-white/90 hover:text-white hover:border-[#C9F06A]/50 transition-all shadow-2xl backdrop-blur-md text-xs font-semibold group cursor-pointer"
+          title="Afficher la barre latérale"
+          aria-label="Afficher la barre latérale"
+        >
+          <PanelLeftOpen size={18} className="text-[#C9F06A] group-hover:scale-110 transition-transform" />
+          <span>Menu</span>
+        </button>
+      )}
+
+      {/* Sidebar (Desktop always fixed & intact, Mobile toggleable drawer) */}
       <aside
         className={`${styles.sidebar} ${
-          mobileMenuOpen ? 'flex fixed inset-0 z-50 overflow-y-auto' : 'hidden md:flex'
+          mobileMenuOpen
+            ? 'flex fixed inset-0 z-50 overflow-y-auto'
+            : sidebarCollapsed
+            ? 'hidden'
+            : 'hidden md:flex'
         }`}
       >
         <div>
           {/* Header & Logo */}
-          <div className="flex items-center justify-between mb-6 md:mb-8 px-3">
+          <div className="flex items-center justify-between mb-6 md:mb-8 px-2">
             <Link to="/" className="flex items-center gap-2 text-xl font-bold text-white font-display">
               <span className="text-[#C9F06A] font-mono font-bold">&lt;/&gt;</span>
               <span>
                 54<span className="text-[#C9F06A]">Devs</span>
               </span>
             </Link>
-            {mobileMenuOpen && (
+            <div className="flex items-center gap-1">
               <button
                 type="button"
-                onClick={() => setMobileMenuOpen(false)}
-                className="md:hidden p-1.5 rounded-lg text-white/60 hover:text-white"
+                onClick={toggleSidebar}
+                className="hidden md:flex p-1.5 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition"
+                title="Masquer la barre latérale"
+                aria-label="Masquer la barre latérale"
               >
-                <X size={20} />
+                <PanelLeftClose size={18} />
               </button>
-            )}
+              {mobileMenuOpen && (
+                <button
+                  type="button"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="md:hidden p-1.5 rounded-lg text-white/60 hover:text-white"
+                  aria-label="Fermer le menu"
+                >
+                  <X size={20} />
+                </button>
+              )}
+            </div>
           </div>
 
           {/* User Card */}
@@ -141,7 +188,7 @@ export default function AppShell({ children, user }) {
       </aside>
 
       {/* Main Content Area */}
-      <main className={styles.mainContent}>{children}</main>
+      <main className={`${styles.mainContent} ${sidebarCollapsed ? 'md:pt-16' : ''}`}>{children}</main>
     </div>
   )
 }

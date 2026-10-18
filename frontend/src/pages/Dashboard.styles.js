@@ -1,6 +1,6 @@
-﻿export const styles = {
-  page: 'min-h-screen bg-[#101915] flex flex-col md:flex-row text-slate-100 font-body selection:bg-[#C9F06A] selection:text-black',
-  sidebar: 'w-full md:w-64 bg-[#0B0D11] text-slate-100 border-b md:border-b-0 md:border-r border-white/10 flex flex-col justify-between py-6 px-4 shrink-0 shadow-2xl backdrop-blur-xl',
+export const styles = {
+  page: 'min-h-screen md:h-screen md:overflow-hidden bg-[#101915] flex flex-col md:flex-row text-slate-100 font-body selection:bg-[#C9F06A] selection:text-black',
+  sidebar: 'w-full md:w-64 md:h-screen md:overflow-y-auto bg-[#0B0D11] text-slate-100 border-b md:border-b-0 md:border-r border-white/10 flex flex-col justify-between py-6 px-4 shrink-0 shadow-2xl backdrop-blur-xl z-30 transition-all duration-300',
   sidebarLogo: 'flex items-center gap-2 text-xl font-bold text-white px-3 mb-6 md:mb-8 font-display',
   userCard: 'w-full flex items-center gap-3 px-3 py-3 rounded-2xl mb-5 transition text-left backdrop-blur-sm',
   userCardActive: 'bg-[#C9F06A]/10 border border-[#C9F06A]/30 text-white',
@@ -12,7 +12,7 @@
   publishCard: 'bg-gradient-to-br from-[#16221C] to-[#181A22] border border-[#C9F06A]/20 rounded-2xl p-4 shadow-xl',
   projectActionButton: 'w-full bg-[#C9F06A] hover:bg-[#D8F87C] text-black text-xs font-bold uppercase tracking-wider py-2.5 rounded-xl transition shadow-md shadow-[#C9F06A]/20',
   logoutButton: 'w-full flex items-center gap-3 px-3.5 py-2.5 text-red-400 hover:text-red-300 text-xs font-bold uppercase tracking-wider transition rounded-xl hover:bg-red-500/10',
-  mainContent: 'flex-1 min-w-0 p-4 sm:p-6 lg:p-8 overflow-y-auto bg-[#101915] text-white',
+  mainContent: 'flex-1 min-w-0 p-4 sm:p-6 lg:p-8 md:h-screen md:overflow-y-auto bg-[#101915] text-white',
   statCard: 'bg-[#16221C]/90 border border-white/10 rounded-2xl p-5 shadow-xl backdrop-blur-md hover:border-[#C9F06A]/30 transition',
   feedCard: 'bg-[#16221C]/90 border border-white/10 rounded-3xl p-6 shadow-xl backdrop-blur-md',
   milestoneCard: 'bg-[#18251E] rounded-xl p-4 border border-white/10',
