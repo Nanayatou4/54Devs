@@ -33,4 +33,7 @@ public interface ProjetRepository extends JpaRepository<Projet, Long> , JpaSpeci
 
     List<Projet> findTop30ByStatutNotOrderByDateCreationDesc(StatutProjet statut);
 
+    @Query("select p.statut, count(p) from Projet p group by p.statut")
+    List<Object[]> compterParStatut();
+
 }

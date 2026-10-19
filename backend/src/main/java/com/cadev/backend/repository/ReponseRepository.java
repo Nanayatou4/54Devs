@@ -22,4 +22,6 @@ public interface ReponseRepository extends JpaRepository<Reponse, Long> {
     @Query("select count(r) from Reponse r where r.auteur.id = :id and r.question.auteur.id <> :id")
     long compterReponsesAuxAutres(@Param("id") Long id);
 
+    void deleteByQuestionId(Long questionId);
+
 }

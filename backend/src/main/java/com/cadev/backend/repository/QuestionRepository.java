@@ -23,5 +23,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> , JpaS
     long countByAuteurId(Long auteurId);
 
     List<Question> findTop50ByResolueFalseAndAuteurIdNotOrderByDateCreationDesc(Long auteurId);
+    long countByResolueFalse();
+
 
 }

@@ -49,5 +49,10 @@ public interface ParticipationChallengeRepository extends JpaRepository<Particip
             + "where p.utilisateur.id = :id "
             + "and p.statut = com.cadev.backend.enumeration.StatutParticipation.REUSSIE")
     List<LocalDateTime> datesReussites(@Param("id") Long id);
+    long countByStatut(StatutParticipation statut);
+
+    @Query("select p.challenge.id, count(p) from ParticipationChallenge p "
+            + "where p.challenge.id in :ids group by p.challenge.id")
+    List<Object[]> compterParticipants(@Param("ids") Collection<Long> ids);
 
 }

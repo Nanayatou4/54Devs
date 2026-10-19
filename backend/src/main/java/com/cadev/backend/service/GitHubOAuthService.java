@@ -47,6 +47,9 @@ public class GitHubOAuthService {
         Utilisateur u = utilisateurs.findByGithubId(githubId)
                 .or(() -> utilisateurs.findByEmail(email))
                 .orElse(null);
+//        if (!u.isActif()) {
+//            throw new ConnexionExterneException("Ce compte a été désactivé.");
+//        }
 
         if (u == null) {
             u = new Utilisateur();

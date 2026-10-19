@@ -31,4 +31,6 @@ public interface MentoratRepository extends JpaRepository<Mentorat, Long> {
     @Query("select m.mentor.id, count(m) from Mentorat m where m.mentor.id in :ids "
             + "and m.statut = com.cadev.backend.enumeration.StatutMentorat.ACCEPTE group by m.mentor.id")
     List<Object[]> compterActifsParMentor(@Param("ids") Collection<Long> ids);
+
+    long countByStatut(StatutMentorat statut);
 }

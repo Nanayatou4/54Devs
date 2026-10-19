@@ -29,4 +29,7 @@ public interface DemandeAdhesionRepository extends JpaRepository<DemandeAdhesion
     @Query("select d from DemandeAdhesion d join fetch d.projet "
             + "where d.demandeur.id = :demandeurId order by d.dateDemande desc")
     List<DemandeAdhesion> findMesDemandes(@Param("demandeurId") Long demandeurId);
+
+    long countByStatut(StatutDemande statut);
+
 }

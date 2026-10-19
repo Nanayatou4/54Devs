@@ -18,5 +18,8 @@ public interface ProfilMentorRepository extends JpaRepository<ProfilMentor, Long
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select m from ProfilMentor m where m.utilisateur.id = :utilisateurId")
     Optional<ProfilMentor> findPourMiseAJour(@Param("utilisateurId") Long utilisateurId);
+
+    long countByActifTrue();
+
 }
 
