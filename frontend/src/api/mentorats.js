@@ -39,38 +39,48 @@ export const mentoratsApi = {
       method: 'POST',
       body: data,
     }),
+  planifier: (id, data) =>
+    apiRequest(`/mentorats/${id}/seances`, {
+      method: 'POST',
+      body: data,
+    }),
 
   /**
    * Enregistrer le compte-rendu d'une séance (par le mentor)
    * @param {number} id
    * @param {number} seanceId
-   * @param {{ compteRendu: string }} data
+   * @param {{ compteRendu: string } | string} data
    */
   compteRenduSeance: (id, seanceId, data) =>
     apiRequest(`/mentorats/${id}/seances/${seanceId}/compte-rendu`, {
       method: 'PUT',
-      body: data,
+      body: typeof data === 'string' ? { compteRendu: data } : data,
+    }),
+  compteRendu: (id, seanceId, compteRendu) =>
+    apiRequest(`/mentorats/${id}/seances/${seanceId}/compte-rendu`, {
+      method: 'PUT',
+      body: typeof compteRendu === 'string' ? { compteRendu } : (compteRendu || {}),
     }),
 
   /**
    * Clôturer un mentorat avec bilan optionnel
    * @param {number} id
-   * @param {{ bilan?: string }} data
+   * @param {{ bilan?: string } | string} data
    */
   terminer: (id, data = {}) =>
     apiRequest(`/mentorats/${id}/terminer`, {
       method: 'PATCH',
-      body: data,
+      body: typeof data === 'string' ? { bilan: data || null } : data,
     }),
 
   /**
    * Écrire ou mettre à jour son bilan final pour un mentorat terminé
    * @param {number} id
-   * @param {{ bilan: string }} data
+   * @param {{ bilan: string } | string} data
    */
   bilan: (id, data) =>
     apiRequest(`/mentorats/${id}/bilan`, {
       method: 'PUT',
-      body: data,
+      body: typeof data === 'string' ? { bilan: data } : data,
     }),
 }

@@ -5,12 +5,14 @@ export const mentorsApi = {
    * Mon profil de mentor (retourne { estMentor, presentation, nombreMentoresMax, actif, placesRestantes })
    */
   monProfil: () => apiRequest('/mentors/moi'),
+  moi: () => apiRequest('/mentors/moi'),
 
   /**
    * Enregistrer / mettre à jour mon profil mentor
    * @param {{ presentation: string, nombreMentoresMax: number, actif: boolean }} data
    */
   enregistrerProfil: (data) => apiRequest('/mentors/moi', { method: 'PUT', body: data }),
+  enregistrer: (data) => apiRequest('/mentors/moi', { method: 'PUT', body: data }),
 
   /**
    * Recherche paginée de mentors
@@ -30,4 +32,5 @@ export const mentorsApi = {
    * Détail d'un mentor par son identifiant utilisateur
    */
   getById: (utilisateurId) => apiRequest(`/mentors/${utilisateurId}`),
+  detail: (utilisateurId) => apiRequest(`/mentors/${utilisateurId}`),
 }
