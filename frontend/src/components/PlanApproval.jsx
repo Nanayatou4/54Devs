@@ -19,7 +19,7 @@ export default function PlanApproval() {
         }
       } catch {
         try {
-          const res = await projetsApi.rechercher({ page: 0, taille: 1 })
+          const res = await projetsApi.rechercher({ page: 0, taille: 1, auth: false })
           const list = Array.isArray(res) ? res : res?.contenu || []
           if (active && list.length > 0) {
             setLatestProject(list[0])

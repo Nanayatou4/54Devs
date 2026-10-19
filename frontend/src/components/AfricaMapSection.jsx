@@ -30,7 +30,7 @@ export default function AfricaMapSection() {
 
     // 2. Fetch developers to count by country
     developpeursApi
-      .rechercher({ page: 0, taille: 100 })
+      .rechercher({ page: 0, taille: 100, auth: false })
       .then(res => {
         if (!active) return
         const list = Array.isArray(res) ? res : res?.contenu || []

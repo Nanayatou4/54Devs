@@ -1,7 +1,7 @@
 import { apiRequest } from './client'
 
 export const developpeursApi = {
-  rechercher: ({ texte, competenceId, type, pays, niveau, disponibilite, page = 0, taille = 10 } = {}) => {
+  rechercher: ({ texte, competenceId, type, pays, niveau, disponibilite, page = 0, taille = 10, auth = true } = {}) => {
     const params = new URLSearchParams()
     if (texte?.trim()) params.set('texte', texte.trim())
     if (competenceId) params.set('competenceId', competenceId)
@@ -11,7 +11,7 @@ export const developpeursApi = {
     if (disponibilite?.trim()) params.set('disponibilite', disponibilite.trim())
     params.set('page', page)
     params.set('taille', taille)
-    return apiRequest(`/developpeurs?${params.toString()}`)
+    return apiRequest(`/developpeurs?${params.toString()}`, { auth })
   },
   getById: (id) => apiRequest(`/developpeurs/${id}`),
 }

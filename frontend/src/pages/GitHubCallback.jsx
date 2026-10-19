@@ -1,7 +1,7 @@
 ﻿import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
-import { authApi, setAuthSession } from '../api'
+import { authApi, getOAuthStateKey, setAuthSession } from '../api'
 
 export default function GitHubCallback() {
   const [searchParams] = useSearchParams()
@@ -17,11 +17,13 @@ export default function GitHubCallback() {
     const code = searchParams.get('code')
     if (!code) { setErreur("Code d'autorisation manquant."); return }
 
-    if (searchParams.get('state') !== sessionStorage.getItem('oauth_state')) {
+    const stateKey = getOAuthStateKey('github')
+    const expectedState = sessionStorage.getItem(stateKey)
+    if (!expectedState || searchParams.get('state') !== expectedState) {
       setErreur('Connexion refusée : état de sécurité invalide.')
       return
     }
-    sessionStorage.removeItem('oauth_state')
+    sessionStorage.removeItem(stateKey)
 
     authApi
       .github(code)

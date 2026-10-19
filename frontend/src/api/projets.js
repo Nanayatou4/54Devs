@@ -3,7 +3,7 @@ import { apiRequest } from './client'
 export const projetsApi = {
   creer: (body) => apiRequest('/projets', { method: 'POST', body }),
 
-  rechercher: ({ texte, technologie, categorie, statut, competenceId, page = 0, taille = 10 } = {}) => {
+  rechercher: ({ texte, technologie, categorie, statut, competenceId, page = 0, taille = 10, auth = true } = {}) => {
     const params = new URLSearchParams()
     if (texte?.trim()) params.set('texte', texte.trim())
     if (technologie?.trim()) params.set('technologie', technologie.trim())
@@ -12,7 +12,7 @@ export const projetsApi = {
     if (competenceId) params.set('competenceId', competenceId)
     params.set('page', page)
     params.set('taille', taille)
-    return apiRequest(`/projets?${params.toString()}`)
+    return apiRequest(`/projets?${params.toString()}`, { auth })
   },
 
   mesProjets: () => apiRequest('/projets/mes-projets'),

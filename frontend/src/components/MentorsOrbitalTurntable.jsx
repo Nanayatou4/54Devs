@@ -24,7 +24,7 @@ export default function MentorsOrbitalTurntable() {
 
     // First try the dedicated /api/mentors endpoint
     mentorsApi
-      .rechercher({ page: 0, taille: 12 })
+      .rechercher({ page: 0, taille: 12, auth: false })
       .then((result) => {
         if (!active) return
         const list = Array.isArray(result) ? result : result?.contenu || []
@@ -41,7 +41,7 @@ export default function MentorsOrbitalTurntable() {
           return
         }
         // Fallback to developers with ENSEIGNER
-        return developpeursApi.rechercher({ type: 'ENSEIGNER', page: 0, taille: 12 })
+        return developpeursApi.rechercher({ type: 'ENSEIGNER', page: 0, taille: 12, auth: false })
       })
       .then((devResult) => {
         if (!active || !devResult) return

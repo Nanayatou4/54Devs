@@ -47,7 +47,11 @@ export default function Register() {
   }
 
   function handleOAuth(buildUrl) {
-    window.location.assign(buildUrl())
+    try {
+      window.location.assign(buildUrl())
+    } catch (err) {
+      setErreur(err.message || 'Impossible de démarrer la connexion.')
+    }
   }
 
   return (

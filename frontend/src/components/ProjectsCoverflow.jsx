@@ -69,7 +69,7 @@ export default function ProjectsCoverflow() {
         // Fallback to projetsApi if publicApi fails
         if (!active) return
         projetsApi
-          .rechercher({ page: 0, taille: 12 })
+          .rechercher({ page: 0, taille: 12, auth: false })
           .then(data => {
             if (!active) return
             const list = Array.isArray(data) ? data : data?.contenu || []
