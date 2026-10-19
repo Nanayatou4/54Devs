@@ -3,7 +3,7 @@ import { Volume2, VolumeX, Play, Pause, Music2 } from 'lucide-react'
 
 /**
  * Lecteur audio d'ambiance africaine pour la page d'accueil.
- * Joue "Kaira", chef-d'œuvre traditionnel de la Kora mandingue par le maître Mamadou Sidiki Diabaté.
+ * Joue "Jammu Africa" par Ismaël Lô (« D'ici ou d'ailleurs, nous sommes des enfants d'Afrique... »).
  * - Démarrage automatique au chargement (avec gestion des politiques des navigateurs via premier clic)
  * - Volume doux et progressif (0.35) pour un accueil immersif sans être agressif
  * - Arrêt propre dès qu'on quitte la page d'accueil
@@ -17,7 +17,7 @@ export default function AfricanAmbientPlayer() {
   const [collapsed, setCollapsed] = useState(false)
 
   useEffect(() => {
-    const audio = new Audio('/kora-welcome.mp3')
+    const audio = new Audio('/ismael-lo-africa.mp3')
     audio.loop = true
     audio.volume = 0.35
     audioRef.current = audio
@@ -128,11 +128,11 @@ export default function AfricanAmbientPlayer() {
             <div className="flex items-center gap-1.5">
               <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#C9F06A] animate-pulse" />
               <p className="text-[11px] font-bold tracking-wider uppercase text-white font-display truncate">
-                Ambiance Kora
+                Ismaël Lô
               </p>
             </div>
             <p className="text-[9px] font-mono tracking-tight text-white/60 truncate max-w-[140px] sm:max-w-[190px]">
-              {isPlaying ? 'Mamadou S. Diabaté — Kaira' : 'Cliquer pour écouter'}
+              {isPlaying ? '« D\'ici ou d\'ailleurs, enfants d\'Afrique »' : 'Cliquer pour écouter'}
             </p>
           </div>
 
