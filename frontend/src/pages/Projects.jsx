@@ -11,11 +11,9 @@ import {
   X,
   ArrowRight,
   Share2,
-  Rocket,
   Sparkles,
   Layers,
   HeartHandshake,
-  CheckCircle2,
 } from 'lucide-react'
 import { projetsApi, competencesApi } from '../api'
 import { getProjectImage } from '../lib/projectImages'
@@ -28,7 +26,6 @@ const INITIATIVE_PRESETS = [
   { label: 'Toutes les initiatives', value: '' },
   { label: 'Open Source', value: 'Open Source' },
   { label: 'Recherche de coéquipier', value: 'Co-founder' },
-  { label: 'Startup Lab', value: 'Startup Lab' },
   { label: 'Impact Social', value: 'Social Impact' },
 ]
 
@@ -173,13 +170,6 @@ export default function Projects() {
               <Plus size={16} />
               <span>Publier un projet</span>
             </Link>
-            <a
-              href="#startup-lab"
-              className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 hover:border-[#C9F06A]/50 hover:bg-white/10 text-white px-6 py-3.5 text-xs font-semibold uppercase tracking-wider transition"
-            >
-              <Rocket size={15} className="text-[#C9F06A]" />
-              <span>Startup Lab</span>
-            </a>
           </div>
         </header>
 
@@ -448,86 +438,6 @@ export default function Projects() {
           </div>
         )}
 
-        {/* ========================================================================= */}
-        {/* 54DEVS STARTUP LAB BANNER (Matching bottom of capture)                     */}
-        {/* ========================================================================= */}
-        <section
-          id="startup-lab"
-          className="mt-20 rounded-[32px] border border-white/10 bg-gradient-to-br from-[#121A15] via-[#16221C] to-[#0E1511] p-8 sm:p-12 shadow-2xl relative overflow-hidden"
-        >
-          <div className="absolute top-0 right-0 w-80 h-80 rounded-full bg-[#C9F06A]/10 blur-[120px] pointer-events-none" />
-
-          <div className="grid lg:grid-cols-12 gap-8 items-center relative z-10">
-            <div className="lg:col-span-7">
-              <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#C9F06A] font-mono">
-                // ACCÉLÉRATEUR PANAFRICAIN
-              </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-white font-display mt-2">
-                54Devs Startup Lab
-              </h2>
-              <p className="text-white/70 text-sm sm:text-base mt-3 leading-relaxed max-w-xl font-body">
-                Un programme d'accélération intensif de 12 semaines pour transformer vos prototypes open-source et idées en startups viables à fort impact panafricain.
-              </p>
-
-              <div className="mt-6 space-y-2.5 text-xs sm:text-sm text-white/80">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 size={16} className="text-[#C9F06A] shrink-0" />
-                  <span>
-                    <strong>Accompagnement 0-to-1 :</strong> Mentorat par des fondateurs ayant levé plus de $10M+.
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 size={16} className="text-[#C9F06A] shrink-0" />
-                  <span>
-                    <strong>Équipe d'ingénieurs d'élite :</strong> Accès aux meilleurs talents et développeurs de la plateforme.
-                  </span>
-                </div>
-              </div>
-
-              <div className="mt-8 flex items-center gap-3">
-                <Link
-                  to="/projects/create"
-                  className="inline-flex items-center gap-2 rounded-full bg-[#C9F06A] text-black px-7 py-3.5 text-xs font-bold uppercase tracking-wider hover:bg-[#D8F87C] transition shadow-lg shadow-[#C9F06A]/20"
-                >
-                  <span>Postuler à la Cohorte 4</span>
-                  <ArrowRight size={14} />
-                </Link>
-              </div>
-            </div>
-
-            <div className="lg:col-span-5 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-center">
-                  <p className="text-2xl sm:text-3xl font-extrabold text-[#C9F06A] font-display">
-                    $2.4M
-                  </p>
-                  <p className="text-[10px] sm:text-xs text-white/50 uppercase tracking-wider mt-1">
-                    Fonds Mobilisés
-                  </p>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-center">
-                  <p className="text-2xl sm:text-3xl font-extrabold text-[#C9F06A] font-display">
-                    12
-                  </p>
-                  <p className="text-[10px] sm:text-xs text-white/50 uppercase tracking-wider mt-1">
-                    Startups Lancées
-                  </p>
-                </div>
-              </div>
-
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4 flex items-center gap-3">
-                <img
-                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
-                  alt="Témoignage"
-                  className="w-10 h-10 rounded-full object-cover ring-2 ring-[#C9F06A]/40 shrink-0"
-                />
-                <p className="text-xs text-white/70 italic leading-snug">
-                  « Le Startup Lab 54Devs nous a apporté la crédibilité technique pour boucler notre tour d'amorçage en 4 semaines. »
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
       </div>
     </div>
   )
