@@ -81,7 +81,11 @@ export default function AdminChallenges() {
   return (
     <main className="min-h-screen bg-[radial-gradient(ellipse_at_45%_0%,rgba(83,160,104,0.2),transparent_45%),linear-gradient(145deg,#10271d,#123829_52%,#10251c)] px-4 py-8 text-[#f3f0e8] sm:px-6 lg:px-10 lg:py-10">
       <div className="mx-auto max-w-4xl">
-        <Link to="/challenges" className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-white/60 transition hover:text-[#c9f06a]"><ArrowLeft size={16} /> Retour aux challenges</Link>
+        <div className="mb-6 flex flex-wrap items-center gap-4">
+          <Link to="/admin" className="inline-flex items-center gap-2 text-sm font-semibold text-white/60 transition hover:text-[#c9f06a]"><ArrowLeft size={16} /> Retour à l'Administration</Link>
+          <span className="text-white/20">·</span>
+          <Link to="/challenges" className="text-sm font-semibold text-white/40 transition hover:text-white">Défis publics</Link>
+        </div>
 
         <header className="mb-7 rounded-3xl border border-white/10 bg-white/[0.07] p-6 shadow-xl shadow-black/10 backdrop-blur-xl sm:p-8">
           <div className="mb-4 grid h-12 w-12 place-items-center rounded-2xl border border-[#c9f06a]/20 bg-[#c9f06a]/10 text-[#c9f06a]"><ShieldCheck size={23} /></div>

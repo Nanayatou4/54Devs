@@ -2,9 +2,9 @@ import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
   ArrowLeft, ArrowRight, Check, CheckCircle2, ChevronLeft, ChevronRight,
-  CircleHelp, MessageCircle, Plus, Search, Send, SlidersHorizontal, X,
+  CircleHelp, MessageCircle, Plus, Search, Send, SlidersHorizontal, X, Trash2, ShieldAlert,
 } from 'lucide-react'
-import { questionsApi } from '../api'
+import { questionsApi, adminApi, getStoredUser } from '../api'
 import { styles } from './Questions.styles'
 
 const PAGE_SIZE = 10
@@ -223,6 +223,8 @@ function QuestionRow({ question }) {
 
 function QuestionDetail({ id }) {
   const navigate = useNavigate()
+  const currentUser = getStoredUser()
+  const isAdmin = currentUser?.role === 'ADMIN'
   const [question, setQuestion] = useState(null)
   const [answer, setAnswer] = useState('')
   const [loading, setLoading] = useState(true)
@@ -277,6 +279,27 @@ function QuestionDetail({ id }) {
           <span className="font-mono text-white/40">{formatDate(question.dateCreation)}</span>
         </div>
         <p className="whitespace-pre-wrap text-white/80 leading-7 py-6">{question.contenu}</p>
+        {isAdmin && (
+          <div className="mt-4 pt-3 border-t border-rose-500/20 flex justify-end">
+            <button
+              type="button"
+              onClick={async () => {
+                if (window.confirm('Supprimer cette question ainsi que toutes ses réponses (action administrateur) ?')) {
+                  try {
+                    await adminApi.supprimerQuestion(id)
+                    navigate('/questions')
+                  } catch (err) {
+                    setFormError(err.message || 'Impossible de supprimer la question.')
+                  }
+                }
+              }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/30 text-xs font-semibold transition"
+            >
+              <Trash2 size={13} />
+              <span>Supprimer la question (Admin)</span>
+            </button>
+          </div>
+        )}
       </article>
 
       <section className="mt-8">
@@ -290,7 +313,29 @@ function QuestionDetail({ id }) {
               <p className="whitespace-pre-wrap text-sm text-white/80 leading-6">{response.contenu}</p>
               <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-4">
                 <div className="flex items-center gap-2"><span className={styles.avatar}>{initials(response.auteur)}</span><span className="text-sm font-semibold text-white/80">{authorName(response.auteur)}</span><span className="text-xs text-white/40 font-mono">· {formatDate(response.dateCreation)}</span></div>
-                {question.estAuteur && !question.resolue && <button onClick={() => markSolution(response.id)} className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition"><CheckCircle2 size={15} /> Choisir comme solution</button>}
+                <div className="flex items-center gap-3">
+                  {question.estAuteur && !question.resolue && <button onClick={() => markSolution(response.id)} className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition"><CheckCircle2 size={15} /> Choisir comme solution</button>}
+                  {isAdmin && (
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        if (window.confirm('Supprimer cette réponse (action administrateur) ?')) {
+                          try {
+                            await adminApi.supprimerReponse(id, response.id)
+                            loadQuestion()
+                          } catch (err) {
+                            setFormError(err.message || 'Impossible de supprimer cette réponse.')
+                          }
+                        }
+                      }}
+                      className="inline-flex items-center gap-1 text-xs text-rose-400 hover:text-rose-300 transition"
+                      title="Supprimer cette réponse (Admin)"
+                    >
+                      <Trash2 size={13} />
+                      <span>Supprimer (Admin)</span>
+                    </button>
+                  )}
+                </div>
               </div>
             </article>
           )) : <div className={`${styles.panel} p-6 text-center text-sm text-white/40`}>Pas encore de réponse. Vous pouvez ouvrir la discussion.</div>}

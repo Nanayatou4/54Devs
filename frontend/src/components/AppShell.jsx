@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { LogOut, Menu, X, PlusCircle, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
+import { LogOut, Menu, X, PlusCircle, PanelLeftClose, PanelLeftOpen, ShieldCheck } from 'lucide-react'
 import { clearAuthSession, getStoredUser } from '../api'
 import { styles } from '../pages/Dashboard.styles'
 import { appNavItems } from './AppShell.data'
@@ -158,6 +158,23 @@ export default function AppShell({ children, user }) {
                 </button>
               )
             })}
+
+            {stored?.role === 'ADMIN' && (
+              <div className="pt-2 mt-2 border-t border-white/10">
+                <button
+                  type="button"
+                  onClick={() => handleNav('/admin')}
+                  className={`${styles.navItem} ${
+                    location.pathname.startsWith('/admin')
+                      ? 'bg-[#C9F06A] text-black font-bold shadow-md shadow-[#C9F06A]/20'
+                      : 'text-[#C9F06A] hover:bg-[#C9F06A]/10 border border-[#C9F06A]/20'
+                  }`}
+                >
+                  <ShieldCheck size={18} />
+                  <span>Administration</span>
+                </button>
+              </div>
+            )}
           </nav>
         </div>
 

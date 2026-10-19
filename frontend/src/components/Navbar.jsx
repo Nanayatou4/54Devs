@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X, ArrowUpRight, Bell } from 'lucide-react'
+import { Menu, X, ArrowUpRight, Bell, ShieldCheck } from 'lucide-react'
 import { styles } from './Navbar.styles'
 import { NAV_LINKS } from './Navbar.data'
 import Avatar from './Avatar'
@@ -99,6 +99,16 @@ export default function Navbar() {
           <div className={styles.desktopActions}>
             {utilisateur ? (
               <div className="flex items-center gap-3">
+                {utilisateur?.role === 'ADMIN' && (
+                  <Link
+                    to="/admin"
+                    title="Panneau d'administration"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#C9F06A]/15 border border-[#C9F06A]/30 text-[#C9F06A] text-xs font-bold hover:bg-[#C9F06A] hover:text-black transition shadow-sm"
+                  >
+                    <ShieldCheck size={14} />
+                    <span>Admin</span>
+                  </Link>
+                )}
                 <Link
                   to="/dashboard"
                   title="Notifications"
@@ -184,6 +194,16 @@ export default function Navbar() {
             <div className="pt-3 border-t border-white/10 space-y-2">
               {utilisateur ? (
                 <>
+                  {utilisateur?.role === 'ADMIN' && (
+                    <Link
+                      to="/admin"
+                      onClick={() => setOpen(false)}
+                      className="flex items-center justify-center gap-1.5 py-2.5 text-center text-xs font-bold text-[#C9F06A] bg-[#C9F06A]/10 border border-[#C9F06A]/20 rounded-xl"
+                    >
+                      <ShieldCheck size={14} />
+                      <span>Administration</span>
+                    </Link>
+                  )}
                   <Link
                     to="/dashboard"
                     onClick={() => setOpen(false)}

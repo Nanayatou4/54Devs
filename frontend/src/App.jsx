@@ -19,6 +19,9 @@ import AppLayout from './components/AppLayout'
 import SmartMatch from './pages/SmartMatch'
 import CommunityHub from './pages/CommunityHub'
 import Mentorship from './pages/Mentorship'
+import AdminRoute from './components/AdminRoute'
+import AdminDashboard from './pages/AdminDashboard'
+import AdminChallenges from './pages/AdminChallenges'
 
 export default function App() {
   return (
@@ -47,6 +50,12 @@ export default function App() {
             <Route path="/challenges/:id" element={<Challenges />} />
             <Route path="/developers" element={<Developers />} />
             <Route path="/developers/:id" element={<Developers />} />
+            <Route element={<AdminRoute />}>
+              <Route path="/admin" element={<AdminDashboard />} />
+            </Route>
+          </Route>
+          <Route element={<AdminRoute />}>
+            <Route path="/admin/challenges/creer" element={<AdminChallenges />} />
           </Route>
         </Route>
       </Routes>
