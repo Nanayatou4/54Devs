@@ -1,4 +1,4 @@
-﻿export const styles = {
+export const styles = {
   page: 'min-h-screen bg-[#101915] text-white selection:bg-[#C9F06A] selection:text-black',
   main: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12',
   hero: 'rounded-3xl bg-[#16221C] border border-white/10 text-white px-6 py-8 md:px-10 md:py-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8 shadow-2xl backdrop-blur-md relative overflow-hidden',

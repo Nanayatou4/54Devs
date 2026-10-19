@@ -1,4 +1,4 @@
-﻿export const styles = {
+export const styles = {
   section: 'bg-gradient-to-b from-[#0C130F] to-[#101915] py-28 border-t border-white/5 relative overflow-hidden',
   container: 'max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10',
   title: 'text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight font-display mb-4',

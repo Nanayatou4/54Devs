@@ -16,7 +16,7 @@
   --color-brand-black: #0C130F;
   --color-brand-dark: #101915;
   --color-brand-gray: #16221C;
-  
+
   --color-dark: #101915;
   --color-dark-surface: #16221C;
   --color-dark-deep: #0C130F;
@@ -26,13 +26,13 @@
   --color-emerald-500: #C9F06A;
   --color-emerald-600: #B4E64F;
   --color-emerald-700: #8CAE6F;
-  
+
   --color-green: #C9F06A;
   --color-green-light: #D8F87C;
-  
+
   --color-cream: #F3F0E8;
   --color-cream-soft: #E9EDE4;
-  
+
   --font-display: 'Space Grotesk', system-ui, -apple-system, sans-serif;
   --font-body: 'Sora', 'Inter', system-ui, -apple-system, sans-serif;
   --font-sans: 'Sora', 'Inter', system-ui, -apple-system, sans-serif;
@@ -90,7 +90,7 @@ h1, h2, h3, h4, .font-heading {
 
 /* Grid & Tech Patterns inspired by InnovateIQ */
 .grid-bg {
-  background-image: 
+  background-image:
     linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
   background-size: 40px 40px;

@@ -15,3 +15,7 @@ export const challengesApi = {
   getById: (id) => apiRequest(`/challenges/${id}`),
   repondre: (id, reponse) => apiRequest(`/challenges/${id}/reponses`, { method: 'POST', body: { reponse } }),
 }
+
+export const adminChallengesApi = {
+  creer: (challenge) => apiRequest('/admin/challenges', { method: 'POST', body: challenge }),
+}

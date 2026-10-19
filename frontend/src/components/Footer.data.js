@@ -1,4 +1,6 @@
 export const PLATFORM_LINKS = [
-  { label: 'Découvrir les projets', to: '/projects' },
-  { label: 'Tableau de bord', to: '/dashboard' },
+  { label: 'Projets', to: '/projects' },
+  { label: 'Développeurs', to: '/developers' },
+  { label: 'Questions & réponses', to: '/questions' },
+  { label: 'Challenges', to: '/challenges' },
 ]

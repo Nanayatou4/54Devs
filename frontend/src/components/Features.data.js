@@ -1,4 +1,4 @@
-﻿import { UserCheck, Sparkles, Rocket } from 'lucide-react'
+import { UserCheck, Sparkles, Rocket } from 'lucide-react'
 
 export const FEATURES = [
   {

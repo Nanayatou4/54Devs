@@ -10,9 +10,9 @@ export const STATUT_OPTIONS = [
 export { STATUT_PROJET as STATUT_LABELS } from '../lib/libelles'
 
 export const STATUT_COLORS = {
-  IDEE: 'bg-primary/10 text-primary',
-  EN_DEVELOPPEMENT: 'bg-green/10 text-green',
-  EN_LANCEMENT: 'bg-purple-100 text-purple-600',
-  TERMINE: 'bg-gray-100 text-gray-600',
-  EN_PAUSE: 'bg-yellow-100 text-yellow-700',
+  IDEE: 'border border-sky-300/20 bg-sky-300/10 text-sky-200',
+  EN_DEVELOPPEMENT: 'border border-emerald-300/20 bg-emerald-300/10 text-emerald-200',
+  EN_LANCEMENT: 'border border-violet-300/20 bg-violet-300/10 text-violet-200',
+  TERMINE: 'border border-white/10 bg-white/[0.07] text-white/55',
+  EN_PAUSE: 'border border-amber-300/20 bg-amber-300/10 text-amber-200',
 }

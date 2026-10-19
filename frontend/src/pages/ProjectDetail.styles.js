@@ -1,4 +1,4 @@
-﻿export const styles = {
+export const styles = {
   page: 'min-h-screen bg-[#101915] text-white selection:bg-[#C9F06A] selection:text-black',
   inner: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8',
   backLink: 'inline-flex items-center gap-1.5 text-white/50 hover:text-[#C9F06A] text-xs font-bold uppercase tracking-wider mb-5 transition',

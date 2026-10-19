@@ -1,4 +1,4 @@
-﻿export const styles = {
+export const styles = {
   page: 'min-h-screen bg-[#101915] flex items-center justify-center p-4 sm:p-6 lg:p-8 relative overflow-hidden font-body selection:bg-[#C9F06A] selection:text-black',
   pageBgGlow: 'absolute -top-40 -left-40 w-96 h-96 bg-[#C9F06A]/10 rounded-full blur-3xl pointer-events-none',
   pageBgGlowRight: 'absolute -bottom-40 -right-40 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none',

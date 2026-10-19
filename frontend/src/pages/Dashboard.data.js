@@ -1,4 +1,4 @@
-﻿import { LayoutDashboard, MessageCircle, Rocket, Trophy, UsersRound } from 'lucide-react'
+import { LayoutDashboard, MessageCircle, Rocket, Trophy, UsersRound } from 'lucide-react'
 
 export const navItems = [
   { key: 'dashboard', label: 'Tableau de bord', icon: LayoutDashboard },

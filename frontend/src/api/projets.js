@@ -19,6 +19,9 @@ export const projetsApi = {
 
   getById: (id) => apiRequest(`/projets/${id}`),
 
+  developpeursRecommandes: (id, limite = 6) =>
+    apiRequest(`/projets/${id}/developpeurs-recommandes?limite=${limite}`),
+
   modifier: (id, body) => apiRequest(`/projets/${id}`, { method: 'PUT', body }),
 
   changerStatut: (id, statut) =>
