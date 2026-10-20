@@ -1,5 +1,7 @@
 package com.cadev.backend.service;
 
+import com.cadev.backend.exception.ActionInterditeException;
+
 import com.cadev.backend.dto.ReponseAuth;
 import com.cadev.backend.dto.sortie.UtilisateurDto;
 import com.cadev.backend.entite.Profil;
@@ -47,9 +49,9 @@ public class GitHubOAuthService {
         Utilisateur u = utilisateurs.findByGithubId(githubId)
                 .or(() -> utilisateurs.findByEmail(email))
                 .orElse(null);
-//        if (!u.isActif()) {
-//            throw new ConnexionExterneException("Ce compte a été désactivé.");
-//        }
+        if (u != null && !u.isActif()) {
+            throw new ActionInterditeException("Ce compte a été désactivé.");
+        }
 
         if (u == null) {
             u = new Utilisateur();

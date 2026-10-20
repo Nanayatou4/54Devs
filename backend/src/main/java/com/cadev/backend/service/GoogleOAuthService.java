@@ -1,5 +1,7 @@
 package com.cadev.backend.service;
 
+import com.cadev.backend.exception.ActionInterditeException;
+
 import com.cadev.backend.dto.ReponseAuth;
 import com.cadev.backend.dto.sortie.UtilisateurDto;
 import com.cadev.backend.entite.Profil;
@@ -53,6 +55,10 @@ public class GoogleOAuthService {
         Utilisateur u = utilisateurs.findByGoogleId(googleId)
                 .or(() -> utilisateurs.findByEmail(email))
                 .orElse(null);
+
+        if (u != null && !u.isActif()) {
+            throw new ActionInterditeException("Ce compte a été désactivé.");
+        }
 
         if (u == null) {
             u = new Utilisateur();

@@ -616,6 +616,11 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (!token) { navigate('/login'); return }
+    const user = getStoredUser()
+    if (user?.role === 'ADMIN') {
+      navigate('/admin', { replace: true })
+      return
+    }
     loadDashboard()
   }, [token, navigate, loadDashboard])
 

@@ -110,7 +110,7 @@ export default function Navbar() {
                   </Link>
                 )}
                 <Link
-                  to="/dashboard"
+                  to={utilisateur?.role === 'ADMIN' ? '/admin' : '/dashboard'}
                   title="Notifications"
                   className="relative p-2 rounded-full text-white/70 hover:text-white hover:bg-white/5 transition"
                 >
@@ -205,11 +205,11 @@ export default function Navbar() {
                     </Link>
                   )}
                   <Link
-                    to="/dashboard"
+                    to={utilisateur?.role === 'ADMIN' ? '/admin' : '/dashboard'}
                     onClick={() => setOpen(false)}
                     className="block py-2.5 text-center text-xs font-semibold text-white/80 hover:text-white"
                   >
-                    Dashboard
+                    {utilisateur?.role === 'ADMIN' ? 'Administration' : 'Dashboard'}
                   </Link>
                   <Link
                     to="/profile"

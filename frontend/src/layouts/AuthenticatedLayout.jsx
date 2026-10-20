@@ -43,7 +43,7 @@ export default function AuthenticatedLayout() {
 
   function logout() {
     clearAuthSession()
-    navigate('/')
+    window.location.assign('/')
   }
 
   return (

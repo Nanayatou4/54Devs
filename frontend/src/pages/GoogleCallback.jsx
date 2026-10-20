@@ -29,7 +29,8 @@ export default function GoogleCallback() {
       .google(code)
       .then((data) => {
         setAuthSession(data)
-        navigate('/dashboard')
+        const target = data?.user?.role === 'ADMIN' ? '/admin' : '/dashboard'
+        navigate(target)
       })
       .catch((err) => setErreur(err.message))
   }, [searchParams, navigate])

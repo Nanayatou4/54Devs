@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { LogOut, Menu, X, PlusCircle, PanelLeftClose, PanelLeftOpen, ShieldCheck } from 'lucide-react'
 import { clearAuthSession, getStoredUser } from '../api'
 import { styles } from '../pages/Dashboard.styles'
-import { appNavItems } from './AppShell.data'
+import { adminNavItems, appNavItems } from './AppShell.data'
 import Avatar from './Avatar'
 
 function personName(person) {
@@ -23,13 +23,34 @@ export default function AppShell({ children, user }) {
     }
   })
 
-  const activeKey =
-    appNavItems.find((item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`))
-      ?.key || 'dashboard'
+  const isAdmin = stored?.role === 'ADMIN'
+
+  const navItems = isAdmin ? adminNavItems : appNavItems
+
+  let activeKey = 'dashboard'
+  if (isAdmin) {
+    if (location.pathname.startsWith('/admin')) {
+      const searchParams = new URLSearchParams(location.search)
+      const tab = searchParams.get('tab')
+      if (tab && ['overview', 'users', 'moderation', 'challenges'].includes(tab)) {
+        activeKey = tab
+      } else if (location.pathname.startsWith('/admin/challenges')) {
+        activeKey = 'challenges'
+      } else {
+        activeKey = 'overview'
+      }
+    } else {
+      activeKey = ''
+    }
+  } else {
+    activeKey =
+      appNavItems.find((item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`))
+        ?.key || 'dashboard'
+  }
 
   function handleLogout() {
     clearAuthSession()
-    navigate('/')
+    window.location.assign('/')
   }
 
   function handleNav(path) {
@@ -137,13 +158,20 @@ export default function AppShell({ children, user }) {
             />
             <div className="text-left min-w-0">
               <p className="text-white text-sm font-semibold truncate">{personName(stored)}</p>
-              <p className="text-gray-400 text-[10px] truncate">{stored?.pays || 'Mon profil'}</p>
+              {isAdmin ? (
+                <p className="text-[#C9F06A] text-[10px] font-bold uppercase tracking-wider truncate flex items-center gap-1">
+                  <ShieldCheck size={11} className="shrink-0" />
+                  <span>Administrateur</span>
+                </p>
+              ) : (
+                <p className="text-gray-400 text-[10px] truncate">{stored?.pays || 'Mon profil'}</p>
+              )}
             </div>
           </Link>
 
           {/* Navigation Links */}
           <nav className="space-y-1" aria-label="Navigation principale">
-            {appNavItems.map((item) => {
+            {navItems.map((item) => {
               const Icon = item.icon
               const isActive = activeKey === item.key
               return (
@@ -158,45 +186,42 @@ export default function AppShell({ children, user }) {
                 </button>
               )
             })}
-
-            {stored?.role === 'ADMIN' && (
-              <div className="pt-2 mt-2 border-t border-white/10">
-                <button
-                  type="button"
-                  onClick={() => handleNav('/admin')}
-                  className={`${styles.navItem} ${
-                    location.pathname.startsWith('/admin')
-                      ? 'bg-[#C9F06A] text-black font-bold shadow-md shadow-[#C9F06A]/20'
-                      : 'text-[#C9F06A] hover:bg-[#C9F06A]/10 border border-[#C9F06A]/20'
-                  }`}
-                >
-                  <ShieldCheck size={18} />
-                  <span>Administration</span>
-                </button>
-              </div>
-            )}
           </nav>
         </div>
 
         {/* Bottom Action Card & Logout */}
         <div className="space-y-3 mt-6">
-          <div className={styles.publishCard}>
-            <span className="text-[#C9F06A] text-xs font-bold uppercase tracking-wider font-mono">
-              Co-création
-            </span>
-            <p className="text-white text-sm font-semibold mt-2 mb-1">Une nouvelle idée ?</p>
-            <p className="text-gray-400 text-xs mb-3">
-              Publiez votre projet et trouvez vos coéquipiers parmi les 54 nations.
-            </p>
-            <Link
-              to="/projects/create"
-              onClick={() => setMobileMenuOpen(false)}
-              className={`flex items-center justify-center gap-2 text-center ${styles.projectActionButton}`}
-            >
-              <PlusCircle size={15} />
-              <span>Nouveau projet</span>
-            </Link>
-          </div>
+          {!isAdmin ? (
+            <div className={styles.publishCard}>
+              <span className="text-[#C9F06A] text-xs font-bold uppercase tracking-wider font-mono">
+                Co-création
+              </span>
+              <p className="text-white text-sm font-semibold mt-2 mb-1">Une nouvelle idée ?</p>
+              <p className="text-gray-400 text-xs mb-3">
+                Publiez votre projet et trouvez vos coéquipiers parmi les 54 nations.
+              </p>
+              <Link
+                to="/projects/create"
+                onClick={() => setMobileMenuOpen(false)}
+                className={`flex items-center justify-center gap-2 text-center ${styles.projectActionButton}`}
+              >
+                <PlusCircle size={15} />
+                <span>Nouveau projet</span>
+              </Link>
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-[#C9F06A]/20 bg-[#C9F06A]/5 p-3.5">
+              <div className="flex items-center gap-2 mb-1">
+                <div className="w-6 h-6 rounded-lg bg-[#C9F06A]/20 flex items-center justify-center text-[#C9F06A]">
+                  <ShieldCheck size={14} />
+                </div>
+                <span className="text-white text-xs font-bold font-display">Console Superviseur</span>
+              </div>
+              <p className="text-white/60 text-[11px] leading-relaxed">
+                Supervision globale : utilisateurs, modération et statistiques des 54 pays.
+              </p>
+            </div>
+          )}
           <button type="button" onClick={handleLogout} className={styles.logoutButton}>
             <LogOut size={18} />
             <span>Se déconnecter</span>

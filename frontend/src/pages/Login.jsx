@@ -22,7 +22,8 @@ export default function Login() {
     try {
       const data = await authApi.connexion({ email, motDePasse })
       setAuthSession(data)
-      navigate(location.state?.from || '/dashboard')
+      const defaultTarget = data?.user?.role === 'ADMIN' ? '/admin' : '/dashboard'
+      navigate(location.state?.from || defaultTarget)
     } catch (err) {
       setErreur(err.message || 'Identifiants incorrects.')
     } finally {

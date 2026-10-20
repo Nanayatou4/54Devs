@@ -11,6 +11,7 @@ export const questionsApi = {
     params.set('taille', taille)
     return apiRequest(`/questions?${params.toString()}`)
   },
+  lister: (params) => questionsApi.rechercher(params),
   categories: () => apiRequest('/questions/categories'),
   getById: (id) => apiRequest(`/questions/${id}`),
   creer: (body) => apiRequest('/questions', { method: 'POST', body }),

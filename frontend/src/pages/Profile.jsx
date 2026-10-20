@@ -198,7 +198,7 @@ export default function Profile() {
 
   function handleLogout() {
     clearAuthSession()
-    navigate('/')
+    window.location.assign('/')
   }
 
   return (

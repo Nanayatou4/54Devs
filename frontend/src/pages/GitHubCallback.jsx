@@ -29,7 +29,8 @@ export default function GitHubCallback() {
       .github(code)
       .then((data) => {
         setAuthSession(data)
-        navigate('/dashboard')
+        const target = data?.user?.role === 'ADMIN' ? '/admin' : '/dashboard'
+        navigate(target)
       })
       .catch((err) => setErreur(err.message))
   }, [searchParams, navigate])

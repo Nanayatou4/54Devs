@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import {
   ShieldCheck,
   Users,
@@ -32,6 +32,16 @@ import {
 import { adminApi, questionsApi, getStoredUser } from '../api'
 import Avatar from '../components/Avatar'
 
+function formatSafeDate(val) {
+  if (!val) return ''
+  try {
+    const d = new Date(val)
+    return isNaN(d.getTime()) ? '' : d.toLocaleDateString('fr-FR')
+  } catch {
+    return ''
+  }
+}
+
 const TABS = [
   { key: 'overview', label: 'Vue d\'ensemble', icon: TrendingUp },
   { key: 'users', label: 'Utilisateurs & Accès', icon: Users },
@@ -41,9 +51,24 @@ const TABS = [
 
 export default function AdminDashboard() {
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const currentUser = getStoredUser()
 
-  const [activeTab, setActiveTab] = useState('overview')
+  const tabFromUrl = searchParams.get('tab')
+  const [activeTab, setActiveTab] = useState(
+    tabFromUrl && ['overview', 'users', 'moderation', 'challenges'].includes(tabFromUrl)
+      ? tabFromUrl
+      : 'overview'
+  )
+
+  useEffect(() => {
+    const currentTab = searchParams.get('tab')
+    if (currentTab && ['overview', 'users', 'moderation', 'challenges'].includes(currentTab)) {
+      setActiveTab(currentTab)
+    } else if (!currentTab) {
+      setActiveTab('overview')
+    }
+  }, [searchParams])
   const [stats, setStats] = useState(null)
   const [loadingStats, setLoadingStats] = useState(true)
   const [statsError, setStatsError] = useState('')
@@ -114,12 +139,13 @@ export default function AdminDashboard() {
   const loadQuestions = useCallback(() => {
     setLoadingQuestions(true)
     questionsApi
-      .lister({ texte: questionSearch, page: 0, taille: 20 })
+      .rechercher({ texte: questionSearch, page: 0, taille: 20 })
       .then((res) => {
-        setQuestions(res.contenu || [])
+        setQuestions(Array.isArray(res?.contenu) ? res.contenu : Array.isArray(res) ? res : [])
       })
       .catch((err) => {
         console.error('Erreur questions:', err)
+        setQuestions([])
       })
       .finally(() => setLoadingQuestions(false))
   }, [questionSearch])
@@ -281,6 +307,7 @@ export default function AdminDashboard() {
                 key={tab.key}
                 onClick={() => {
                   setActiveTab(tab.key)
+                  setSearchParams({ tab: tab.key })
                   setActionErrorMessage('')
                   setActionSuccessMessage('')
                 }}
@@ -782,7 +809,7 @@ export default function AdminDashboard() {
                           </span>
                         )}
                         <span className="text-xs text-white/40 font-mono">
-                          {q.dateCreation ? new Date(q.dateCreation).toLocaleDateString('fr-FR') : ''}
+                          {formatSafeDate(q.dateCreation)}
                         </span>
                       </div>
                       <Link
@@ -791,7 +818,7 @@ export default function AdminDashboard() {
                       >
                         {q.titre}
                       </Link>
-                      <p className="text-xs text-white/60 line-clamp-2 mt-1">{q.contenu}</p>
+                      <p className="text-xs text-white/60 line-clamp-2 mt-1">{q.extrait || q.contenu}</p>
                       <div className="mt-2 text-xs text-white/40 flex items-center gap-4">
                         <span>Par {q.auteur?.pseudo || q.auteur?.prenom || 'Membre'}</span>
                         <span>•</span>
