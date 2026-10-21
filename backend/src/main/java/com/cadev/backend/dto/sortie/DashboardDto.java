@@ -6,6 +6,7 @@ public record DashboardDto(
         UtilisateurResumeDto utilisateur,
         ProfilCompletDto profil,
         int demandesATraiter,
+        int invitationsEnAttente,
         int demandesMentoratATraiter,
         List<MonProjetDto> mesProjets,
         List<DemandeDto> mesDemandesEnAttente,

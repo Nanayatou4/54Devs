@@ -14,5 +14,6 @@ public record ProjetDetailDto(
         List<CompetenceProjetDto> competencesRecherchees,
         List<MembreDto> membres,
         boolean estCreateur, boolean estMembre,
-        MaDemandeDto maDemande
+        MaDemandeDto maDemande,
+        MaInvitationDto maInvitation
 ) {}

@@ -4,10 +4,7 @@ import com.cadev.backend.dto.sortie.*;
 import com.cadev.backend.entite.CompetenceUtilisateur;
 import com.cadev.backend.entite.Profil;
 import com.cadev.backend.entite.Utilisateur;
-import com.cadev.backend.enumeration.RoleMembre;
-import com.cadev.backend.enumeration.StatutDemande;
-import com.cadev.backend.enumeration.StatutMentorat;
-import com.cadev.backend.enumeration.TypeCompetence;
+import com.cadev.backend.enumeration.*;
 import com.cadev.backend.exception.RessourceIntrouvableException;
 import com.cadev.backend.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +31,7 @@ public class DashboardService {
     private final BadgeService badgeService;
     private final MatchingService matching;
     private final MentoratRepository mentorats;
+    private final InvitationProjetRepository invitations;
 
     @Transactional(readOnly = true)
     public DashboardDto construire(String email) {
@@ -68,6 +66,7 @@ public class DashboardService {
                 UtilisateurResumeDto.depuis(moi),
                 profilComplet(moi, mesCompetences.size()),
                 demandesATraiter,
+                (int) invitations.countByInviteIdAndStatut(moi.getId(), StatutInvitation.EN_ATTENTE),
                 (int) mentorats.countByMentorIdAndStatut(moi.getId(), StatutMentorat.EN_ATTENTE),
                 mesProjets.stream().limit(6).toList(),
                 mesDemandes,

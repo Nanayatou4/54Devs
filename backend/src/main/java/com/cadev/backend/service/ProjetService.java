@@ -31,6 +31,7 @@ public class ProjetService {
     private final DemandeAdhesionRepository demandes;
     private final LimiteProjetsService limite;
     private final BadgeService badges;
+    private final InvitationProjetRepository invitations;
 
 
     @Transactional
@@ -167,6 +168,10 @@ public class ProjetService {
                 .findFirstByProjetIdAndDemandeurIdOrderByDateDemandeDesc(p.getId(), moi.getId())
                 .map(d -> new MaDemandeDto(d.getId(), d.getStatut()))
                 .orElse(null);
+        MaInvitationDto maInvitation = invitations
+                .findFirstByProjetIdAndInviteIdOrderByDateInvitationDesc(p.getId(), moi.getId())
+                .map(i -> new MaInvitationDto(i.getId(), i.getStatut()))
+                .orElse(null);
 
         return new ProjetDetailDto(
                 p.getId(), p.getNom(), p.getDescription(), p.getProbleme(), p.getSolution(),
@@ -176,7 +181,7 @@ public class ProjetService {
                 UtilisateurResumeDto.depuis(p.getCreateur()),
                 p.getCompetencesRecherchees().stream().map(CompetenceProjetDto::depuis).toList(),
                 equipe.stream().map(MembreDto::depuis).toList(),
-                estCreateur, estMembre, maDemande);
+                estCreateur, estMembre, maDemande, maInvitation);
     }
 
     private void verifierCreateur(Projet p, Utilisateur moi) {

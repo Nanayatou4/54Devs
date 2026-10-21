@@ -11,6 +11,7 @@ import com.cadev.backend.entite.Projet;
 import com.cadev.backend.entite.Utilisateur;
 import com.cadev.backend.enumeration.RoleMembre;
 import com.cadev.backend.enumeration.StatutDemande;
+import com.cadev.backend.enumeration.StatutInvitation;
 import com.cadev.backend.enumeration.StatutProjet;
 import com.cadev.backend.exception.ActionInterditeException;
 import com.cadev.backend.exception.ConflitException;
@@ -35,6 +36,7 @@ public class DemandeService {
     private final CompetenceUtilisateurRepository competencesUtilisateur;
     private final LimiteProjetsService limite;
     private final BadgeService badges;
+    private final InvitationProjetRepository invitations;
 
 
     @Transactional
@@ -57,6 +59,9 @@ public class DemandeService {
         }
         if (ProjetService.calculerPlacesRestantes(p, membres.countByProjetId(projetId)) == 0) {
             throw new ConflitException("Ce projet est complet");
+        }
+        if (invitations.existsByProjetIdAndInviteIdAndStatut(projetId, moi.getId(), StatutInvitation.EN_ATTENTE)) {
+            throw new ConflitException("Vous avez déjà une invitation en attente pour ce projet : acceptez-la");
         }
 
         limite.verifier(moi, true);

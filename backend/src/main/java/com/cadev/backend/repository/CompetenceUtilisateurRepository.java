@@ -29,7 +29,9 @@ public interface CompetenceUtilisateurRepository extends JpaRepository<Competenc
             + "where u.actif = true "
             + "and u.id not in (select m.utilisateur.id from MembreProjet m where m.projet.id = :projetId) "
             + "and u.id not in (select d.demandeur.id from DemandeAdhesion d where d.projet.id = :projetId "
-            + "and d.statut = com.cadev.backend.enumeration.StatutDemande.EN_ATTENTE)")
+            + "and d.statut = com.cadev.backend.enumeration.StatutDemande.EN_ATTENTE)"
+            + "and u.id not in (select i.invite.id from InvitationProjet i where i.projet.id = :projetId "
+            + "and i.statut = com.cadev.backend.enumeration.StatutInvitation.EN_ATTENTE)")
     List<CompetenceUtilisateur> findCandidatsPourProjet(@Param("projetId") Long projetId);
 
     // Les compétences des autres développeurs sur certaines compétences (échanges)
