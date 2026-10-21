@@ -35,3 +35,7 @@ export function getStoredUser() {
     return null
   }
 }
+
+export function getHomePath(user) {
+  return user?.role === 'ADMIN' ? '/admin' : '/dashboard'
+}

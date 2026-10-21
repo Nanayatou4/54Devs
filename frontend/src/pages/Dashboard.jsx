@@ -10,6 +10,7 @@ import { getProjectImage } from '../lib/projectImages'
 import { styles } from './Dashboard.styles'
 import { ROLE_LABELS, STATUT_LABELS } from './Dashboard.data'
 import Avatar from '../components/Avatar'
+import InviteDeveloperButton from '../components/InviteDeveloperButton'
 
 const MISSING_LABELS = {
   BIO: 'Ajouter une présentation',
@@ -212,6 +213,7 @@ function DeveloperSuggestion({ item }) {
         </div>
       )}
       <Compatibility value={item.candidat.compatibilite} />
+      <div className="mt-4"><InviteDeveloperButton developer={developer} /></div>
       <Link to={`/developers/${developer.utilisateurId}`} className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-[#C9F06A] hover:text-[#D8F87C]">
         Voir le profil <ArrowRight size={13} />
       </Link>
@@ -225,6 +227,7 @@ function DashboardContent({ data }) {
   const missing = data.profil?.manquants || []
   const requestsToHandle = data.demandesATraiter || 0
   const mentorshipRequests = data.demandesMentoratATraiter || 0
+  const invitationsEnAttente = data.invitationsEnAttente || 0
   const myProjects = data.mesProjets || []
   const pendingApplications = data.mesDemandesEnAttente || []
   const recommendedProjects = data.projetsRecommandes || []
@@ -253,6 +256,13 @@ function DashboardContent({ data }) {
           <Plus size={16} /> Nouveau projet
         </Link>
       </header>
+
+      {invitationsEnAttente > 0 && (
+        <section className="mb-8 flex flex-col gap-4 rounded-3xl border border-[#C9F06A]/30 bg-[#C9F06A]/10 p-5 sm:flex-row sm:items-center sm:justify-between">
+          <div><h2 className="font-bold text-white">{invitationsEnAttente === 1 ? 'Vous avez 1 invitation à rejoindre un projet' : `Vous avez ${invitationsEnAttente} invitations à rejoindre un projet`}</h2><p className="mt-1 text-sm text-white/55">Consultez les conditions puis acceptez ou refusez les propositions.</p></div>
+          <Link to="/invitations" className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#C9F06A] px-4 py-2.5 text-xs font-bold text-black">Voir mes invitations <ArrowRight size={14} /></Link>
+        </section>
+      )}
 
       {/* 3 Raccourcis d'action immédiate */}
       <section className="grid sm:grid-cols-3 gap-4 mb-8" aria-label="Actions rapides">

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import {
   ShieldCheck,
   Users,
@@ -32,16 +32,6 @@ import {
 import { adminApi, questionsApi, getStoredUser } from '../api'
 import Avatar from '../components/Avatar'
 
-function formatSafeDate(val) {
-  if (!val) return ''
-  try {
-    const d = new Date(val)
-    return isNaN(d.getTime()) ? '' : d.toLocaleDateString('fr-FR')
-  } catch {
-    return ''
-  }
-}
-
 const TABS = [
   { key: 'overview', label: 'Vue d\'ensemble', icon: TrendingUp },
   { key: 'users', label: 'Utilisateurs & Accès', icon: Users },
@@ -50,25 +40,16 @@ const TABS = [
 ]
 
 export default function AdminDashboard() {
-  const navigate = useNavigate()
-  const [searchParams, setSearchParams] = useSearchParams()
   const currentUser = getStoredUser()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const requestedTab = searchParams.get('tab')
+  const activeTab = TABS.some((tab) => tab.key === requestedTab) ? requestedTab : 'overview'
 
-  const tabFromUrl = searchParams.get('tab')
-  const [activeTab, setActiveTab] = useState(
-    tabFromUrl && ['overview', 'users', 'moderation', 'challenges'].includes(tabFromUrl)
-      ? tabFromUrl
-      : 'overview'
-  )
-
-  useEffect(() => {
-    const currentTab = searchParams.get('tab')
-    if (currentTab && ['overview', 'users', 'moderation', 'challenges'].includes(currentTab)) {
-      setActiveTab(currentTab)
-    } else if (!currentTab) {
-      setActiveTab('overview')
-    }
-  }, [searchParams])
+  function setActiveTab(tab) {
+    setSearchParams(tab === 'overview' ? {} : { tab })
+    setActionErrorMessage('')
+    setActionSuccessMessage('')
+  }
   const [stats, setStats] = useState(null)
   const [loadingStats, setLoadingStats] = useState(true)
   const [statsError, setStatsError] = useState('')
@@ -139,13 +120,12 @@ export default function AdminDashboard() {
   const loadQuestions = useCallback(() => {
     setLoadingQuestions(true)
     questionsApi
-      .rechercher({ texte: questionSearch, page: 0, taille: 20 })
+      .lister({ texte: questionSearch, page: 0, taille: 20 })
       .then((res) => {
-        setQuestions(Array.isArray(res?.contenu) ? res.contenu : Array.isArray(res) ? res : [])
+        setQuestions(res.contenu || [])
       })
       .catch((err) => {
         console.error('Erreur questions:', err)
-        setQuestions([])
       })
       .finally(() => setLoadingQuestions(false))
   }, [questionSearch])
@@ -265,7 +245,8 @@ export default function AdminDashboard() {
       </div>
 
       {/* Main Container */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 mt-8">
+      <div className="mx-auto mt-8 max-w-[1600px] px-4 sm:px-8">
+        <div className="min-w-0">
         {/* Flash Notifications */}
         {actionSuccessMessage && (
           <div className="mb-6 flex items-center justify-between rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200 animate-fadeIn">
@@ -296,33 +277,6 @@ export default function AdminDashboard() {
             </button>
           </div>
         )}
-
-        {/* Navigation Tabs */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-white/10 scrollbar-none">
-          {TABS.map((tab) => {
-            const Icon = tab.icon
-            const isActive = activeTab === tab.key
-            return (
-              <button
-                key={tab.key}
-                onClick={() => {
-                  setActiveTab(tab.key)
-                  setSearchParams({ tab: tab.key })
-                  setActionErrorMessage('')
-                  setActionSuccessMessage('')
-                }}
-                className={`inline-flex items-center gap-2.5 px-5 py-3 rounded-xl text-xs font-bold tracking-wide transition-all cursor-pointer whitespace-nowrap ${
-                  isActive
-                    ? 'bg-[#C9F06A] text-black shadow-lg shadow-[#C9F06A]/20'
-                    : 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white border border-white/5'
-                }`}
-              >
-                <Icon size={16} />
-                <span>{tab.label}</span>
-              </button>
-            )
-          })}
-        </div>
 
         {/* ========================================================================= */}
         {/* TAB 1: OVERVIEW / STATISTIQUES                                             */}
@@ -809,7 +763,7 @@ export default function AdminDashboard() {
                           </span>
                         )}
                         <span className="text-xs text-white/40 font-mono">
-                          {formatSafeDate(q.dateCreation)}
+                          {q.dateCreation ? new Date(q.dateCreation).toLocaleDateString('fr-FR') : ''}
                         </span>
                       </div>
                       <Link
@@ -818,7 +772,7 @@ export default function AdminDashboard() {
                       >
                         {q.titre}
                       </Link>
-                      <p className="text-xs text-white/60 line-clamp-2 mt-1">{q.extrait || q.contenu}</p>
+                      <p className="text-xs text-white/60 line-clamp-2 mt-1">{q.contenu}</p>
                       <div className="mt-2 text-xs text-white/40 flex items-center gap-4">
                         <span>Par {q.auteur?.pseudo || q.auteur?.prenom || 'Membre'}</span>
                         <span>•</span>
@@ -939,7 +893,7 @@ export default function AdminDashboard() {
                           </td>
                           <td className="py-3.5 px-4 sm:px-6 text-right">
                             <Link
-                              to={`/challenges/${c.id}`}
+                              to={`/admin/challenges/${c.id}`}
                               className="inline-flex items-center gap-1 text-xs text-[#C9F06A] hover:underline"
                             >
                               <span>Consulter</span>
@@ -976,6 +930,7 @@ export default function AdminDashboard() {
             </div>
           </div>
         )}
+        </div>
       </div>
 
       {/* Confirmation Modal */}

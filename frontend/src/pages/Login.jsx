@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams, useLocation } from 'react-router-dom'
 import { ArrowRight, Eye, EyeOff, Loader2, Mail, Lock } from 'lucide-react'
-import { authApi, buildGitHubAuthUrl, buildGoogleAuthUrl, setAuthSession } from '../api'
+import { authApi, buildGitHubAuthUrl, buildGoogleAuthUrl, getHomePath, setAuthSession } from '../api'
 import { styles } from './Login.styles'
 
 export default function Login() {
@@ -22,8 +22,7 @@ export default function Login() {
     try {
       const data = await authApi.connexion({ email, motDePasse })
       setAuthSession(data)
-      const defaultTarget = data?.user?.role === 'ADMIN' ? '/admin' : '/dashboard'
-      navigate(location.state?.from || defaultTarget)
+      navigate(location.state?.from || getHomePath(data.utilisateur))
     } catch (err) {
       setErreur(err.message || 'Identifiants incorrects.')
     } finally {

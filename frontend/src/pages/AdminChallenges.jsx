@@ -97,7 +97,7 @@ export default function AdminChallenges() {
         {created && (
           <div className="mb-6 flex flex-col gap-3 rounded-2xl border border-emerald-300/20 bg-emerald-300/10 p-4 text-sm text-emerald-100 sm:flex-row sm:items-center sm:justify-between">
             <span className="inline-flex items-center gap-2"><CheckCircle2 size={18} /> Challenge « {created.titre} » créé.</span>
-            <Link to={`/challenges/${created.id}`} className="font-bold text-[#c9f06a] hover:underline">Voir le challenge</Link>
+            <Link to={`/admin/challenges/${created.id}`} className="font-bold text-[#c9f06a] hover:underline">Voir le challenge</Link>
           </div>
         )}
         {error && <div role="alert" className="mb-6 rounded-2xl border border-red-300/20 bg-red-400/10 p-4 text-sm text-red-100">{error}</div>}

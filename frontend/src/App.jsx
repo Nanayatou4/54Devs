@@ -20,8 +20,10 @@ import SmartMatch from './pages/SmartMatch'
 import CommunityHub from './pages/CommunityHub'
 import Mentorship from './pages/Mentorship'
 import AdminRoute from './components/AdminRoute'
+import AdminLayout from './components/AdminLayout'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminChallenges from './pages/AdminChallenges'
+import Invitations from './pages/Invitations'
 
 export default function App() {
   return (
@@ -41,6 +43,7 @@ export default function App() {
             <Route path="/projects/:id" element={<ProjectDetail />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/invitations" element={<Invitations />} />
             <Route path="/smart-match" element={<SmartMatch />} />
             <Route path="/community" element={<CommunityHub />} />
             <Route path="/mentorship" element={<Mentorship />} />
@@ -50,12 +53,13 @@ export default function App() {
             <Route path="/challenges/:id" element={<Challenges />} />
             <Route path="/developers" element={<Developers />} />
             <Route path="/developers/:id" element={<Developers />} />
-            <Route element={<AdminRoute />}>
-              <Route path="/admin" element={<AdminDashboard />} />
-            </Route>
           </Route>
           <Route element={<AdminRoute />}>
-            <Route path="/admin/challenges/creer" element={<AdminChallenges />} />
+            <Route element={<AdminLayout />}>
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/challenges/creer" element={<AdminChallenges />} />
+              <Route path="/admin/challenges/:id" element={<Challenges />} />
+            </Route>
           </Route>
         </Route>
       </Routes>

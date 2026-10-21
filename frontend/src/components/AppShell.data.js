@@ -1,6 +1,7 @@
 import {
   GraduationCap,
   HelpCircle,
+  Mail,
   LayoutDashboard,
   Rocket,
   Sparkles,
@@ -13,6 +14,7 @@ import {
 export const appNavItems = [
   { key: 'dashboard', label: 'Tableau de bord', icon: LayoutDashboard, path: '/dashboard' },
   { key: 'projects', label: 'Projets & Équipes', icon: Rocket, path: '/projects' },
+  { key: 'invitations', label: 'Mes invitations', icon: Mail, path: '/invitations' },
   { key: 'developers', label: 'Développeurs & Mentors', icon: Users, path: '/developers' },
   { key: 'smart-match', label: 'Appariement intelligent', icon: Sparkles, path: '/smart-match' },
   { key: 'questions', label: 'Questions & Entraide', icon: HelpCircle, path: '/questions' },

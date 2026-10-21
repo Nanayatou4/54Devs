@@ -32,6 +32,17 @@ export const projetsApi = {
   envoyerDemande: (projetId, body) =>
     apiRequest(`/projets/${projetId}/demandes`, { method: 'POST', body }),
 
+  inviter: (projetId, body) =>
+    apiRequest(`/projets/${projetId}/invitations`, { method: 'POST', body }),
+
+  getInvitations: (projetId, statut) => {
+    const q = statut ? `?statut=${encodeURIComponent(statut)}` : ''
+    return apiRequest(`/projets/${projetId}/invitations${q}`)
+  },
+
+  annulerInvitation: (projetId, invitationId) =>
+    apiRequest(`/projets/${projetId}/invitations/${invitationId}`, { method: 'DELETE' }),
+
   getDemandesRecues: (projetId, statut) => {
     const q = statut ? `?statut=${encodeURIComponent(statut)}` : ''
     return apiRequest(`/projets/${projetId}/demandes${q}`)

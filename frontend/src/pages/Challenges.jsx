@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import {
-  ArrowLeft, ArrowRight, Award, CheckCircle2, Clock3, Code2, Flame,
-  Lightbulb, LoaderCircle, Medal, MessageSquareText, Send, ShieldCheck, Trophy,
+  ArrowLeft, ArrowRight, Award, CalendarDays, CheckCircle2, Clock3, Code2, Flame, LoaderCircle, Medal, MessageSquareText, RotateCcw, Send, Trophy,
 } from 'lucide-react'
 import { challengesApi } from '../api'
 import { styles } from './Challenges.styles'
@@ -14,10 +13,6 @@ const TYPES = [
 const DIFFICULTIES = [['FACILE', 'Facile'], ['MOYEN', 'Intermédiaire'], ['DIFFICILE', 'Difficile']]
 const TYPE_LABELS = Object.fromEntries(TYPES)
 const DIFFICULTY_LABELS = Object.fromEntries(DIFFICULTIES)
-
-function nameOf(user) {
-  return user?.pseudo || [user?.prenom, user?.nom].filter(Boolean).join(' ') || 'Membre 54Devs'
-}
 
 function dateLabel(date) {
   if (!date) return '—'
@@ -32,57 +27,48 @@ function statusLabel(participation) {
   return 'En cours'
 }
 
-function ChallengeCard({ challenge }) {
-  const completed = challenge.maParticipation?.statut === 'REUSSIE'
-  return (
-    <Link to={`/challenges/${challenge.id}`} className={`${styles.challenge} group`}>
-      <div className="flex flex-col sm:flex-row sm:items-start gap-4">
-        <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[#18251E] border border-white/10 text-[#C9F06A]"><Code2 size={22} /></div>
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2 mb-2">
-            <span className={`${styles.pill} bg-[#C9F06A]/10 border border-[#C9F06A]/20 text-[#C9F06A]`}>{TYPE_LABELS[challenge.type] || challenge.type}</span>
-            <span className={`${styles.pill} ${challenge.difficulte === 'DIFFICILE' ? 'bg-orange-500/10 border border-orange-500/20 text-orange-400' : challenge.difficulte === 'MOYEN' ? 'bg-amber-500/10 border border-amber-500/20 text-amber-400' : 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400'}`}>{DIFFICULTY_LABELS[challenge.difficulte] || challenge.difficulte}</span>
-            {completed && <span className={`${styles.pill} bg-emerald-500/15 border border-emerald-500/30 text-emerald-400`}><CheckCircle2 size={12} className="mr-1" />Réussi</span>}
-            {!challenge.ouvert && <span className={`${styles.pill} bg-white/5 border border-white/10 text-white/40`}>Terminé</span>}
-          </div>
-          <h2 className="text-lg font-bold text-white group-hover:text-[#C9F06A] transition font-display">{challenge.titre}</h2>
-          <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-xs text-white/40 font-mono">
-            <span className="inline-flex items-center gap-1.5"><Award size={14} className="text-[#C9F06A]" />{challenge.points} points</span>
-            <span className="inline-flex items-center gap-1.5"><CheckCircle2 size={14} />{challenge.nombreReussites} réussite{challenge.nombreReussites === 1 ? '' : 's'}</span>
-            <span className="inline-flex items-center gap-1.5"><Clock3 size={14} />Jusqu'au {dateLabel(challenge.dateFin)}</span>
-            {challenge.maParticipation && <span>{statusLabel(challenge.maParticipation)}</span>}
-          </div>
-        </div>
-        <ArrowRight size={18} className="hidden sm:block mt-1 text-white/30 group-hover:text-[#C9F06A] transition" />
-      </div>
-    </Link>
-  )
-}
-
 function Leaderboard() {
   const [data, setData] = useState(null)
   const [error, setError] = useState('')
+
   useEffect(() => {
-    challengesApi.classement({ taille: 5 }).then(setData).catch(err => setError(err.message || 'Classement indisponible.'))
+    challengesApi.classement({ taille: 5 })
+      .then(setData)
+      .catch((err) => setError(err.message || 'Classement indisponible.'))
   }, [])
+
   const rows = data?.classement?.contenu || []
   const mine = data?.moi
 
   return (
-    <section className={`${styles.panel} overflow-hidden`}>
-      <div className="p-5 border-b border-white/10 flex items-center gap-2"><Trophy size={17} className="text-[#C9F06A]" /><h2 className="font-bold text-sm text-white font-display">Classement</h2></div>
-      {mine && <div className="mx-4 mt-4 rounded-xl bg-[#18251E] border border-white/10 p-4">
-        <p className="text-[11px] uppercase tracking-wider font-mono font-bold text-[#C9F06A]">Votre progression</p>
-        <div className="flex items-end justify-between mt-2"><span className="font-bold text-white font-display">{mine.rang ? `Rang ${mine.rang}` : 'Pas encore classé'}</span><span className="text-sm font-bold text-[#C9F06A] font-mono">{mine.scoreTotal} pts</span></div>
-        <p className="text-xs text-white/40 font-mono mt-1">{mine.challengesReussis} challenge{mine.challengesReussis === 1 ? '' : 's'} réussi{mine.challengesReussis === 1 ? '' : 's'}</p>
-      </div>}
-      {error ? <p className="p-5 text-xs text-white/40">{error}</p> : rows.length ? <ol className="p-3">
-        {rows.map(row => <li key={row.rang} className="flex items-center gap-3 rounded-xl px-2 py-3 hover:bg-white/[0.02] transition">
-          <span className={`w-7 text-center text-xs font-bold font-mono ${row.rang <= 3 ? 'text-[#C9F06A]' : 'text-white/40'}`}>{row.rang <= 3 ? <Medal size={17} className="inline text-[#C9F06A]" /> : row.rang}</span>
-          <span className="min-w-0 flex-1 truncate text-sm font-medium text-white">{nameOf(row.utilisateur)}</span>
-          <span className="text-xs font-bold text-[#C9F06A] font-mono">{row.scoreTotal} pts</span>
-        </li>)}
-      </ol> : <p className="p-5 text-sm text-white/40">Le classement apparaîtra dès les premières participations.</p>}
+    <section className={`${styles.panel} h-fit overflow-hidden`}>
+      <div className="flex items-center gap-2 border-b border-white/10 p-5">
+        <Trophy size={17} className="text-[#C9F06A]" />
+        <h2 className="font-bold text-sm text-white font-display">Classement</h2>
+      </div>
+      {mine && (
+        <div className="mx-4 mt-4 rounded-xl border border-white/10 bg-[#18251E] p-4">
+          <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#C9F06A]">Votre progression</p>
+          <div className="mt-2 flex items-end justify-between gap-2">
+            <span className="font-bold text-white font-display">{mine.rang ? `Rang ${mine.rang}` : 'Pas encore classé'}</span>
+            <span className="font-mono text-sm font-bold text-[#C9F06A]">{mine.scoreTotal} pts</span>
+          </div>
+          <p className="mt-1 text-xs font-mono text-white/40">{mine.challengesReussis} challenge{mine.challengesReussis === 1 ? '' : 's'} réussi{mine.challengesReussis === 1 ? '' : 's'}</p>
+        </div>
+      )}
+      {error ? <p className="p-5 text-xs text-white/45">{error}</p> : rows.length ? (
+        <ol className="p-3">
+          {rows.map((row) => (
+            <li key={row.rang} className="flex items-center gap-3 rounded-xl px-2 py-3 transition hover:bg-white/[0.03]">
+              <span className={`w-7 text-center text-xs font-bold font-mono ${row.rang <= 3 ? 'text-[#C9F06A]' : 'text-white/40'}`}>
+                {row.rang <= 3 ? <Medal size={17} className="inline text-[#C9F06A]" /> : row.rang}
+              </span>
+              <span className="min-w-0 flex-1 truncate text-sm font-medium text-white">{row.utilisateur?.pseudo || [row.utilisateur?.prenom, row.utilisateur?.nom].filter(Boolean).join(' ') || 'Membre 54Devs'}</span>
+              <span className="font-mono text-xs font-bold text-[#C9F06A]">{row.scoreTotal} pts</span>
+            </li>
+          ))}
+        </ol>
+      ) : data ? <p className="p-5 text-sm text-white/40">Le classement apparaîtra après les premières participations.</p> : <p className="p-5 text-sm text-white/40">Chargement du classement…</p>}
     </section>
   )
 }
@@ -90,96 +76,56 @@ function Leaderboard() {
 function DailyChallenge() {
   const [challenge, setChallenge] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
+
   useEffect(() => {
-    challengesApi.duJour().then(setChallenge).catch(() => setChallenge(null)).finally(() => setLoading(false))
+    challengesApi.duJour()
+      .then(setChallenge)
+      .catch(() => setError(true))
+      .finally(() => setLoading(false))
   }, [])
-  if (loading || !challenge) return null
+
+  if (loading) return <div className={`${styles.panel} p-8 text-center text-sm text-white/50`}>Chargement du challenge du jour…</div>
+  if (!challenge) return (
+    <div className={`${styles.panel} p-8 text-center`}>
+      <h2 className="font-bold text-white font-display">Aucun challenge du jour</h2>
+      <p className="mt-2 text-sm text-white/55">{error ? 'Le challenge du jour est momentanément indisponible.' : 'Revenez plus tard pour découvrir le prochain défi.'}</p>
+    </div>
+  )
+
   return (
     <section className={styles.daily}>
       <div className="absolute -right-10 -top-24 h-64 w-64 rounded-full bg-[#C9F06A]/10 blur-3xl" />
-      <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-        <div className="max-w-2xl">
-          <p className="inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.16em] font-mono font-bold text-[#C9F06A]"><Flame size={14} /> À relever aujourd'hui</p>
-          <h2 className="text-2xl sm:text-3xl font-extrabold mt-3 text-white font-display">{challenge.titre}</h2>
-          <p className="text-sm text-white/60 mt-2 font-body">{TYPE_LABELS[challenge.type] || challenge.type} · {DIFFICULTY_LABELS[challenge.difficulte] || challenge.difficulte} · {challenge.points} points</p>
+      <div className="relative">
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="mr-2 inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase tracking-[0.16em] text-[#C9F06A]"><Flame size={14} /> À relever aujourd'hui</p>
+          <span className={`${styles.pill} border border-[#C9F06A]/20 bg-[#C9F06A]/10 text-[#C9F06A]`}>{TYPE_LABELS[challenge.type] || challenge.type}</span>
+          <span className={`${styles.pill} border border-white/10 bg-white/5 text-white/70`}>{DIFFICULTY_LABELS[challenge.difficulte] || challenge.difficulte}</span>
         </div>
-        <Link to={`/challenges/${challenge.id}`} className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#C9F06A] px-5 py-3 text-sm font-bold text-black hover:bg-[#D8F87C] transition shadow-lg shadow-[#C9F06A]/20">Voir le challenge <ArrowRight size={16} /></Link>
+        <div className="mt-4 flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0 flex-1">
+            <h2 className="text-2xl font-extrabold text-white font-display sm:text-3xl">{challenge.titre}</h2>
+            {challenge.enonce && <p className="mt-3 line-clamp-4 whitespace-pre-line text-sm leading-6 text-white/70">{challenge.enonce}</p>}
+            {challenge.extraitCode && (
+              <div className="mt-4 overflow-hidden rounded-xl border border-white/10 bg-[#090A0E]/70">
+                <div className="flex items-center gap-2 border-b border-white/10 px-3 py-2 text-[10px] font-mono uppercase tracking-wider text-white/45"><Code2 size={13} className="text-[#C9F06A]" />{challenge.langage || 'Extrait de code'}</div>
+                <pre className="max-h-24 overflow-hidden px-3 py-2.5 text-xs leading-5 text-white/70"><code>{challenge.extraitCode}</code></pre>
+              </div>
+            )}
+            <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-xs text-white/55">
+              <span className="inline-flex items-center gap-1.5 font-semibold text-[#C9F06A]"><Award size={14} />{challenge.points} points</span>
+              {challenge.dateFin && <span className="inline-flex items-center gap-1.5"><CalendarDays size={14} />Jusqu’au {dateLabel(challenge.dateFin)}</span>}
+              {challenge.nombreEssaisMax && <span className="inline-flex items-center gap-1.5"><RotateCcw size={14} />{challenge.nombreEssaisMax} essais maximum</span>}
+            </div>
+          </div>
+          <Link to={`/challenges/${challenge.id}`} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#C9F06A] px-5 py-3 text-sm font-bold text-black shadow-lg shadow-[#C9F06A]/20 transition hover:bg-[#D8F87C]">Relever le défi <ArrowRight size={16} /></Link>
+        </div>
       </div>
     </section>
   )
 }
 
-function ChallengeList() {
-  const [challenges, setChallenges] = useState([])
-  const [type, setType] = useState('')
-  const [difficulty, setDifficulty] = useState('')
-  const [availability, setAvailability] = useState('true')
-  const [page, setPage] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
-  const [total, setTotal] = useState(0)
-  const [retryCount, setRetryCount] = useState(0)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-
-  useEffect(() => {
-    let active = true
-    setLoading(true)
-    setError('')
-    challengesApi.lister({ type, difficulte: difficulty, ouvert: availability === '' ? null : availability === 'true', page, taille: 10 })
-      .then(result => {
-        if (!active) return
-        setChallenges(result?.contenu || [])
-        setTotalPages(result?.totalPages || 0)
-        setTotal(result?.totalElements || 0)
-      })
-      .catch(err => { if (active) setError(err.message || 'Impossible de charger les challenges.') })
-      .finally(() => { if (active) setLoading(false) })
-    return () => { active = false }
-  }, [type, difficulty, availability, page, retryCount])
-
-  function changeFilter(setter, value) { setter(value); setPage(0) }
-
-  return (
-    <>
-      <DailyChallenge />
-      <div className={styles.layout}>
-        <section className={`${styles.panel} overflow-hidden`} aria-label="Liste des challenges">
-          <div className={styles.controls}>
-            <select className={styles.select} value={type} onChange={event => changeFilter(setType, event.target.value)} aria-label="Filtrer par type">
-              <option value="">Tous les thèmes</option>{TYPES.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
-            </select>
-            <select className={styles.select} value={difficulty} onChange={event => changeFilter(setDifficulty, event.target.value)} aria-label="Filtrer par difficulté">
-              <option value="">Toutes les difficultés</option>{DIFFICULTIES.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
-            </select>
-            <select className={styles.select} value={availability} onChange={event => changeFilter(setAvailability, event.target.value)} aria-label="Filtrer par disponibilité">
-              <option value="true">En cours</option><option value="">Tous</option><option value="false">Terminés</option>
-            </select>
-          </div>
-          {error ? <div className="p-10 text-center"><p className="text-sm text-red-400">{error}</p><button onClick={() => setRetryCount(count => count + 1)} className="mt-3 text-sm font-semibold text-[#C9F06A] hover:underline">Réessayer</button></div>
-            : loading ? <div className="p-12 text-center text-sm text-white/40 font-mono">Chargement des challenges...</div>
-              : challenges.length ? <>
-                {challenges.map(challenge => <ChallengeCard key={challenge.id} challenge={challenge} />)}
-                <div className="px-5 py-4 border-t border-white/10 flex items-center justify-between gap-4">
-                  <span className="text-xs text-white/40 font-mono">{total} challenge{total === 1 ? '' : 's'}</span>
-                  <div className="flex items-center gap-3"><button disabled={page === 0} onClick={() => setPage(page - 1)} className="text-sm font-semibold text-[#C9F06A] disabled:opacity-30">Précédent</button><span className="text-xs text-white/40 font-mono">{page + 1} / {Math.max(totalPages, 1)}</span><button disabled={page + 1 >= totalPages} onClick={() => setPage(page + 1)} className="text-sm font-semibold text-[#C9F06A] disabled:opacity-30">Suivant</button></div>
-                </div>
-              </> : <div className="p-10 text-center"><div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-[#C9F06A]/10 border border-[#C9F06A]/20 text-[#C9F06A] mb-4"><Lightbulb size={22} /></div><h2 className="font-bold text-white font-display text-lg">Aucun challenge trouvé</h2><p className="text-sm text-white/60 mt-2">Essayez d'autres filtres ou revenez plus tard.</p></div>}
-        </section>
-
-        <aside className="space-y-5">
-          <Leaderboard />
-          <section className={`${styles.panel} p-5`}>
-            <div className="mb-3 grid h-10 w-10 place-items-center rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400"><ShieldCheck size={19} /></div>
-            <h2 className="font-bold text-sm text-white font-display">Comment ça marche</h2>
-            <p className="text-sm leading-relaxed text-white/60 mt-2">Chaque challenge a un nombre d'essais limité. Les points sont attribués lorsque la réponse est correcte.</p>
-          </section>
-        </aside>
-      </div>
-    </>
-  )
-}
-
-function ChallengeDetail({ id }) {
+function ChallengeDetail({ id, backPath }) {
   const navigate = useNavigate()
   const [challenge, setChallenge] = useState(null)
   const [answer, setAnswer] = useState('')
@@ -213,8 +159,15 @@ function ChallengeDetail({ id }) {
   }
 
   if (loading) return <div className={`${styles.panel} p-12 text-center text-sm text-white/40 font-mono`}><LoaderCircle size={20} className="inline animate-spin mr-2 text-[#C9F06A]" />Chargement du challenge...</div>
-  if (error && !challenge) return <div className={`${styles.panel} p-10 text-center`}><p className="text-sm text-red-400">{error}</p><button onClick={() => navigate('/challenges')} className="mt-4 text-sm font-semibold text-[#C9F06A] hover:underline">Retour aux challenges</button></div>
-  if (!challenge) return null
+  if (!challenge) return (
+    <div className={`${styles.panel} p-10 text-center`}>
+      <p className="text-sm text-red-300">{error || 'Ce challenge est introuvable ou sa fiche est vide.'}</p>
+      <div className="mt-4 flex flex-wrap justify-center gap-4">
+        <button type="button" onClick={() => load()} className="text-sm font-semibold text-[#C9F06A] hover:underline">Réessayer</button>
+        <button type="button" onClick={() => navigate(backPath)} className="text-sm font-semibold text-white/60 hover:text-white">Retour aux challenges</button>
+      </div>
+    </div>
+  )
 
   const participation = challenge.maParticipation
   const canAnswer = challenge.ouvert && participation?.statut !== 'REUSSIE' && participation?.statut !== 'ECHOUEE'
@@ -222,7 +175,7 @@ function ChallengeDetail({ id }) {
 
   return (
     <>
-      <Link to="/challenges" className="inline-flex items-center gap-2 text-sm font-semibold text-white/50 hover:text-[#C9F06A] mb-5 transition"><ArrowLeft size={16} /> Tous les challenges</Link>
+      <Link to={backPath} className="inline-flex items-center gap-2 text-sm font-semibold text-white/50 hover:text-[#C9F06A] mb-5 transition"><ArrowLeft size={16} /> Tous les challenges</Link>
       <div className={styles.layout}>
         <article className={`${styles.panel} ${styles.detail}`}>
           <div className="flex flex-wrap items-center gap-2 mb-4">
@@ -268,7 +221,9 @@ function ChallengeDetail({ id }) {
 
 export default function Challenges() {
   const { id } = useParams()
+  const { pathname } = useLocation()
+  const backPath = pathname.startsWith('/admin/challenges/') ? '/admin?tab=challenges' : '/challenges'
   return <div className={styles.page}><main className={styles.main}>
-    {id ? <ChallengeDetail key={id} id={id} /> : <><header className={styles.header}><div><p className={styles.eyebrow}>Pratique & progression</p><h1 className={styles.title}>Challenges techniques</h1><p className={styles.subtitle}>Résolvez des problèmes concrets, testez vos connaissances et cumulez des points au fil de vos réussites.</p></div></header><ChallengeList /></>}
+    {id ? <ChallengeDetail key={id} id={id} backPath={backPath} /> : <><header className={styles.header}><div><p className={styles.eyebrow}>Pratique & progression</p><h1 className={styles.title}>Challenge du jour</h1><p className={styles.subtitle}>Un défi technique à relever aujourd’hui. Répondez correctement pour gagner des points.</p></div></header><div className={styles.layout}><DailyChallenge /><Leaderboard /></div></>}
   </main></div>
 }

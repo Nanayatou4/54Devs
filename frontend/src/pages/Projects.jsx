@@ -15,7 +15,7 @@ import {
   Layers,
   HeartHandshake,
 } from 'lucide-react'
-import { projetsApi, competencesApi } from '../api'
+import { projetsApi, competencesApi, getStoredUser } from '../api'
 import { getProjectImage } from '../lib/projectImages'
 import Avatar from '../components/Avatar'
 
@@ -127,6 +127,7 @@ export default function Projects() {
 
   const projets = result?.contenu || []
   const totalPages = result?.totalPages || 0
+  const currentUser = getStoredUser()
 
   function goToPage(p) {
     updateParams({ page: String(p) }, false)
@@ -263,6 +264,7 @@ export default function Projects() {
             {projets.map((p) => {
               const creatorAvatar =
                 p.createur?.avatarUrl || null
+              const isCreator = Boolean(currentUser?.id && p.createur?.id === currentUser.id)
               const imageUrl = getProjectImage(p)
 
               return (
@@ -357,9 +359,9 @@ export default function Projects() {
                       <div className="flex items-center gap-2">
                         <Link
                           to={`/projects/${p.id}`}
-                          className="flex-1 text-center py-2.5 px-4 rounded-xl bg-[#C9F06A] text-black font-bold text-xs uppercase tracking-wider hover:bg-[#D8F87C] transition shadow-md shadow-[#C9F06A]/15"
+                          className={`flex-1 text-center py-2.5 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition ${isCreator ? 'border border-white/10 bg-white/5 text-white/80 hover:bg-white/10' : 'bg-[#C9F06A] text-black hover:bg-[#D8F87C] shadow-md shadow-[#C9F06A]/15'}`}
                         >
-                          {p.ouvertAuxDemandes ? 'Postuler / Rejoindre' : 'Voir le projet'}
+                          {isCreator ? 'Gérer mon projet' : p.ouvertAuxDemandes ? 'Postuler / Rejoindre' : 'Voir le projet'}
                         </Link>
                         <button
                           type="button"

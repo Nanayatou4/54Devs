@@ -1,4 +1,9 @@
 export const styles = {
+  overlay: 'fixed inset-0 z-[90] flex items-center justify-center bg-black/75 p-3 backdrop-blur-sm sm:p-6',
+  modal: 'flex w-full max-w-xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#111A15] p-4 text-white shadow-2xl sm:p-6 max-h-[92vh]',
+  modalTitle: 'text-lg font-bold text-white font-display',
+  btnPrimary: 'inline-flex items-center justify-center gap-2 rounded-xl bg-[#C9F06A] px-4 py-2.5 text-sm font-bold text-black transition hover:bg-[#D8F87C] disabled:cursor-not-allowed disabled:opacity-50',
+  btnSecondary: 'inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white/75 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50',
   page: 'min-h-screen bg-[#101915] text-white selection:bg-[#C9F06A] selection:text-black',
   inner: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8',
   backLink: 'inline-flex items-center gap-1.5 text-white/50 hover:text-[#C9F06A] text-xs font-bold uppercase tracking-wider mb-5 transition',

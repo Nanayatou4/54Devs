@@ -7,6 +7,7 @@ import {
 import { competencesApi, developpeursApi, ROLE_MEMBRE, STATUT_PROJET } from '../api'
 import { styles } from './Developers.styles'
 import Avatar from '../components/Avatar'
+import InviteDeveloperButton from '../components/InviteDeveloperButton'
 
 const LEVELS = [['DEBUTANT', 'Débutant'], ['INTERMEDIAIRE', 'Intermédiaire'], ['AVANCE', 'Avancé']]
 const LEVEL_LABELS = Object.fromEntries(LEVELS)
@@ -191,6 +192,7 @@ function DeveloperDetail({ id }) {
         {developer.niveau && <p className="text-sm text-white/40 font-mono mt-1">{LEVEL_LABELS[developer.niveau] || developer.niveau}</p>}
         {(developer.ville || developer.pays) && <p className="inline-flex items-center gap-1.5 text-sm text-white/50 mt-3"><MapPin size={14} className="text-[#C9F06A]" />{[developer.ville, developer.pays].filter(Boolean).join(', ')}</p>}
         {developer.disponibilite && <p className="mt-4 inline-flex rounded-full bg-[#C9F06A]/10 border border-[#C9F06A]/20 px-3 py-1.5 text-xs font-semibold text-[#C9F06A] font-mono">{developer.disponibilite}</p>}
+        <div className="mt-5"><InviteDeveloperButton developer={developer} /></div>
         {links.length > 0 && <div className="mt-5 border-t border-white/10 pt-4 space-y-2">{links.map(([label, url]) => <a key={label} href={url} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 text-sm font-medium text-[#C9F06A] hover:underline"><ExternalLink size={14} />{label}</a>)}</div>}
       </aside>
       <div className="space-y-5">

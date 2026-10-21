@@ -5,7 +5,7 @@ import {
   Send, CheckCircle, XCircle, Clock, UserMinus, RefreshCw, AlertTriangle,
   Image as ImageIcon,
 } from 'lucide-react'
-import { getToken, getStoredUser, projetsApi, competencesApi } from '../api'
+import { getToken, getStoredUser, projetsApi, competencesApi, invitationsApi } from '../api'
 import { getProjectImage, COVER_PRESETS } from '../lib/projectImages'
 import Avatar from '../components/Avatar'
 import { styles } from './ProjectDetail.styles'
@@ -30,9 +30,15 @@ export default function ProjectDetail() {
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState('')
   const [catalogue, setCatalogue] = useState([])
+  const [imagePreviewError, setImagePreviewError] = useState(false)
 
   const [demandes, setDemandes] = useState([])
   const [demandesLoading, setDemandesLoading] = useState(false)
+  const [invitations, setInvitations] = useState([])
+  const [invitationsLoading, setInvitationsLoading] = useState(false)
+  const [invitationError, setInvitationError] = useState('')
+  const [acceptInvitation, setAcceptInvitation] = useState(false)
+  const [invitationBusy, setInvitationBusy] = useState(false)
 
   const [discussions, setDiscussions] = useState([])
   const [discussionsLoading, setDiscussionsLoading] = useState(false)
@@ -78,6 +84,7 @@ export default function ProjectDetail() {
     if (!projet) return
     setListError('')
     if (activeTab === 'requests' && projet.estCreateur) loadDemandes()
+    if (activeTab === 'invitations' && projet.estCreateur) loadInvitations()
     if (activeTab === 'discussions' && (projet.estMembre || projet.estCreateur)) loadDiscussionsLast()
     if (activeTab === 'departs' && projet.estCreateur) loadDeparts()
   }, [activeTab, projet?.id])
@@ -88,6 +95,39 @@ export default function ProjectDetail() {
       .then(data => setDemandes(Array.isArray(data) ? data : []))
       .catch(err => { setDemandes([]); setListError(err.message) })
       .finally(() => setDemandesLoading(false))
+  }
+
+  function loadInvitations() {
+    setInvitationsLoading(true)
+    projetsApi.getInvitations(id)
+      .then(data => setInvitations(Array.isArray(data) ? data : []))
+      .catch(err => setInvitationError(err.message || 'Impossible de charger les invitations.'))
+      .finally(() => setInvitationsLoading(false))
+  }
+
+  async function respondInvitation(decision) {
+    if (!projet.maInvitation?.id) return
+    setInvitationBusy(true)
+    setInvitationError('')
+    try {
+      await invitationsApi.repondre(projet.maInvitation.id, decision, acceptInvitation)
+      setAcceptInvitation(false)
+      await loadProjet()
+    } catch (err) {
+      setInvitationError(err.message || 'Impossible de répondre à cette invitation.')
+    } finally {
+      setInvitationBusy(false)
+    }
+  }
+
+  async function cancelInvitation(invitationId) {
+    setInvitationError('')
+    try {
+      await projetsApi.annulerInvitation(id, invitationId)
+      setInvitations(old => old.filter(item => item.id !== invitationId))
+    } catch (err) {
+      setInvitationError(err.message || 'Impossible d’annuler cette invitation.')
+    }
   }
 
   function loadDiscussionsLast() {
@@ -155,6 +195,7 @@ export default function ProjectDetail() {
       })),
     })
     setSaveError('')
+    setImagePreviewError(false)
     setEditing(true)
     if (catalogue.length === 0) {
       competencesApi.lister().then(setCatalogue).catch(() => {})
@@ -303,6 +344,7 @@ export default function ProjectDetail() {
     ...(isMembre ? [{ key: 'discussions', label: 'Discussions' }] : []),
     ...(projet.estCreateur ? [
       { key: 'requests', label: 'Demandes' },
+      { key: 'invitations', label: 'Invitations envoyées' },
       { key: 'departs', label: 'Départs' },
     ] : []),
   ]
@@ -341,6 +383,14 @@ export default function ProjectDetail() {
           <Clock size={14} className="inline mr-1" /> Demande envoyée
         </button>
       )
+    }
+    if (projet.maInvitation?.statut === 'EN_ATTENTE') {
+      return <div className="space-y-3">
+        <p className="text-sm font-semibold text-[#C9F06A]">Vous êtes invité à rejoindre ce projet.</p>
+        <label className="flex items-start gap-2 text-xs text-white/70"><input type="checkbox" checked={acceptInvitation} onChange={e => setAcceptInvitation(e.target.checked)} className="mt-0.5 accent-[#C9F06A]" /><span>Je m’engage à contribuer à ce projet jusqu’à sa fin. {projet.conditionsEngagement && <span className="block mt-1 text-white/50">Conditions : {projet.conditionsEngagement}</span>}</span></label>
+        <div className="flex gap-2"><button disabled={!acceptInvitation || !projet.ouvertAuxDemandes || invitationBusy} onClick={() => respondInvitation('ACCEPTEE')} className={styles.btnPrimary}>{projet.ouvertAuxDemandes ? 'Accepter' : projet.statut === 'TERMINE' ? 'Terminé' : 'Complet'}</button><button disabled={invitationBusy} onClick={() => respondInvitation('REFUSEE')} className={styles.btnSecondary}>Refuser</button></div>
+        {invitationError && <p role="alert" className="text-xs text-red-300">{invitationError}</p>}
+      </div>
     }
     if (!projet.ouvertAuxDemandes) {
       return (
@@ -506,6 +556,22 @@ export default function ProjectDetail() {
                   Réessayer
                 </button>
               </div>
+            )}
+
+            {activeTab === 'invitations' && projet.estCreateur && (
+              <section className="space-y-4">
+                <div className="flex items-center justify-between gap-3">
+                  <div><h2 className="text-lg font-bold text-white">Invitations envoyées</h2><p className="mt-1 text-xs text-white/45">Suivez les réponses et annulez les invitations encore en attente.</p></div>
+                  <button onClick={loadInvitations} className="inline-flex items-center gap-1 text-xs font-semibold text-[#C9F06A]"><RefreshCw size={13} /> Actualiser</button>
+                </div>
+                {invitationError && <p role="alert" className="rounded-xl border border-red-400/20 bg-red-400/10 p-3 text-sm text-red-300">{invitationError}</p>}
+                {invitationsLoading ? <div className="py-10 text-center"><Loader2 size={22} className="inline animate-spin text-[#C9F06A]" /></div> : invitations.length ? <div className="space-y-3">
+                  {invitations.map(invitation => <article key={invitation.id} className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-[#141E19] p-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-center gap-3"><Avatar name={invitation.invite?.pseudo || [invitation.invite?.prenom, invitation.invite?.nom].filter(Boolean).join(' ')} className="h-10 w-10 rounded-full" /><div><p className="text-sm font-semibold text-white">{invitation.invite?.pseudo || [invitation.invite?.prenom, invitation.invite?.nom].filter(Boolean).join(' ') || 'Développeur'}</p><p className="text-xs text-white/45">{invitation.invite?.pays || ''}{invitation.dateInvitation ? ` · ${new Date(invitation.dateInvitation).toLocaleDateString('fr-FR')}` : ''}</p>{invitation.message && <p className="mt-1 text-xs text-white/60">{invitation.message}</p>}</div></div>
+                    <div className="flex items-center gap-3"><span className={`rounded-full px-3 py-1 text-xs font-semibold ${invitation.statut === 'EN_ATTENTE' ? 'bg-amber-300/10 text-amber-200' : invitation.statut === 'ACCEPTEE' ? 'bg-emerald-400/10 text-emerald-300' : 'bg-white/5 text-white/50'}`}>{({ EN_ATTENTE: 'En attente', ACCEPTEE: 'Acceptée', REFUSEE: 'Refusée', ANNULEE: 'Annulée' })[invitation.statut] || invitation.statut}</span>{invitation.statut === 'EN_ATTENTE' && <button onClick={() => cancelInvitation(invitation.id)} className="text-xs font-semibold text-red-300 hover:text-red-200">Annuler</button>}</div>
+                  </article>)}
+                </div> : <p className="py-10 text-center text-sm text-white/45">Aucune invitation envoyée pour ce projet.</p>}
+              </section>
             )}
 
             {/* === Members === */}
@@ -902,7 +968,7 @@ export default function ProjectDetail() {
               </button>
             </div>
 
-            <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+            <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pr-2">
               <div>
                 <label className={styles.editLabel}>Nom du projet</label>
                 <input value={editForm.nom} onChange={e => setEditForm(f => ({ ...f, nom: e.target.value }))}
@@ -936,7 +1002,7 @@ export default function ProjectDetail() {
                 <div className="flex gap-2">
                   <input
                     value={editForm.imageUrl || ''}
-                    onChange={e => setEditForm(f => ({ ...f, imageUrl: e.target.value }))}
+                    onChange={e => { setImagePreviewError(false); setEditForm(f => ({ ...f, imageUrl: e.target.value })) }}
                     placeholder="https://images.unsplash.com/... ou URL personnalisée"
                     className={styles.input}
                   />
@@ -953,7 +1019,7 @@ export default function ProjectDetail() {
                 </div>
                 {editForm.imageUrl && (
                   <div className="mt-2 h-32 rounded-xl overflow-hidden border border-white/10 relative">
-                    <img src={editForm.imageUrl} alt="Aperçu" className="w-full h-full object-cover" />
+                    {imagePreviewError ? <div className="grid h-full place-items-center bg-[#18251E] px-4 text-center text-xs text-white/45">Cette adresse ne permet pas d’afficher un aperçu. Utilisez l’URL directe d’une image.</div> : <img src={editForm.imageUrl} alt="Aperçu de la couverture" onError={() => setImagePreviewError(true)} className="w-full h-full object-cover" />}
                   </div>
                 )}
               </div>

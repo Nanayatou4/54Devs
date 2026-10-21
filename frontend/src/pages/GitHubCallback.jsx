@@ -1,7 +1,7 @@
 ﻿import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
-import { authApi, getOAuthStateKey, setAuthSession } from '../api'
+import { authApi, getHomePath, getOAuthStateKey, setAuthSession } from '../api'
 
 export default function GitHubCallback() {
   const [searchParams] = useSearchParams()
@@ -29,8 +29,7 @@ export default function GitHubCallback() {
       .github(code)
       .then((data) => {
         setAuthSession(data)
-        const target = data?.user?.role === 'ADMIN' ? '/admin' : '/dashboard'
-        navigate(target)
+        navigate(getHomePath(data.utilisateur))
       })
       .catch((err) => setErreur(err.message))
   }, [searchParams, navigate])
