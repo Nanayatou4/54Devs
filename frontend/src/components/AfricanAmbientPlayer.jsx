@@ -11,7 +11,7 @@ export default function AfricanAmbientPlayer() {
   const [isPlaying, setIsPlaying] = useState(false)
 
   useEffect(() => {
-    const audio = new Audio('/ismael-lo-africa.mp3')
+    const audio = new Audio('/ismael-lo-africa.mp3?v=2')
     audio.loop = true
     audio.volume = 0.35
     audioRef.current = audio
