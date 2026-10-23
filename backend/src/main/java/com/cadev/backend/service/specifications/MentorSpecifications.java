@@ -23,7 +23,9 @@ public class MentorSpecifications {
 
             conditions.add(cb.isTrue(root.get("actif")));
             conditions.add(cb.isTrue(utilisateur.get("actif")));
-            conditions.add(cb.notEqual(utilisateur.get("id"), moiId)); // jamais soi-même
+            if (moiId != null) {
+                conditions.add(cb.notEqual(utilisateur.get("id"), moiId)); // jamais soi-même
+            }
 
             if (texte != null && !texte.isBlank()) {
                 String motif = "%" + texte.trim().toLowerCase() + "%";

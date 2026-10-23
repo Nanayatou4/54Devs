@@ -50,13 +50,15 @@ public class DeveloppeurService {
     public PageDto<DeveloppeurResumeDto> rechercher(String email, String texte, Long competenceId,
                                                     TypeCompetence type, String pays, Niveau niveau,
                                                     String disponibilite, int page, int taille) {
-        Utilisateur moi = utilisateurs.findByEmail(email)
-                .orElseThrow(() -> new RessourceIntrouvableException("Utilisateur introuvable"));
+        Long moiId = null;
+        if (email != null && !email.isBlank()) {
+            moiId = utilisateurs.findByEmail(email).map(Utilisateur::getId).orElse(null);
+        }
 
         Pageable pageable = PageRequest.of(Math.max(page, 0), Math.min(Math.max(taille, 1), TAILLE_MAX),
                 Sort.by("pseudo").ascending());
         Page<Profil> resultat = profils.findAll(
-                DeveloppeurSpecifications.filtres(moi.getId(), texte, competenceId, type, pays, niveau, disponibilite),
+                DeveloppeurSpecifications.filtres(moiId, texte, competenceId, type, pays, niveau, disponibilite),
                 pageable);
 
         List<Long> ids = resultat.getContent().stream().map(p -> p.getUtilisateur().getId()).toList();

@@ -28,7 +28,9 @@ public class DeveloppeurController {
             @RequestParam(required = false) String disponibilite,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int taille) {
-        return service.rechercher(auth.getName(), texte, competenceId, type, pays, niveau, disponibilite, page, taille);
+        String email = (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName()))
+                ? auth.getName() : null;
+        return service.rechercher(email, texte, competenceId, type, pays, niveau, disponibilite, page, taille);
     }
 
     @GetMapping("/{utilisateurId}")

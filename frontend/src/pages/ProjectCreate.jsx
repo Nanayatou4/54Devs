@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import {
   ArrowRight, Save, X, Loader2, Users, CheckCircle,
-  Rocket, ExternalLink, Image as ImageIcon, Sparkles,
+  Rocket, ExternalLink, Image as ImageIcon, Sparkles, Plus,
 } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
@@ -19,6 +19,55 @@ export default function ProjectCreate() {
   const [error, setError] = useState('')
   const [catalogue, setCatalogue] = useState([])
   const [createdProject, setCreatedProject] = useState(null)
+  const [autreCompetence, setAutreCompetence] = useState('')
+  const [showAllCatalogue, setShowAllCatalogue] = useState(false)
+  const [ajoutLoading, setAjoutLoading] = useState(false)
+
+  async function handleAjoutAutreCompetence() {
+    const nomSaisi = autreCompetence.trim()
+    if (!nomSaisi) return
+    if (form.competencesRecherchees.length >= 15) {
+      setError('Vous avez atteint la limite maximale de 15 compétences.')
+      return
+    }
+
+    setError('')
+
+    // 1. Vérifier si elle existe déjà dans le catalogue (insensible à la casse)
+    const existante = catalogue.find(c => c.nom.toLowerCase() === nomSaisi.toLowerCase())
+    if (existante) {
+      if (!form.competencesRecherchees.some(s => s.competenceId === existante.id)) {
+        set('competencesRecherchees', [
+          ...form.competencesRecherchees,
+          { competenceId: existante.id, obligatoire: false, niveauRequis: 'DEBUTANT' },
+        ])
+      }
+      setAutreCompetence('')
+      return
+    }
+
+    // 2. Si absente, créer via l'API pour obtenir un vrai ID de compétence
+    setAjoutLoading(true)
+    try {
+      const nouvelle = await competencesApi.creer(nomSaisi, 'Autre')
+      setCatalogue(prev => [...prev, nouvelle])
+      set('competencesRecherchees', [
+        ...form.competencesRecherchees,
+        { competenceId: nouvelle.id, obligatoire: false, niveauRequis: 'DEBUTANT' },
+      ])
+      setAutreCompetence('')
+    } catch (err) {
+      // Fallback si l'API backend n'a pas encore redémarré : ajout dans le champ technologies
+      const currentTechs = form.technologies ? form.technologies.split(',').map(t => t.trim()).filter(Boolean) : []
+      if (!currentTechs.some(t => t.toLowerCase() === nomSaisi.toLowerCase())) {
+        set('technologies', [...currentTechs, nomSaisi].join(', '))
+      }
+      setError(`La compétence « ${nomSaisi} » a été ajoutée à vos technologies recherchées.`)
+      setAutreCompetence('')
+    } finally {
+      setAjoutLoading(false)
+    }
+  }
 
   const [form, setForm] = useState({
     nom: '',
@@ -414,9 +463,21 @@ export default function ProjectCreate() {
               </div>
 
               <div className="mb-8">
-                <label className={styles.label}>Compétences recherchées ({form.competencesRecherchees.length}/15)</label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className={styles.label}>Compétences recherchées ({form.competencesRecherchees.length}/15)</label>
+                  {catalogue.length > 12 && (
+                    <button
+                      type="button"
+                      onClick={() => setShowAllCatalogue(prev => !prev)}
+                      className="text-xs text-[#C9F06A] hover:underline font-semibold cursor-pointer"
+                    >
+                      {showAllCatalogue ? 'Afficher moins' : `Voir tout le catalogue (${catalogue.length})`}
+                    </button>
+                  )}
+                </div>
+
                 <div className="flex flex-wrap gap-2 mt-2">
-                  {catalogue.slice(0, 12).map(c => {
+                  {(showAllCatalogue ? catalogue : catalogue.slice(0, 14)).map(c => {
                     const selected = form.competencesRecherchees.some(s => s.competenceId === c.id)
                     return (
                       <button key={c.id} type="button" onClick={() => {
@@ -428,6 +489,74 @@ export default function ProjectCreate() {
                     )
                   })}
                 </div>
+
+                {/* Section Autre compétence */}
+                <div className="mt-5 rounded-2xl border border-white/10 bg-[#16221C]/70 p-4">
+                  <div className="flex items-center justify-between gap-2 mb-1.5">
+                    <span className="text-xs font-bold text-white font-display">
+                      Autre compétence (non listée ci-dessus)
+                    </span>
+                    <span className="text-[10px] font-mono text-[#C9F06A] bg-[#C9F06A]/10 px-2 py-0.5 rounded">Personnalisée</span>
+                  </div>
+                  <p className="text-[11px] text-white/50 mb-3">
+                    Vous avez besoin d'une compétence ou d'un outil particulier ? Saisissez-le ici pour l'ajouter immédiatement au projet.
+                  </p>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={autreCompetence}
+                      onChange={e => setAutreCompetence(e.target.value)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault()
+                          handleAjoutAutreCompetence()
+                        }
+                      }}
+                      placeholder="ex. Next.js, Rust, Solidity, Tailwind, FastAPI..."
+                      maxLength={50}
+                      className="flex-1 rounded-xl border border-white/10 bg-[#0E1511] px-4 py-2.5 text-xs text-white placeholder-white/40 focus:border-[#C9F06A] focus:outline-none focus:ring-1 focus:ring-[#C9F06A]"
+                    />
+                    <button
+                      type="button"
+                      disabled={!autreCompetence.trim() || ajoutLoading}
+                      onClick={handleAjoutAutreCompetence}
+                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#C9F06A] text-black text-xs font-bold hover:bg-[#D8F87C] disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer shadow-md shadow-[#C9F06A]/10"
+                    >
+                      {ajoutLoading ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
+                      <span>Ajouter</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Résumé des compétences sélectionnées avec suppression en 1 clic */}
+                {form.competencesRecherchees.length > 0 && (
+                  <div className="mt-4 pt-3 border-t border-white/5">
+                    <span className="text-[11px] font-mono uppercase tracking-wider text-white/50 block mb-2">
+                      Compétences sélectionnées ({form.competencesRecherchees.length}) :
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {form.competencesRecherchees.map(s => {
+                        const comp = catalogue.find(c => c.id === s.competenceId)
+                        return (
+                          <span
+                            key={s.competenceId}
+                            className="inline-flex items-center gap-1.5 bg-[#C9F06A]/15 border border-[#C9F06A]/30 text-[#C9F06A] text-xs px-2.5 py-1 rounded-lg font-medium"
+                          >
+                            <span>{comp?.nom || `Compétence #${s.competenceId}`}</span>
+                            <button
+                              type="button"
+                              onClick={() => set('competencesRecherchees', form.competencesRecherchees.filter(item => item.competenceId !== s.competenceId))}
+                              className="text-white/60 hover:text-white hover:scale-110 transition cursor-pointer"
+                              title="Retirer cette compétence"
+                            >
+                              <X size={12} />
+                            </button>
+                          </span>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}

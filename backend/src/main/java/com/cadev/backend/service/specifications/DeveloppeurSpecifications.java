@@ -24,7 +24,9 @@ public class DeveloppeurSpecifications {
             Join<Profil, Utilisateur> utilisateur = root.join("utilisateur");
 
             conditions.add(cb.isTrue(utilisateur.get("actif")));
-            conditions.add(cb.notEqual(utilisateur.get("id"), moiId)); // jamais soi-même
+            if (moiId != null) {
+                conditions.add(cb.notEqual(utilisateur.get("id"), moiId)); // jamais soi-même
+            }
 
             if (texte != null && !texte.isBlank()) {
                 String motif = "%" + texte.trim().toLowerCase() + "%";

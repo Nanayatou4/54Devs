@@ -96,11 +96,14 @@ public class MentorService {
     @Transactional(readOnly = true)
     public PageDto<MentorResumeDto> rechercher(String email, String texte, Long competenceId, String pays,
                                                Niveau niveau, int page, int taille) {
-        Utilisateur moi = trouverUtilisateur(email);
+        Long moiId = null;
+        if (email != null && !email.isBlank()) {
+            moiId = utilisateurs.findByEmail(email).map(Utilisateur::getId).orElse(null);
+        }
         Pageable pageable = PageRequest.of(Math.max(page, 0), Math.min(Math.max(taille, 1), TAILLE_MAX),
                 Sort.by(Sort.Direction.DESC, "dateCreation"));
         Page<ProfilMentor> resultat = profilsMentor.findAll(
-                MentorSpecifications.filtres(moi.getId(), texte, competenceId, pays, niveau), pageable);
+                MentorSpecifications.filtres(moiId, texte, competenceId, pays, niveau), pageable);
 
         List<Long> ids = resultat.getContent().stream().map(pm -> pm.getUtilisateur().getId()).toList();
         Map<Long, List<CompetenceUtilisateur>> competences = ids.isEmpty()

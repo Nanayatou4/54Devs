@@ -42,6 +42,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/public/**").permitAll()
+                        .requestMatchers("/api/mentors/moi").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/mentors", "/api/mentors/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/developpeurs", "/api/developpeurs/**").permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(e -> e.authenticationEntryPoint(
                         (req, res, ex) -> {

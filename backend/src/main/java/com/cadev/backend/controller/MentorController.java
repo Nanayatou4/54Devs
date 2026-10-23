@@ -38,7 +38,9 @@ public class MentorController {
             @RequestParam(required = false) Niveau niveau,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int taille) {
-        return service.rechercher(auth.getName(), texte, competenceId, pays, niveau, page, taille);
+        String email = (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName()))
+                ? auth.getName() : null;
+        return service.rechercher(email, texte, competenceId, pays, niveau, page, taille);
     }
 
     @GetMapping("/{utilisateurId}")
@@ -46,4 +48,3 @@ public class MentorController {
         return service.detail(utilisateurId);
     }
 }
-

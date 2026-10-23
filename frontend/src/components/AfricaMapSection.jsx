@@ -29,21 +29,29 @@ export default function AfricaMapSection() {
       .catch(() => {})
 
     // 2. Fetch developers to count by country
-    developpeursApi
-      .rechercher({ page: 0, taille: 100, auth: false })
-      .then(res => {
-        if (!active) return
-        const list = Array.isArray(res) ? res : res?.contenu || []
-        const counts = {}
-        list.forEach(dev => {
-          const pays = (dev.pays || '').trim().toLowerCase()
-          if (pays) {
-            counts[pays] = (counts[pays] || 0) + 1
-          }
-        })
-        setCountryStats(prev => ({ ...prev, devsByCountry: counts }))
+    const loadDevs = (data) => {
+      if (!active) return
+      const list = Array.isArray(data) ? data : data?.contenu || []
+      const counts = {}
+      list.forEach(dev => {
+        const pays = (dev.pays || '').trim().toLowerCase()
+        if (pays) {
+          counts[pays] = (counts[pays] || 0) + 1
+        }
       })
-      .catch(() => {})
+      setCountryStats(prev => ({ ...prev, devsByCountry: counts }))
+    }
+
+    publicApi
+      .developpeurs(100)
+      .then(loadDevs)
+      .catch(() => {
+        if (!active) return
+        developpeursApi
+          .rechercher({ page: 0, taille: 100, auth: false })
+          .then(loadDevs)
+          .catch(() => {})
+      })
 
     // 3. Fetch projects to count by country
     publicApi

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, GraduationCap, Users, ChevronLeft, ChevronRight, Loader2, Sparkles, PlusCircle } from 'lucide-react'
-import { developpeursApi, mentorsApi } from '../api'
+import { developpeursApi, mentorsApi, publicApi } from '../api'
 
 function getDisplayName(person) {
   return person?.pseudo || [person?.prenom, person?.nom].filter(Boolean).join(' ') || 'Mentor'
@@ -22,25 +22,40 @@ export default function MentorsOrbitalTurntable() {
     let active = true
     setLoading(true)
 
-    // First try the dedicated /api/mentors endpoint
-    mentorsApi
-      .rechercher({ page: 0, taille: 12, auth: false })
-      .then((result) => {
+    const extractMentors = (result) => {
+      const list = Array.isArray(result) ? result : result?.contenu || []
+      if (list && list.length > 0) {
+        return list.map((item) => ({
+          ...(item.developpeur || item),
+          presentation: item.presentation,
+          placesRestantes: item.placesRestantes,
+          nombreMentoresMax: item.nombreMentoresMax,
+        }))
+      }
+      return null
+    }
+
+    // Try publicApi first, then /api/mentors, then /api/developpeurs
+    publicApi
+      .mentors(12)
+      .then((data) => {
         if (!active) return
-        const list = Array.isArray(result) ? result : result?.contenu || []
-        if (list.length > 0) {
-          // Normalize MentorResumeDto -> person object
-          const formatted = list.map((item) => ({
-            ...(item.developpeur || item),
-            presentation: item.presentation,
-            placesRestantes: item.placesRestantes,
-            nombreMentoresMax: item.nombreMentoresMax,
-          }))
+        const formatted = extractMentors(data)
+        if (formatted) {
           setMentors(formatted)
           setLoading(false)
           return
         }
-        // Fallback to developers with ENSEIGNER
+        return mentorsApi.rechercher({ page: 0, taille: 12, auth: false })
+      })
+      .then((result) => {
+        if (!active || !result) return
+        const formatted = extractMentors(result)
+        if (formatted) {
+          setMentors(formatted)
+          setLoading(false)
+          return
+        }
         return developpeursApi.rechercher({ type: 'ENSEIGNER', page: 0, taille: 12, auth: false })
       })
       .then((devResult) => {
@@ -260,9 +275,9 @@ export default function MentorsOrbitalTurntable() {
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3">
                         <div className="relative">
-                          {activeMentor.photoUrl ? (
+                          {(activeMentor.photoUrl || activeMentor.avatarUrl) ? (
                             <img
-                              src={activeMentor.photoUrl}
+                              src={activeMentor.photoUrl || activeMentor.avatarUrl}
                               alt={getDisplayName(activeMentor)}
                               className="w-13 h-13 sm:w-14 sm:h-14 rounded-xl object-cover border border-[#C9F06A]/50"
                             />

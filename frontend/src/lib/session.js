@@ -9,6 +9,9 @@ export function getToken() {
 export function setAuthSession({ token, utilisateur }) {
   localStorage.setItem(TOKEN_KEY, token)
   localStorage.setItem(USER_KEY, JSON.stringify(utilisateur))
+  if (utilisateur?.avatarUrl) {
+    localStorage.setItem(PHOTO_KEY, utilisateur.avatarUrl)
+  }
 }
 
 export function clearAuthSession() {
@@ -20,6 +23,18 @@ export function clearAuthSession() {
 export function setProfilePhoto(dataUrl) {
   if (dataUrl) localStorage.setItem(PHOTO_KEY, dataUrl)
   else localStorage.removeItem(PHOTO_KEY)
+
+  // Met également à jour l'utilisateur dans localStorage s'il existe
+  try {
+    const raw = localStorage.getItem(USER_KEY)
+    if (raw) {
+      const u = JSON.parse(raw)
+      u.avatarUrl = dataUrl || null
+      localStorage.setItem(USER_KEY, JSON.stringify(u))
+    }
+  } catch {}
+
+  window.dispatchEvent(new Event('54devs_user_updated'))
 }
 
 export function getProfilePhoto() {
@@ -30,7 +45,28 @@ export function getStoredUser() {
   const raw = localStorage.getItem(USER_KEY)
   if (!raw) return null
   try {
-    return JSON.parse(raw)
+    const u = JSON.parse(raw)
+    const photo = localStorage.getItem(PHOTO_KEY)
+    if (photo && !u.avatarUrl) {
+      u.avatarUrl = photo
+    }
+    return u
+  } catch {
+    return null
+  }
+}
+
+export function updateStoredUser(patch) {
+  try {
+    const u = getStoredUser() || {}
+    const updated = { ...u, ...patch }
+    localStorage.setItem(USER_KEY, JSON.stringify(updated))
+    if (patch.avatarUrl !== undefined) {
+      if (patch.avatarUrl) localStorage.setItem(PHOTO_KEY, patch.avatarUrl)
+      else localStorage.removeItem(PHOTO_KEY)
+    }
+    window.dispatchEvent(new Event('54devs_user_updated'))
+    return updated
   } catch {
     return null
   }

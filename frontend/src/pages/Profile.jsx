@@ -173,6 +173,13 @@ export default function Profile() {
       setCompetences(updatedComp)
 
       setProfilePhoto(updated?.avatarUrl || null)
+      updateStoredUser({
+        pseudo: updated?.pseudo,
+        pays: updated?.pays,
+        ville: updated?.ville,
+        niveau: updated?.niveau,
+        avatarUrl: updated?.avatarUrl || null,
+      })
 
       setEditing(false)
     } catch (err) {

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 // Teintes harmonisées avec la palette du site (vert/lime/teal…), choisies de façon stable selon le nom
 const COLORS = ['#2F6B4F', '#3D7A5C', '#1F5F5B', '#4A6B2A', '#5B4B8A', '#7A4B5C', '#2C5A7A', '#6B5A2A']
@@ -23,6 +23,10 @@ function colorOf(name) {
 export default function Avatar({ src, name, className = 'h-8 w-8', textClassName = 'text-xs', title, style }) {
   const [broken, setBroken] = useState(false)
   const label = name || 'Utilisateur'
+
+  useEffect(() => {
+    setBroken(false)
+  }, [src])
 
   if (src && !broken) {
     return (

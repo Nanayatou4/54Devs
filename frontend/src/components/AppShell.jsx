@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { LogOut, Menu, X, PlusCircle, PanelLeftClose, PanelLeftOpen, ShieldCheck } from 'lucide-react'
-import { clearAuthSession, getStoredUser } from '../api'
+import { clearAuthSession, getStoredUser, getProfilePhoto } from '../api'
 import { styles } from '../pages/Dashboard.styles'
 import { adminNavItems, appNavItems } from './AppShell.data'
 import Avatar from './Avatar'
@@ -13,7 +13,21 @@ function personName(person) {
 export default function AppShell({ children, user }) {
   const navigate = useNavigate()
   const location = useLocation()
-  const stored = user || getStoredUser()
+  const [stored, setStored] = useState(() => user || getStoredUser())
+  const [photo, setPhoto] = useState(() => getProfilePhoto())
+
+  useEffect(() => {
+    function handleUserUpdate() {
+      setStored(user || getStoredUser())
+      setPhoto(getProfilePhoto())
+    }
+    window.addEventListener('54devs_user_updated', handleUserUpdate)
+    window.addEventListener('storage', handleUserUpdate)
+    return () => {
+      window.removeEventListener('54devs_user_updated', handleUserUpdate)
+      window.removeEventListener('storage', handleUserUpdate)
+    }
+  }, [user])
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
     try {
@@ -151,7 +165,7 @@ export default function AppShell({ children, user }) {
             className={`${styles.userCard} ${styles.userCardInactive}`}
           >
             <Avatar
-              src={stored?.avatarUrl}
+              src={photo || stored?.avatarUrl}
               name={personName(stored)}
               className="w-10 h-10 ring-2 ring-[#C9F06A]/40"
               textClassName="text-xs"
