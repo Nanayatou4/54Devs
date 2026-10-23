@@ -51,12 +51,9 @@ function DeveloperCard({ developer }) {
             {(developer.competencesAApprendre || []).length > 0 && <span className="text-white/40">Souhaite apprendre : <span className="text-white/70">{developer.competencesAApprendre.slice(0, 2).join(', ')}</span></span>}
           </div>
         </div>
-        <div className="flex flex-col items-end justify-between self-stretch shrink-0 gap-3">
-          <InviteDeveloperButton developer={developer} compact label="Inviter" />
-          <div className="hidden sm:flex items-center gap-1 text-xs text-[#C9F06A] opacity-0 group-hover:opacity-100 transition-opacity font-semibold">
-            <span>Voir le profil</span>
-            <ArrowRight size={14} className="text-[#C9F06A] group-hover:translate-x-1 transition" />
-          </div>
+        <div className="hidden sm:flex flex-col items-end justify-between self-stretch shrink-0">
+          <span className="text-xs text-[#C9F06A] opacity-0 group-hover:opacity-100 transition-opacity font-semibold">Voir le profil &rarr;</span>
+          <ArrowRight size={18} className="mt-1 text-white/30 group-hover:text-[#C9F06A] group-hover:translate-x-1 transition" />
         </div>
       </div>
     </Link>
