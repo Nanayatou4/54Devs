@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import {
   ArrowLeft, Loader2, Pencil, Save, X, Users, MessageSquare,
-  Send, CheckCircle, XCircle, Clock, UserMinus, RefreshCw, AlertTriangle,
+  Send, CheckCircle, XCircle, Clock, UserMinus, RefreshCw, AlertTriangle, UserPlus,
   Image as ImageIcon,
 } from 'lucide-react'
 import { getToken, getStoredUser, projetsApi, competencesApi, invitationsApi } from '../api'
@@ -560,9 +560,12 @@ export default function ProjectDetail() {
 
             {activeTab === 'invitations' && projet.estCreateur && (
               <section className="space-y-4">
-                <div className="flex items-center justify-between gap-3">
-                  <div><h2 className="text-lg font-bold text-white">Invitations envoyées</h2><p className="mt-1 text-xs text-white/45">Suivez les réponses et annulez les invitations encore en attente.</p></div>
-                  <button onClick={loadInvitations} className="inline-flex items-center gap-1 text-xs font-semibold text-[#C9F06A]"><RefreshCw size={13} /> Actualiser</button>
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
+                  <div><h2 className="text-lg font-bold text-white font-display">Invitations envoyées</h2><p className="mt-1 text-xs text-white/50">Suivez les réponses des développeurs et gérez les invitations en attente.</p></div>
+                  <div className="flex items-center gap-2">
+                    <button onClick={loadInvitations} className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 px-3 py-1.5 text-xs font-semibold text-white/70 hover:bg-white/5 transition"><RefreshCw size={13} /> <span>Actualiser</span></button>
+                    <Link to="/developers" className="inline-flex items-center gap-1.5 rounded-xl bg-[#C9F06A] px-3.5 py-1.5 text-xs font-bold text-black hover:bg-[#D8F87C] transition shadow-md"><UserPlus size={14} /> <span>+ Inviter un développeur</span></Link>
+                  </div>
                 </div>
                 {invitationError && <p role="alert" className="rounded-xl border border-red-400/20 bg-red-400/10 p-3 text-sm text-red-300">{invitationError}</p>}
                 {invitationsLoading ? <div className="py-10 text-center"><Loader2 size={22} className="inline animate-spin text-[#C9F06A]" /></div> : invitations.length ? <div className="space-y-3">
@@ -570,7 +573,15 @@ export default function ProjectDetail() {
                     <div className="flex items-center gap-3"><Avatar name={invitation.invite?.pseudo || [invitation.invite?.prenom, invitation.invite?.nom].filter(Boolean).join(' ')} className="h-10 w-10 rounded-full" /><div><p className="text-sm font-semibold text-white">{invitation.invite?.pseudo || [invitation.invite?.prenom, invitation.invite?.nom].filter(Boolean).join(' ') || 'Développeur'}</p><p className="text-xs text-white/45">{invitation.invite?.pays || ''}{invitation.dateInvitation ? ` · ${new Date(invitation.dateInvitation).toLocaleDateString('fr-FR')}` : ''}</p>{invitation.message && <p className="mt-1 text-xs text-white/60">{invitation.message}</p>}</div></div>
                     <div className="flex items-center gap-3"><span className={`rounded-full px-3 py-1 text-xs font-semibold ${invitation.statut === 'EN_ATTENTE' ? 'bg-amber-300/10 text-amber-200' : invitation.statut === 'ACCEPTEE' ? 'bg-emerald-400/10 text-emerald-300' : 'bg-white/5 text-white/50'}`}>{({ EN_ATTENTE: 'En attente', ACCEPTEE: 'Acceptée', REFUSEE: 'Refusée', ANNULEE: 'Annulée' })[invitation.statut] || invitation.statut}</span>{invitation.statut === 'EN_ATTENTE' && <button onClick={() => cancelInvitation(invitation.id)} className="text-xs font-semibold text-red-300 hover:text-red-200">Annuler</button>}</div>
                   </article>)}
-                </div> : <p className="py-10 text-center text-sm text-white/45">Aucune invitation envoyée pour ce projet.</p>}
+                </div> : <div className="py-12 text-center rounded-2xl border border-dashed border-white/10 p-8">
+                    <UserPlus size={32} className="mx-auto text-white/30 mb-3" />
+                    <p className="text-sm font-semibold text-white font-display">Aucune invitation envoyée pour ce projet</p>
+                    <p className="mt-1 text-xs text-white/50 max-w-sm mx-auto">Invitez des développeurs de la communauté pour renforcer votre équipe et accélérer le projet.</p>
+                    <Link to="/developers" className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#C9F06A] px-4 py-2 text-xs font-bold text-black hover:bg-[#D8F87C] transition shadow-md">
+                      <UserPlus size={14} />
+                      <span>Trouver des développeurs à inviter</span>
+                    </Link>
+                  </div>}
               </section>
             )}
 
