@@ -77,16 +77,15 @@ export default function MentorsOrbitalTurntable() {
 
   const total = mentors.length
 
-  // Autoplay rotation when mentors exist
+  // Autoplay défilement automatique d'un mentor à l'autre
   useEffect(() => {
     if (isPaused || total <= 1) return
     const timer = setInterval(() => {
       setActiveIndex(prev => (prev + 1) % total)
-    }, 4500)
+    }, 3800)
     return () => clearInterval(timer)
   }, [isPaused, total])
 
-  const activeMentor = total > 0 ? mentors[activeIndex % total] : null
   const nextMentor = total > 1 ? mentors[(activeIndex + 1) % total] : null
   const prevMentor = total > 1 ? mentors[(activeIndex - 1 + total) % total] : null
 
@@ -159,7 +158,7 @@ export default function MentorsOrbitalTurntable() {
             onMouseLeave={() => setIsPaused(false)}
           >
             {/* Ambient turntable lights */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(201, 240, 106,0.12),transparent_60%)] pointer-events-none" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(201,240,106,0.12),transparent_60%)] pointer-events-none" />
 
             {/* Concentric Orbit Rings SVG */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -182,7 +181,7 @@ export default function MentorsOrbitalTurntable() {
               </div>
 
               {total > 1 && (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
                   <button
                     type="button"
                     onClick={() => setActiveIndex(prev => (prev - 1 + total) % total)}
@@ -191,9 +190,6 @@ export default function MentorsOrbitalTurntable() {
                   >
                     <ChevronLeft size={16} />
                   </button>
-                  <span className="text-xs font-mono font-bold text-white/60 px-1">
-                    {String(activeIndex + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
-                  </span>
                   <button
                     type="button"
                     onClick={() => setActiveIndex(prev => (prev + 1) % total)}
@@ -211,7 +207,7 @@ export default function MentorsOrbitalTurntable() {
               
               {/* Central 54Devs Core Disc */}
               <div className="absolute z-0 flex flex-col items-center justify-center pointer-events-none opacity-85">
-                <div className="relative w-24 h-24 rounded-full border-2 border-[#C9F06A]/40 bg-[#16221C]/90 flex flex-col items-center justify-center shadow-[0_0_40px_rgba(201, 240, 106,0.25)]">
+                <div className="relative w-24 h-24 rounded-full border-2 border-[#C9F06A]/40 bg-[#16221C]/90 flex flex-col items-center justify-center shadow-[0_0_40px_rgba(201,240,106,0.25)]">
                   <span className="text-lg font-black tracking-tight text-white font-display">
                     &lt;54/&gt;
                   </span>
@@ -263,107 +259,113 @@ export default function MentorsOrbitalTurntable() {
                 </div>
               )}
 
-              {/* State 3: Active Orbiting Mentors from Backend */}
-              {!loading && total > 0 && activeMentor && (
+              {/* State 3: Active Orbiting Mentors Sliding from Backend */}
+              {!loading && total > 0 && (
                 <div className="relative w-full max-w-md h-full flex flex-col justify-between items-center py-2">
                   
-                  {/* ACTIVE MENTOR CARD */}
-                  <Link
-                    to={`/developers/${activeMentor.utilisateurId || activeMentor.id}`}
-                    className="relative z-20 w-full rounded-2xl border-2 border-[#C9F06A] bg-[#16171C]/95 p-5 sm:p-6 shadow-[0_0_45px_-5px_rgba(201, 240, 106,0.65)] backdrop-blur-xl transition-all duration-500 transform hover:scale-[1.02] block text-left"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        <div className="relative">
-                          {(activeMentor.photoUrl || activeMentor.avatarUrl) ? (
-                            <img
-                              src={activeMentor.photoUrl || activeMentor.avatarUrl}
-                              alt={getDisplayName(activeMentor)}
-                              className="w-13 h-13 sm:w-14 sm:h-14 rounded-xl object-cover border border-[#C9F06A]/50"
-                            />
-                          ) : (
-                            <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br from-[#C9F06A] to-amber-600 flex items-center justify-center text-black font-black text-lg border border-[#C9F06A]/50 shadow-inner">
-                              {getAvatarLetters(activeMentor)}
-                            </div>
-                          )}
-                          {activeMentor.pays && (
-                            <span className="absolute -bottom-1 -right-1 text-xs bg-black/80 px-1 py-0.5 rounded-full border border-white/10">
-                              🌍
-                            </span>
-                          )}
-                        </div>
-
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-[11px] font-mono font-bold tracking-[0.25em] text-[#C9F06A]">
-                              {String(activeIndex + 1).padStart(2, '0')}
-                            </span>
-                            <span className="inline-block rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase bg-[#C9F06A]/20 text-[#C9F06A] border border-[#C9F06A]/40">
-                              {activeMentor.disponibilite || 'Mentor Actif'}
-                            </span>
-                          </div>
-                          <h3 className="text-base sm:text-lg font-bold text-white font-display mt-0.5">
-                            {getDisplayName(activeMentor)}
-                          </h3>
-                          <p className="text-xs text-[#C9F06A]/90 font-medium">
-                            {activeMentor.titre || activeMentor.role || [activeMentor.ville, activeMentor.pays].filter(Boolean).join(', ') || 'Ingénieur'}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="text-right hidden sm:block">
-                        <span className="text-[11px] text-white/50 block uppercase tracking-wider">
-                          Niveau
-                        </span>
-                        <span className="text-xs font-bold text-white font-mono uppercase">
-                          {activeMentor.niveau || 'Avancé'}
-                        </span>
-                      </div>
-                    </div>
-
-                    {activeMentor.bio && (
-                      <p className="mt-3.5 text-xs sm:text-sm text-white/80 leading-relaxed font-body line-clamp-2">
-                        « {activeMentor.bio} »
-                      </p>
-                    )}
-
-                    {/* Skills to teach from Backend */}
-                    <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-white/10">
-                      <div className="flex flex-wrap gap-1.5">
-                        {(activeMentor.competencesAEnseigner || activeMentor.competencesMaitrisees || []).slice(0, 3).map(spec => (
-                          <span
-                            key={spec}
-                            className="rounded-md bg-white/10 px-2 py-0.5 text-[10px] font-mono font-semibold text-white/80"
+                  {/* Sliding Track with smooth animation */}
+                  <div className="relative z-20 w-full overflow-hidden py-1">
+                    <div
+                      className="flex transition-transform duration-700 ease-in-out"
+                      style={{ transform: `translateX(-${activeIndex * 100}%)` }}
+                    >
+                      {mentors.map((mentor, idx) => (
+                        <div key={mentor.utilisateurId || mentor.id || idx} className="w-full flex-shrink-0 px-0.5">
+                          <Link
+                            to={`/developers/${mentor.utilisateurId || mentor.id}`}
+                            className="relative w-full rounded-2xl border-2 border-[#C9F06A] bg-[#16171C]/95 p-5 sm:p-6 shadow-[0_0_45px_-5px_rgba(201,240,106,0.65)] backdrop-blur-xl transition-all duration-300 transform hover:scale-[1.01] block text-left"
                           >
-                            {spec}
-                          </span>
-                        ))}
-                      </div>
-                      <span className="inline-flex items-center gap-1 text-xs font-bold text-[#C9F06A]">
-                        <span>Voir le profil</span>
-                        <ArrowRight size={12} />
-                      </span>
-                    </div>
-                  </Link>
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex items-center gap-3">
+                                <div className="relative">
+                                  {(mentor.photoUrl || mentor.avatarUrl) ? (
+                                    <img
+                                      src={mentor.photoUrl || mentor.avatarUrl}
+                                      alt={getDisplayName(mentor)}
+                                      className="w-13 h-13 sm:w-14 sm:h-14 rounded-xl object-cover border border-[#C9F06A]/50"
+                                    />
+                                  ) : (
+                                    <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br from-[#C9F06A] to-amber-600 flex items-center justify-center text-black font-black text-lg border border-[#C9F06A]/50 shadow-inner">
+                                      {getAvatarLetters(mentor)}
+                                    </div>
+                                  )}
+                                  {mentor.pays && (
+                                    <span className="absolute -bottom-1 -right-1 text-xs bg-black/80 px-1 py-0.5 rounded-full border border-white/10">
+                                      🌍
+                                    </span>
+                                  )}
+                                </div>
 
-                  {/* Secondary Preview Cards (Prev & Next) */}
+                                <div>
+                                  <div className="flex items-center gap-2">
+                                    <span className="inline-block rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase bg-[#C9F06A]/20 text-[#C9F06A] border border-[#C9F06A]/40">
+                                      {mentor.disponibilite || 'Mentor Actif'}
+                                    </span>
+                                  </div>
+                                  <h3 className="text-base sm:text-lg font-bold text-white font-display mt-1">
+                                    {getDisplayName(mentor)}
+                                  </h3>
+                                  <p className="text-xs text-[#C9F06A]/90 font-medium">
+                                    {mentor.titre || mentor.role || [mentor.ville, mentor.pays].filter(Boolean).join(', ') || 'Ingénieur'}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="text-right hidden sm:block">
+                                <span className="text-[11px] text-white/50 block uppercase tracking-wider">
+                                  Niveau
+                                </span>
+                                <span className="text-xs font-bold text-white font-mono uppercase">
+                                  {mentor.niveau || 'Avancé'}
+                                </span>
+                              </div>
+                            </div>
+
+                            {mentor.bio && (
+                              <p className="mt-3.5 text-xs sm:text-sm text-white/80 leading-relaxed font-body line-clamp-2">
+                                « {mentor.bio} »
+                              </p>
+                            )}
+
+                            {/* Skills to teach from Backend */}
+                            <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-white/10">
+                              <div className="flex flex-wrap gap-1.5">
+                                {(mentor.competencesAEnseigner || mentor.competencesMaitrisees || []).slice(0, 3).map(spec => (
+                                  <span
+                                    key={spec}
+                                    className="rounded-md bg-white/10 px-2 py-0.5 text-[10px] font-mono font-semibold text-white/80"
+                                  >
+                                    {spec}
+                                  </span>
+                                ))}
+                              </div>
+                              <span className="inline-flex items-center gap-1 text-xs font-bold text-[#C9F06A]">
+                                <span>Voir le profil</span>
+                                <ArrowRight size={12} />
+                              </span>
+                            </div>
+                          </Link>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Secondary Quick-Switch Previews */}
                   {total > 1 && (
-                    <div className="relative z-10 w-full grid grid-cols-2 gap-3 mt-4">
+                    <div className="relative z-10 w-full grid grid-cols-2 gap-3 mt-3">
                       {prevMentor && (
                         <button
                           type="button"
                           onClick={() => setActiveIndex((activeIndex - 1 + total) % total)}
                           className="text-left rounded-xl border border-white/10 bg-[#16221C]/80 p-3 hover:border-[#C9F06A]/50 hover:bg-[#18191f] transition-all duration-300 group"
                         >
-                          <div className="flex items-center gap-2 mb-1.5">
-                            <span className="text-[10px] font-mono text-[#C9F06A]">
-                              {String(((activeIndex - 1 + total) % total) + 1).padStart(2, '0')}
-                            </span>
+                          <div className="flex items-center gap-1.5 mb-1">
+                            <ChevronLeft size={13} className="text-[#C9F06A]" />
                             <span className="text-xs font-bold text-white/80 truncate group-hover:text-white">
                               {getDisplayName(prevMentor)}
                             </span>
                           </div>
-                          <p className="text-[10px] text-white/50 truncate">
+                          <p className="text-[10px] text-white/50 truncate pl-4">
                             {prevMentor.titre || prevMentor.pays || 'Mentor'}
                           </p>
                         </button>
@@ -375,13 +377,11 @@ export default function MentorsOrbitalTurntable() {
                           onClick={() => setActiveIndex((activeIndex + 1) % total)}
                           className="text-left rounded-xl border border-white/10 bg-[#16221C]/80 p-3 hover:border-[#C9F06A]/50 hover:bg-[#18191f] transition-all duration-300 group"
                         >
-                          <div className="flex items-center gap-2 mb-1.5">
-                            <span className="text-[10px] font-mono text-[#C9F06A]">
-                              {String(((activeIndex + 1) % total) + 1).padStart(2, '0')}
-                            </span>
+                          <div className="flex items-center justify-between mb-1">
                             <span className="text-xs font-bold text-white/80 truncate group-hover:text-white">
                               {getDisplayName(nextMentor)}
                             </span>
+                            <ChevronRight size={13} className="text-[#C9F06A]" />
                           </div>
                           <p className="text-[10px] text-white/50 truncate">
                             {nextMentor.titre || nextMentor.pays || 'Mentor'}
