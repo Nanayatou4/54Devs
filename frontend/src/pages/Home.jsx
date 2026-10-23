@@ -5,7 +5,6 @@ import MentorsOrbitalTurntable from '../components/MentorsOrbitalTurntable'
 import AfricaMapSection from '../components/AfricaMapSection'
 import ProjectsCoverflow from '../components/ProjectsCoverflow'
 import Features from '../components/Features'
-import PlanApproval from '../components/PlanApproval'
 import PublicStats from '../components/PublicStats'
 import CTA from '../components/CTA'
 import Footer from '../components/Footer'
@@ -33,9 +32,6 @@ export default function Home() {
 
         {/* Écosystème Central & Piliers */}
         <Features />
-
-        {/* Approbation collaborative du plan */}
-        <PlanApproval />
 
         {/* Statistiques publiques d'impact */}
         <PublicStats />
