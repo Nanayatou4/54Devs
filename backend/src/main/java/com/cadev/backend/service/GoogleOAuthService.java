@@ -40,8 +40,9 @@ public class GoogleOAuthService {
 
     private static final String TOKEN_URL = "https://oauth2.googleapis.com/token";
     private static final String USERINFO_URL = "https://www.googleapis.com/oauth2/v2/userinfo";
-    private static final String REDIRECT_URI = "http://localhost:5173/auth/callback/google";
-
+    @Value("${app.oauth.google.redirect-uri}")
+    private String redirectUri;
+    //private static final String REDIRECT_URI = "https://five4devs-frontend.onrender.com/auth/callback/google";
     @Transactional
     public ReponseAuth authentifierAvecGoogle(String code) {
         String accessToken = echangerCodePourToken(code);
@@ -87,7 +88,8 @@ public class GoogleOAuthService {
             String formBody = "code=" + URLEncoder.encode(code, StandardCharsets.UTF_8)
                     + "&client_id=" + URLEncoder.encode(clientId, StandardCharsets.UTF_8)
                     + "&client_secret=" + URLEncoder.encode(clientSecret, StandardCharsets.UTF_8)
-                    + "&redirect_uri=" + URLEncoder.encode(REDIRECT_URI, StandardCharsets.UTF_8)
+                    + "&redirect_uri=" + URLEncoder.encode(redirectUri, StandardCharsets.UTF_8)
+                    //+ "&redirect_uri=" + URLEncoder.encode(REDIRECT_URI, StandardCharsets.UTF_8)
                     + "&grant_type=authorization_code";
 
             HttpRequest request = HttpRequest.newBuilder()
