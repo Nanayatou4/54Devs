@@ -14,7 +14,7 @@ export default function Hero() {
           playsInline
           className="w-full h-full object-cover opacity-45 scale-105 transition-opacity duration-1000"
         >
-          <source src="/hero-bg.mp4" type="video/mp4" />
+          <source src="/hero-bg-optimized.mp4" type="video/mp4" />
         </video>
 
         {/* Ambient Dark Gradients: Blends seamlessly with Navbar and Next Section */}
