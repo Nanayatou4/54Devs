@@ -14,6 +14,7 @@ import {
   profilApi,
   projetsApi,
   setProfilePhoto,
+  updateStoredUser,
   ROLE_MEMBRE,
   STATUT_PROJET,
 } from '../api'
