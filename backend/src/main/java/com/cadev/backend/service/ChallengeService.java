@@ -218,6 +218,53 @@ public class ChallengeService {
         return construireDetail(c, trouverUtilisateur(email));
     }
 
+
+    @Transactional
+    public ChallengeDetailDto modifier(Long id, String email, ChallengeRequete req) {
+        Challenge c = challenges.findById(id)
+                .orElseThrow(() -> new RessourceIntrouvableException("Challenge introuvable"));
+        if (req.dateFin().isBefore(req.dateDebut())) {
+            throw new RequeteInvalideException("La date de fin ne peut pas précéder la date de début");
+        }
+        List<String> reponses = req.reponsesAcceptees().stream().map(String::trim).toList();
+        if (reponses.stream().anyMatch(r -> r.contains("|"))) {
+            throw new RequeteInvalideException("Une réponse acceptée ne peut pas contenir le caractère |");
+        }
+        String reponsesJointes = String.join("|", reponses);
+        if (reponsesJointes.length() > 500) {
+            throw new RequeteInvalideException("Les réponses acceptées sont trop longues (500 caractères au total)");
+        }
+        // Les règles et réponses peuvent être corrigées, mais on ne modifie pas les dates
+        // d'un défi déjà joué afin de préserver l'historique des participations.
+        if (participations.countByChallengeId(id) > 0
+                && (!c.getDateDebut().equals(req.dateDebut()) || !c.getDateFin().equals(req.dateFin()))) {
+            throw new ConflitException("Les dates ne peuvent plus être modifiées après la première participation.");
+        }
+        c.setTitre(req.titre().trim());
+        c.setEnonce(req.enonce().trim());
+        c.setExtraitCode(req.extraitCode());
+        c.setLangage(req.langage());
+        c.setType(req.type());
+        c.setDifficulte(req.difficulte());
+        c.setPoints(pointsPour(req.difficulte()));
+        c.setReponsesAcceptees(reponsesJointes);
+        c.setExplication(req.explication());
+        c.setNombreEssaisMax(req.nombreEssaisMax());
+        c.setDateDebut(req.dateDebut());
+        c.setDateFin(req.dateFin());
+        return construireDetail(c, trouverUtilisateur(email));
+    }
+
+    @Transactional
+    public void supprimer(Long id) {
+        Challenge c = challenges.findById(id)
+                .orElseThrow(() -> new RessourceIntrouvableException("Challenge introuvable"));
+        if (participations.countByChallengeId(id) > 0) {
+            throw new ConflitException("Ce challenge possède déjà des participations et ne peut pas être supprimé.");
+        }
+        challenges.delete(c);
+    }
+
     // ---------- Règles réutilisables ----------
 
     public static int pointsPour(DifficulteChallenge difficulte) {
