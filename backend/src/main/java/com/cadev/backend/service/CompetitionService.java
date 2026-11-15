@@ -88,14 +88,8 @@ public class CompetitionService {
     @Transactional(readOnly = true)
     public List<SoumissionCompetitionDto> soumissionsAdmin(Long competitionId) {
         trouverCompetition(competitionId);
-        List<SoumissionCompetition> classement =
-                soumissions.findByCompetitionIdOrderByScoreDescDateSoumissionAsc(competitionId);
-        if (c.getType() == com.cadev.backend.enumeration.TypeCompetition.SOLO) {
-            for (int i = 0; i < Math.min(3, classement.size()); i++) {
-                badgeService.attribuerBadgePodium(classement.get(i).getUtilisateur().getId(), i + 1);
-            }
-        }
-        return classement.stream().map(SoumissionCompetitionDto::depuis).toList();
+        return soumissions.findByCompetitionIdOrderByScoreDescDateSoumissionAsc(competitionId)
+                .stream().map(SoumissionCompetitionDto::depuis).toList();
     }
 
     @Transactional
@@ -116,8 +110,14 @@ public class CompetitionService {
         Competition c = trouverCompetition(competitionId);
         if (LocalDateTime.now(FUSEAU).isBefore(c.getDateFin()))
             throw new ConflitException("Le classement sera publié à la clôture de la compétition.");
-        return soumissions.findByCompetitionIdOrderByScoreDescDateSoumissionAsc(competitionId)
-                .stream().map(SoumissionCompetitionDto::depuis).toList();
+        List<SoumissionCompetition> classement =
+                soumissions.findByCompetitionIdOrderByScoreDescDateSoumissionAsc(competitionId);
+        if (c.getType() == com.cadev.backend.enumeration.TypeCompetition.SOLO) {
+            for (int i = 0; i < Math.min(3, classement.size()); i++) {
+                badgeService.attribuerBadgePodium(classement.get(i).getUtilisateur().getId(), i + 1);
+            }
+        }
+        return classement.stream().map(SoumissionCompetitionDto::depuis).toList();
     }
 
     private Competition trouverCompetition(Long id) {
