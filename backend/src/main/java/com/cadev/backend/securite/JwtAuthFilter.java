@@ -32,15 +32,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             jwtService.validateAndGetEmail(header.substring(7)).ifPresent(email -> {
                 try {
                     UserDetails details = utilisateurDetailsService.loadUserByUsername(email);
-                    // un compte désactivé reste anonyme : 401 sur les routes protégées
+                    // Un compte désactivé ne doit jamais être authentifié, même avec un ancien JWT.
                     if (details.isEnabled()) {
                         var auth = new UsernamePasswordAuthenticationToken(details, null, details.getAuthorities());
                         auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
                         SecurityContextHolder.getContext().setAuthentication(auth);
                     }
-                    var auth = new UsernamePasswordAuthenticationToken(details, null, details.getAuthorities());
-                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
-                    SecurityContextHolder.getContext().setAuthentication(auth);
                 } catch (UsernameNotFoundException ignored) { }
             });
         }
