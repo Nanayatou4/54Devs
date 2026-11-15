@@ -2,6 +2,7 @@ package com.cadev.backend.controller;
 
 import com.cadev.backend.dto.entree.SoumissionCompetitionRequete;
 import com.cadev.backend.dto.sortie.CompetitionDto;
+import com.cadev.backend.dto.sortie.SoumissionCompetitionDto;
 import com.cadev.backend.service.CompetitionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,6 @@ import java.util.List;
 @RequestMapping("/api/competitions")
 @RequiredArgsConstructor
 public class CompetitionController {
-
     private final CompetitionService service;
 
     @GetMapping
@@ -26,7 +26,12 @@ public class CompetitionController {
     @PostMapping("/{id}/soumissions")
     @ResponseStatus(HttpStatus.CREATED)
     public CompetitionDto soumettre(Authentication auth, @PathVariable Long id,
-                                     @Valid @RequestBody SoumissionCompetitionRequete requete) {
+            @Valid @RequestBody SoumissionCompetitionRequete requete) {
         return service.soumettre(id, auth.getName(), requete);
+    }
+
+    @GetMapping("/{id}/classement")
+    public List<SoumissionCompetitionDto> classement(@PathVariable Long id) {
+        return service.classement(id);
     }
 }
