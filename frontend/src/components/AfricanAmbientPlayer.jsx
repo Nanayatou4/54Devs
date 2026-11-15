@@ -16,32 +16,7 @@ export default function AfricanAmbientPlayer() {
     audio.volume = 0.35
     audioRef.current = audio
 
-    const startAudio = () => {
-      audio
-        .play()
-        .then(() => setIsPlaying(true))
-        .catch(() => setIsPlaying(false))
-    }
-
-    startAudio()
-
-    const handleFirstGesture = () => {
-      if (audioRef.current && audioRef.current.paused) {
-        audioRef.current
-          .play()
-          .then(() => setIsPlaying(true))
-          .catch(() => {})
-      }
-      window.removeEventListener('pointerdown', handleFirstGesture)
-      window.removeEventListener('keydown', handleFirstGesture)
-    }
-
-    window.addEventListener('pointerdown', handleFirstGesture)
-    window.addEventListener('keydown', handleFirstGesture)
-
     return () => {
-      window.removeEventListener('pointerdown', handleFirstGesture)
-      window.removeEventListener('keydown', handleFirstGesture)
       audio.pause()
       audio.src = ''
     }
