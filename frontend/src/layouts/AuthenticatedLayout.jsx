@@ -4,6 +4,7 @@ import { LogOut, PanelLeftClose, PanelLeftOpen, ShieldCheck } from 'lucide-react
 import { clearAuthSession, getStoredUser } from '../api'
 import { navItems } from '../pages/Dashboard.data'
 import { styles } from '../pages/Dashboard.styles'
+import Logo from '../components/Logo'
 
 function displayName(user) {
   return user?.pseudo || [user?.prenom, user?.nom].filter(Boolean).join(' ') || 'Membre 54Devs'
@@ -52,8 +53,11 @@ export default function AuthenticatedLayout() {
         <div>
           <div className={`mb-6 flex items-center gap-2 px-2 md:px-0 ${expanded ? 'justify-between md:flex-row' : 'justify-center md:flex-col'}`}>
             <Link to="/dashboard" className={`${styles.sidebarLogo} !mb-0 !px-1`} aria-label="54Devs, tableau de bord">
-              <span className="text-[#c9f06a]">&lt;/&gt;</span>
-              {expanded && <span>54<span className="text-[#c9f06a]">Devs</span></span>}
+              {expanded ? (
+                <Logo variant="full" className="h-8 w-auto" withLink={false} />
+              ) : (
+                <Logo variant="icon" className="h-8 w-8" withLink={false} />
+              )}
             </Link>
             <button
               type="button"

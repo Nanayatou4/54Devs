@@ -4,6 +4,7 @@ import { Menu, X, ArrowUpRight, Bell, ShieldCheck } from 'lucide-react'
 import { styles } from './Navbar.styles'
 import { NAV_LINKS } from './Navbar.data'
 import Avatar from './Avatar'
+import Logo from './Logo'
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
@@ -44,15 +45,7 @@ export default function Navbar() {
         <div className={styles.container}>
           {/* Logo Brand */}
           <div className={styles.logoGroup}>
-            <Link to="/" className={styles.logo}>
-              <div className={styles.logoIcon}>&lt;/&gt;</div>
-              <div className="flex flex-col">
-                <span className={styles.logoBrand}>
-                  54<span className="text-[#C9F06A]">DEVS</span>
-                </span>
-                <span className={styles.logoTagline}>Let's build Africa</span>
-              </div>
-            </Link>
+            <Logo variant="full" className="h-9 sm:h-10 w-auto" to="/" />
             <div className={styles.logoSubline}>
               <span className="w-1.5 h-1.5 rounded-full bg-[#C9F06A]" />
               <span>54 NATIONS • DAKAR & PANAFRICAIN</span>

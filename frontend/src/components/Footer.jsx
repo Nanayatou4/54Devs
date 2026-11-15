@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { styles } from './Footer.styles'
+import Logo from './Logo'
 
 export default function Footer() {
   return (
@@ -8,10 +9,9 @@ export default function Footer() {
         <div className={styles.grid}>
           {/* Logo & description */}
           <div className="md:col-span-2">
-            <Link to="/" className={styles.logoWrapper}>
-              <span className={styles.logoIcon}>&lt;/&gt;</span>
-              <span>54Devs</span>
-            </Link>
+            <div className="mb-3">
+              <Logo variant="full" className="h-10 sm:h-11 w-auto" to="/" />
+            </div>
             <p className={styles.description}>
               L'écosystème panafricain de développement par excellence. Mettre en relation les talents et bâtisseurs de 54 nations pour construire ensemble des solutions technologiques innovantes.
             </p>

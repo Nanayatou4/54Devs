@@ -4,6 +4,7 @@ import { Eye, EyeOff, Loader2, ArrowRight } from 'lucide-react'
 import { authApi, buildGitHubAuthUrl, buildGoogleAuthUrl, setAuthSession } from '../api'
 import { styles } from './Register.styles'
 import { getPasswordStrength } from './Register.data'
+import Logo from '../components/Logo'
 
 export default function Register() {
   const navigate = useNavigate()
@@ -65,10 +66,9 @@ export default function Register() {
         <div className={styles.leftPanel}>
           <div className={styles.leftBgNetwork} />
           
-          <Link to="/" className={styles.logo}>
-            <span className={styles.logoIcon}>&lt;/&gt;</span>
-            <span>54Devs</span>
-          </Link>
+          <div className="mb-6">
+            <Logo variant="full" className="h-10 sm:h-11 w-auto" to="/" />
+          </div>
 
           <div className={styles.stepsList}>
             {/* Step 1 */}
