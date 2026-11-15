@@ -24,6 +24,7 @@ import AdminRoute from './components/AdminRoute'
 import AdminLayout from './components/AdminLayout'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminChallenges from './pages/AdminChallenges'
+import AdminCompetitions from './pages/AdminCompetitions'
 import Invitations from './pages/Invitations'
 
 export default function App() {
@@ -60,6 +61,7 @@ export default function App() {
             <Route element={<AdminLayout />}>
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/challenges/creer" element={<AdminChallenges />} />
+              <Route path="/admin/competitions/creer" element={<AdminCompetitions />} />
               <Route path="/admin/challenges/:id" element={<Challenges />} />
             </Route>
           </Route>
