@@ -12,6 +12,8 @@ export const competitionsApi = {
 export const adminCompetitionsApi = {
   lister: () => apiRequest('/admin/competitions'),
   creer: (competition) => apiRequest('/admin/competitions', { method: 'POST', body: competition }),
+  modifier: (id, competition) => apiRequest(`/admin/competitions/${id}`, { method: 'PUT', body: competition }),
+  supprimer: (id) => apiRequest(`/admin/competitions/${id}`, { method: 'DELETE' }),
   soumissions: (id) => apiRequest(`/admin/competitions/${id}/soumissions`),
   evaluer: (competitionId, submissionId, evaluation) => apiRequest(
     `/admin/competitions/${competitionId}/soumissions/${submissionId}/evaluation`,
