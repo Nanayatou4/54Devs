@@ -62,6 +62,7 @@ export default function App() {
             <Route element={<AdminLayout />}>
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/challenges/creer" element={<AdminChallenges />} />
+              <Route path="/admin/challenges/:id/modifier" element={<AdminChallenges />} />
               <Route path="/admin/competitions/creer" element={<AdminCompetitions />} />
               <Route path="/admin/competitions" element={<AdminCompetitionManagement />} />
               <Route path="/admin/challenges/:id" element={<Challenges />} />
