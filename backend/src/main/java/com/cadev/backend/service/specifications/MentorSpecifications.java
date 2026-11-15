@@ -5,6 +5,7 @@ import com.cadev.backend.entite.Profil;
 import com.cadev.backend.entite.ProfilMentor;
 import com.cadev.backend.entite.Utilisateur;
 import com.cadev.backend.enumeration.Niveau;
+import com.cadev.backend.enumeration.Role;
 import com.cadev.backend.enumeration.TypeCompetence;
 import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
@@ -23,6 +24,7 @@ public class MentorSpecifications {
 
             conditions.add(cb.isTrue(root.get("actif")));
             conditions.add(cb.isTrue(utilisateur.get("actif")));
+            conditions.add(cb.notEqual(utilisateur.get("role"), Role.ADMIN));
             if (moiId != null) {
                 conditions.add(cb.notEqual(utilisateur.get("id"), moiId)); // jamais soi-même
             }

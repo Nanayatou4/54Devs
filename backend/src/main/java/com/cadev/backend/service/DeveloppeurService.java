@@ -5,6 +5,7 @@ import com.cadev.backend.entite.CompetenceUtilisateur;
 import com.cadev.backend.entite.Profil;
 import com.cadev.backend.entite.Utilisateur;
 import com.cadev.backend.enumeration.Niveau;
+import com.cadev.backend.enumeration.Role;
 import com.cadev.backend.enumeration.TypeCompetence;
 import com.cadev.backend.exception.RessourceIntrouvableException;
 import com.cadev.backend.repository.CompetenceUtilisateurRepository;
@@ -77,7 +78,7 @@ public class DeveloppeurService {
     @Transactional(readOnly = true)
     public DeveloppeurDetailDto detail(Long utilisateurId) {
         Profil p = profils.findByUtilisateurId(utilisateurId)
-                .filter(x -> x.getUtilisateur().isActif())
+                .filter(x -> x.getUtilisateur().isActif() && x.getUtilisateur().getRole() != Role.ADMIN)
                 .orElseThrow(() -> new RessourceIntrouvableException("Développeur introuvable"));
         Utilisateur u = p.getUtilisateur();
 

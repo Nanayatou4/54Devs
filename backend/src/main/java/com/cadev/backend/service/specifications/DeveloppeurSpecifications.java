@@ -4,6 +4,7 @@ import com.cadev.backend.entite.CompetenceUtilisateur;
 import com.cadev.backend.entite.Profil;
 import com.cadev.backend.entite.Utilisateur;
 import com.cadev.backend.enumeration.Niveau;
+import com.cadev.backend.enumeration.Role;
 import com.cadev.backend.enumeration.TypeCompetence;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
@@ -24,6 +25,7 @@ public class DeveloppeurSpecifications {
             Join<Profil, Utilisateur> utilisateur = root.join("utilisateur");
 
             conditions.add(cb.isTrue(utilisateur.get("actif")));
+            conditions.add(cb.notEqual(utilisateur.get("role"), Role.ADMIN));
             if (moiId != null) {
                 conditions.add(cb.notEqual(utilisateur.get("id"), moiId)); // jamais soi-même
             }
