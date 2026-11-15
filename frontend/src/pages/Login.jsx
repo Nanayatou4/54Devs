@@ -30,9 +30,9 @@ export default function Login() {
     }
   }
 
-  function fillDemo(demoEmail, demoPass) {
+  function fillDemo(demoEmail) {
     setEmail(demoEmail)
-    setMotDePasse(demoPass)
+    setMotDePasse('')
     setErreur('')
   }
 
@@ -109,12 +109,12 @@ export default function Login() {
                 <span className="text-[10px] text-white/50 font-mono">1-Clic</span>
               </div>
               <p className="text-[11px] text-white/70 mb-3">
-                Cliquez sur un profil pour pré-remplir les accès de test :
+                Cliquez sur un profil pour pré-remplir l'adresse e-mail. Le mot de passe de test est communiqué séparément au jury :
               </p>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
-                  onClick={() => fillDemo('awafall@gmail.com', 'awafall1')}
+                  onClick={() => fillDemo('awafall@gmail.com')}
                   className="rounded-xl border border-[#C9F06A]/40 bg-[#C9F06A]/15 hover:bg-[#C9F06A]/25 p-2.5 text-xs font-bold text-white transition flex flex-col items-start cursor-pointer group text-left"
                 >
                   <span className="text-[#C9F06A] group-hover:underline text-[11px]">
@@ -125,7 +125,7 @@ export default function Login() {
 
                 <button
                   type="button"
-                  onClick={() => fillDemo('adminmaya@gmail.com', 'adminmaya')}
+                  onClick={() => fillDemo('adminmaya@gmail.com')}
                   className="rounded-xl border border-white/20 bg-white/5 hover:bg-white/10 p-2.5 text-xs font-bold text-white transition flex flex-col items-start cursor-pointer group text-left"
                 >
                   <span className="text-white group-hover:underline text-[11px]">
