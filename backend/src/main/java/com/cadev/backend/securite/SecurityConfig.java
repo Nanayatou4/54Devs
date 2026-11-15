@@ -45,6 +45,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/mentors/moi").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/mentors", "/api/mentors/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/developpeurs", "/api/developpeurs/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/health").permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(e -> e.authenticationEntryPoint(
                         (req, res, ex) -> {
