@@ -63,6 +63,41 @@ public class CompetitionService {
     }
 
     @Transactional
+    public CompetitionDto modifier(Long id, CompetitionRequete req) {
+        Competition c = competitions.findById(id)
+                .orElseThrow(() -> new RessourceIntrouvableException("Compétition introuvable."));
+        if (!req.dateFin().isAfter(req.dateDebut()))
+            throw new RequeteInvalideException("La date de fin doit être postérieure à la date de début.");
+
+        List<SoumissionCompetition> existantes = soumissions.findByCompetitionIdOrderByScoreDescDateSoumissionAsc(id);
+        if (!existantes.isEmpty()) {
+            if (!c.getDateDebut().equals(req.dateDebut()) || !c.getDateFin().equals(req.dateFin()))
+                throw new ConflitException("Les dates ne peuvent plus être modifiées après la première soumission.");
+            if (existantes.stream().anyMatch(s -> s.getScore() > req.pointsMaximum()))
+                throw new ConflitException("Le score maximum ne peut pas être inférieur à une note déjà attribuée.");
+            if (c.getType() != req.type())
+                throw new ConflitException("Le format ne peut plus être modifié après la première soumission.");
+        }
+        c.setTitre(req.titre().trim());
+        c.setDescription(req.description().trim());
+        c.setTheme(req.theme().trim());
+        c.setType(req.type());
+        c.setDateDebut(req.dateDebut());
+        c.setDateFin(req.dateFin());
+        c.setPointsMaximum(req.pointsMaximum());
+        return CompetitionDto.depuis(c, false, null, statut(c));
+    }
+
+    @Transactional
+    public void supprimer(Long id) {
+        Competition c = competitions.findById(id)
+                .orElseThrow(() -> new RessourceIntrouvableException("Compétition introuvable."));
+        if (soumissions.existsByCompetitionId(id))
+            throw new ConflitException("Cette compétition possède des soumissions et ne peut pas être supprimée. Archivez-la plutôt que de perdre les participations.");
+        competitions.delete(c);
+    }
+
+    @Transactional
     public CompetitionDto soumettre(Long id, String email, SoumissionCompetitionRequete req) {
         Competition c = trouverCompetition(id);
         LocalDateTime maintenant = LocalDateTime.now(FUSEAU);
