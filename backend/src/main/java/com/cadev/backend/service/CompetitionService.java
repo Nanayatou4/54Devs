@@ -101,6 +101,7 @@ public class CompetitionService {
                 .filter(x -> x.getCompetition().getId().equals(competitionId))
                 .orElseThrow(() -> new RessourceIntrouvableException("Soumission introuvable."));
         s.setScore(req.score());
+        s.setEvaluee(true);
         s.setRetourEvaluation(req.retourEvaluation() == null ? null : req.retourEvaluation().trim());
         return SoumissionCompetitionDto.depuis(s);
     }
@@ -112,7 +113,8 @@ public class CompetitionService {
             throw new ConflitException("Le classement sera publié à la clôture de la compétition.");
         List<SoumissionCompetition> classement =
                 soumissions.findByCompetitionIdOrderByScoreDescDateSoumissionAsc(competitionId);
-        if (c.getType() == com.cadev.backend.enumeration.TypeCompetition.SOLO) {
+        boolean toutesEvaluees = classement.stream().allMatch(SoumissionCompetition::isEvaluee);
+        if (toutesEvaluees && c.getType() == com.cadev.backend.enumeration.TypeCompetition.SOLO) {
             for (int i = 0; i < Math.min(3, classement.size()); i++) {
                 badgeService.attribuerBadgePodium(classement.get(i).getUtilisateur().getId(), i + 1);
             }
