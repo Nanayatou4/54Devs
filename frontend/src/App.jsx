@@ -13,6 +13,7 @@ import GoogleCallback from './pages/GoogleCallback'
 import Dashboard from './pages/Dashboard'
 import Questions from './pages/Questions'
 import Challenges from './pages/Challenges'
+import Competitions from './pages/Competitions'
 import Developers from './pages/Developers'
 import ProtectedRoute from './components/ProtectedRoute'
 import AppLayout from './components/AppLayout'
@@ -51,6 +52,7 @@ export default function App() {
             <Route path="/questions/:id" element={<Questions />} />
             <Route path="/challenges" element={<Challenges />} />
             <Route path="/challenges/:id" element={<Challenges />} />
+            <Route path="/competitions" element={<Competitions />} />
             <Route path="/developers" element={<Developers />} />
             <Route path="/developers/:id" element={<Developers />} />
           </Route>
