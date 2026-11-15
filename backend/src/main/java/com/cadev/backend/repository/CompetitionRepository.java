@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface CompetitionRepository extends JpaRepository<Competition, Long> {
     List<Competition> findByPublieeTrueOrderByDateDebutDesc();
+    List<Competition> findAllByOrderByDateDebutDesc();
 }
