@@ -247,6 +247,13 @@ export default function AdminDashboard() {
               <Trophy size={16} />
               <span>Nouvelle compétition</span>
             </Link>
+            <Link
+              to="/admin/competitions/creer"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white/80 transition hover:bg-white/10"
+            >
+              <Award size={16} />
+              <span>Gérer les compétitions</span>
+            </Link>
           </div>
         </div>
       </div>
@@ -836,6 +843,9 @@ export default function AdminDashboard() {
               </Link>
               <Link to="/admin/competitions" className="inline-flex items-center gap-2 rounded-xl border border-[#C9F06A]/30 bg-[#C9F06A]/10 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-[#C9F06A] hover:bg-[#C9F06A]/20 transition">
                 <Trophy size={15} /> Évaluer les compétitions
+              </Link>
+              <Link to="/admin/competitions/creer" className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white/80 hover:bg-white/10 transition">
+                <Award size={15} /> Gérer les compétitions
               </Link>
             </div>
 
