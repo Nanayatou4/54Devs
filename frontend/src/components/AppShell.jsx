@@ -59,7 +59,7 @@ export default function AppShell({ children, user }) {
   } else {
     activeKey =
       appNavItems.find((item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`))
-        ?.key || 'dashboard'
+        ?.key || (location.pathname.startsWith('/challenges') ? 'competitions' : 'dashboard')
   }
 
   function handleLogout() {

@@ -19,8 +19,7 @@ export const appNavItems = [
   { key: 'smart-match', label: 'Appariement intelligent', icon: Sparkles, path: '/smart-match' },
   { key: 'questions', label: 'Questions & Entraide', icon: HelpCircle, path: '/questions' },
   { key: 'mentorship', label: 'Mentorat', icon: GraduationCap, path: '/mentorship' },
-  { key: 'challenges', label: 'Défis & Compétitions', icon: Trophy, path: '/challenges' },
-  { key: 'competitions', label: 'Compétitions Solo', icon: Trophy, path: '/competitions' },
+  { key: 'competitions', label: 'Compétitions & Arène', icon: Trophy, path: '/competitions' },
   { key: 'profile', label: 'Mon Profil & Compétences', icon: User, path: '/profile' },
 ]
 
