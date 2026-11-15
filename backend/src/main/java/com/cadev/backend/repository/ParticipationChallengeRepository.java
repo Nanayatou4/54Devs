@@ -27,6 +27,8 @@ public interface ParticipationChallengeRepository extends JpaRepository<Particip
 
     long countByChallengeIdAndStatut(Long challengeId, StatutParticipation statut);
 
+    long countByChallengeId(Long challengeId);
+
     @Query("select p.challenge.id, count(p) from ParticipationChallenge p "
             + "where p.challenge.id in :ids and p.statut = :statut group by p.challenge.id")
     List<Object[]> compterParChallenge(@Param("ids") Collection<Long> ids,
