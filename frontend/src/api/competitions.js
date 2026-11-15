@@ -6,11 +6,15 @@ export const competitionsApi = {
     method: 'POST',
     body: submission,
   }),
+  classement: (id) => apiRequest(`/competitions/${id}/classement`),
 }
 
 export const adminCompetitionsApi = {
-  creer: (competition) => apiRequest('/admin/competitions', {
-    method: 'POST',
-    body: competition,
-  }),
+  lister: () => apiRequest('/admin/competitions'),
+  creer: (competition) => apiRequest('/admin/competitions', { method: 'POST', body: competition }),
+  soumissions: (id) => apiRequest(`/admin/competitions/${id}/soumissions`),
+  evaluer: (competitionId, submissionId, evaluation) => apiRequest(
+    `/admin/competitions/${competitionId}/soumissions/${submissionId}/evaluation`,
+    { method: 'PUT', body: evaluation },
+  ),
 }
