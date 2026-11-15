@@ -66,4 +66,10 @@ export const adminApi = {
       method: 'POST',
       body: challenge,
     }),
+
+  modifierChallenge: (id, challenge) =>
+    apiRequest(`/admin/challenges/${id}`, { method: 'PUT', body: challenge }),
+
+  supprimerChallenge: (id) =>
+    apiRequest(`/admin/challenges/${id}`, { method: 'DELETE' }),
 }
