@@ -110,7 +110,7 @@ export default function AdminCompetitions() {
             <input required maxLength={80} value={form.theme} onChange={e => update('theme', e.target.value)} className={field} placeholder="Backend, IA, Web, Mobile…"/>
           </label>
           <label className={label}>Format
-            <select value={form.type} onChange={e => update('type', e.target.value)} className={field}><option value="SOLO" className="bg-[#123326]">Solo</option><option value="EQUIPE" className="bg-[#123326]">Équipe (bientôt disponible)</option></select>
+            <select value={form.type} onChange={e => update('type', e.target.value)} className={field}><option value="SOLO" className="bg-[#123326]">Solo</option><option value="EQUIPE" disabled className="bg-[#123326]">Équipe (bientôt disponible)</option></select>
           </label>
           <label className={label}>Date et heure de début *
             <input required type="datetime-local" value={form.dateDebut} onChange={e => update('dateDebut', e.target.value)} className={field}/>
