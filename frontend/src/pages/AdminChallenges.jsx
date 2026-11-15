@@ -1,8 +1,9 @@
 import StyledSelect from '../components/StyledSelect'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
 import { Link, Navigate } from 'react-router-dom'
 import { ArrowLeft, CheckCircle2, LoaderCircle, ShieldCheck, Sparkles } from 'lucide-react'
-import { adminChallengesApi, getStoredUser } from '../api'
+import { adminChallengesApi, adminApi, challengesApi, getStoredUser } from '../api'
 
 const TYPES = [
   ['DEBUG', 'Débogage'], ['ALGORITHME', 'Algorithme'], ['SECURITE', 'Sécurité'],
@@ -21,6 +22,8 @@ const fieldClass = 'mt-2 w-full rounded-xl border border-white/10 bg-[#0d2119]/7
 const labelClass = 'block text-sm font-semibold text-white/85'
 
 export default function AdminChallenges() {
+  const { id } = useParams()
+  const editing = Boolean(id)
   const user = getStoredUser()
   const [form, setForm] = useState({
     titre: '', enonce: '', extraitCode: '', langage: '', type: 'DEBUG', difficulte: 'FACILE',
@@ -29,8 +32,32 @@ export default function AdminChallenges() {
   const [error, setError] = useState('')
   const [created, setCreated] = useState(null)
   const [saving, setSaving] = useState(false)
+  const [loading, setLoading] = useState(editing)
 
   if (user?.role !== 'ADMIN') return <Navigate to="/dashboard" replace />
+
+
+  useEffect(() => {
+    if (!editing) return
+    let active = true
+    Promise.all([challengesApi.getById(id), adminApi.challenges({ page: 0, taille: 50 })])
+      .then(([detail, adminList]) => {
+        if (!active) return
+        const adminChallenge = (adminList.contenu || []).find(item => String(item.id) === String(id))
+        if (!adminChallenge) throw new Error('Challenge introuvable dans la banque.')
+        setForm({
+          titre: detail.titre || '', enonce: detail.enonce || '',
+          extraitCode: detail.extraitCode || '', langage: detail.langage || '',
+          type: detail.type || 'DEBUG', difficulte: detail.difficulte || 'FACILE',
+          reponsesAcceptees: (adminChallenge.reponsesAcceptees || []).join(String.fromCharCode(10)),
+          explication: detail.explication || '', nombreEssaisMax: String(detail.nombreEssaisMax || 3),
+          dateDebut: detail.dateDebut, dateFin: detail.dateFin,
+        })
+      })
+      .catch(err => setError(err.message || 'Impossible de charger ce challenge.'))
+      .finally(() => { if (active) setLoading(false) })
+    return () => { active = false }
+  }, [editing, id])
 
   function update(field, value) {
     setForm(current => ({ ...current, [field]: value }))
@@ -56,7 +83,7 @@ export default function AdminChallenges() {
 
     setSaving(true)
     try {
-      const challenge = await adminChallengesApi.creer({
+      const payload = {
         titre: form.titre.trim(),
         enonce: form.enonce.trim(),
         extraitCode: form.extraitCode.trim() || null,
@@ -68,7 +95,8 @@ export default function AdminChallenges() {
         nombreEssaisMax: Number(form.nombreEssaisMax),
         dateDebut: form.dateDebut,
         dateFin: form.dateFin,
-      })
+      }
+      const challenge = editing ? await adminChallengesApi.modifier(id, payload) : await adminChallengesApi.creer(payload)
       setCreated(challenge)
       setForm(current => ({ ...current, titre: '', enonce: '', extraitCode: '', langage: '', reponsesAcceptees: '', explication: '' }))
     } catch (err) {
@@ -90,7 +118,7 @@ export default function AdminChallenges() {
         <header className="mb-7 rounded-3xl border border-white/10 bg-white/[0.07] p-6 shadow-xl shadow-black/10 backdrop-blur-xl sm:p-8">
           <div className="mb-4 grid h-12 w-12 place-items-center rounded-2xl border border-[#c9f06a]/20 bg-[#c9f06a]/10 text-[#c9f06a]"><ShieldCheck size={23} /></div>
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#c9f06a]">Administration · Challenges</p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">Créer un challenge</h1>
+          <h1 className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">{editing ? 'Modifier un challenge' : 'Créer un challenge'}</h1>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/60">Préparez un défi pour la communauté. Les points sont calculés automatiquement selon la difficulté.</p>
         </header>
 
@@ -102,7 +130,7 @@ export default function AdminChallenges() {
         )}
         {error && <div role="alert" className="mb-6 rounded-2xl border border-red-300/20 bg-red-400/10 p-4 text-sm text-red-100">{error}</div>}
 
-        <form onSubmit={submit} className="space-y-6 rounded-3xl border border-white/10 bg-white/[0.07] p-5 shadow-xl shadow-black/10 backdrop-blur-xl sm:p-8">
+        {loading ? <div className="rounded-2xl border border-white/10 bg-white/[0.07] p-8 text-center text-white/70">Chargement du challenge…</div> : <form onSubmit={submit} className="space-y-6 rounded-3xl border border-white/10 bg-white/[0.07] p-5 shadow-xl shadow-black/10 backdrop-blur-xl sm:p-8">
           <div className="grid gap-5 sm:grid-cols-2">
             <label className={`${labelClass} sm:col-span-2`}>Titre <span className="text-[#c9f06a]">*</span>
               <input required minLength={5} maxLength={150} value={form.titre} onChange={e => update('titre', e.target.value)} className={fieldClass} placeholder="Ex. Trouver l’élément manquant" />
@@ -143,10 +171,10 @@ export default function AdminChallenges() {
           <div className="flex flex-col-reverse gap-3 border-t border-white/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
             <p className="inline-flex items-center gap-2 text-xs text-white/50"><Sparkles size={15} className="text-[#c9f06a]" /> {form.difficulte === 'FACILE' ? 10 : form.difficulte === 'MOYEN' ? 20 : 30} points seront attribués.</p>
             <button type="submit" disabled={saving} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#c9f06a] px-6 text-sm font-bold text-[#102018] transition hover:bg-[#d8fa83] disabled:cursor-not-allowed disabled:opacity-60">
-              {saving ? <><LoaderCircle size={17} className="animate-spin" /> Création…</> : 'Créer le challenge'}
+              {saving ? <><LoaderCircle size={17} className="animate-spin" /> Création…</> : editing ? 'Enregistrer les modifications' : 'Créer le challenge'}
             </button>
           </div>
-        </form>
+        </form>}
       </div>
     </main>
   )
