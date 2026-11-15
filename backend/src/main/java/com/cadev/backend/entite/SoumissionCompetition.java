@@ -39,6 +39,9 @@ public class SoumissionCompetition {
     @Column(nullable = false)
     private int score;
 
+    @Column(nullable = false)
+    private boolean evaluee = false;
+
     @Column(length = 2000)
     private String retourEvaluation;
 
