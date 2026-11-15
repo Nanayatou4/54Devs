@@ -34,9 +34,6 @@ export default function AdminChallenges() {
   const [saving, setSaving] = useState(false)
   const [loading, setLoading] = useState(editing)
 
-  if (user?.role !== 'ADMIN') return <Navigate to="/dashboard" replace />
-
-
   useEffect(() => {
     if (!editing) return
     let active = true
@@ -96,7 +93,7 @@ export default function AdminChallenges() {
         dateDebut: form.dateDebut,
         dateFin: form.dateFin,
       }
-      const challenge = editing ? await adminChallengesApi.modifier(id, payload) : await adminChallengesApi.creer(payload)
+      const challenge = editing ? await adminApi.modifierChallenge(id, payload) : await adminChallengesApi.creer(payload)
       setCreated(challenge)
       setForm(current => ({ ...current, titre: '', enonce: '', extraitCode: '', langage: '', reponsesAcceptees: '', explication: '' }))
     } catch (err) {
@@ -105,6 +102,8 @@ export default function AdminChallenges() {
       setSaving(false)
     }
   }
+
+  if (user?.role !== 'ADMIN') return <Navigate to="/dashboard" replace />
 
   return (
     <main className="min-h-screen bg-[radial-gradient(ellipse_at_45%_0%,rgba(83,160,104,0.2),transparent_45%),linear-gradient(145deg,#10271d,#123829_52%,#10251c)] px-4 py-8 text-[#f3f0e8] sm:px-6 lg:px-10 lg:py-10">
@@ -124,7 +123,7 @@ export default function AdminChallenges() {
 
         {created && (
           <div className="mb-6 flex flex-col gap-3 rounded-2xl border border-emerald-300/20 bg-emerald-300/10 p-4 text-sm text-emerald-100 sm:flex-row sm:items-center sm:justify-between">
-            <span className="inline-flex items-center gap-2"><CheckCircle2 size={18} /> Challenge « {created.titre} » créé.</span>
+            <span className="inline-flex items-center gap-2"><CheckCircle2 size={18} /> Challenge « {created.titre} » {editing ? 'mis à jour' : 'créé'}.</span>
             <Link to={`/admin/challenges/${created.id}`} className="font-bold text-[#c9f06a] hover:underline">Voir le challenge</Link>
           </div>
         )}
@@ -171,7 +170,7 @@ export default function AdminChallenges() {
           <div className="flex flex-col-reverse gap-3 border-t border-white/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
             <p className="inline-flex items-center gap-2 text-xs text-white/50"><Sparkles size={15} className="text-[#c9f06a]" /> {form.difficulte === 'FACILE' ? 10 : form.difficulte === 'MOYEN' ? 20 : 30} points seront attribués.</p>
             <button type="submit" disabled={saving} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#c9f06a] px-6 text-sm font-bold text-[#102018] transition hover:bg-[#d8fa83] disabled:cursor-not-allowed disabled:opacity-60">
-              {saving ? <><LoaderCircle size={17} className="animate-spin" /> Création…</> : editing ? 'Enregistrer les modifications' : 'Créer le challenge'}
+              {saving ? <><LoaderCircle size={17} className="animate-spin" /> Enregistrement…</> : editing ? 'Enregistrer les modifications' : 'Créer le challenge'}
             </button>
           </div>
         </form>}
