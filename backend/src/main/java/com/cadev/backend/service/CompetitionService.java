@@ -29,6 +29,7 @@ public class CompetitionService {
     private final CompetitionRepository competitions;
     private final SoumissionCompetitionRepository soumissions;
     private final UtilisateurRepository utilisateurs;
+    private final BadgeService badgeService;
 
     @Transactional(readOnly = true)
     public List<CompetitionDto> lister(String email) {
@@ -87,8 +88,14 @@ public class CompetitionService {
     @Transactional(readOnly = true)
     public List<SoumissionCompetitionDto> soumissionsAdmin(Long competitionId) {
         trouverCompetition(competitionId);
-        return soumissions.findByCompetitionIdOrderByScoreDescDateSoumissionAsc(competitionId)
-                .stream().map(SoumissionCompetitionDto::depuis).toList();
+        List<SoumissionCompetition> classement =
+                soumissions.findByCompetitionIdOrderByScoreDescDateSoumissionAsc(competitionId);
+        if (c.getType() == com.cadev.backend.enumeration.TypeCompetition.SOLO) {
+            for (int i = 0; i < Math.min(3, classement.size()); i++) {
+                badgeService.attribuerBadgePodium(classement.get(i).getUtilisateur().getId(), i + 1);
+            }
+        }
+        return classement.stream().map(SoumissionCompetitionDto::depuis).toList();
     }
 
     @Transactional
@@ -104,7 +111,7 @@ public class CompetitionService {
         return SoumissionCompetitionDto.depuis(s);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public List<SoumissionCompetitionDto> classement(Long competitionId) {
         Competition c = trouverCompetition(competitionId);
         if (LocalDateTime.now(FUSEAU).isBefore(c.getDateFin()))
