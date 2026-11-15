@@ -263,11 +263,11 @@ export default function AdminDashboard() {
               <span>Nouvelle compétition</span>
             </Link>
             <Link
-              to="/admin/competitions/creer"
+              to="/admin/competitions"
               className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white/80 transition hover:bg-white/10"
             >
               <Award size={16} />
-              <span>Gérer les compétitions</span>
+              <span>Évaluer les compétitions</span>
             </Link>
           </div>
         </div>
