@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SoumissionCompetitionRepository extends JpaRepository<SoumissionCompetition, Long> {
+    boolean existsByCompetitionId(Long competitionId);
     Optional<SoumissionCompetition> findByCompetitionIdAndUtilisateurId(Long competitionId, Long utilisateurId);
     List<SoumissionCompetition> findByCompetitionIdOrderByScoreDescDateSoumissionAsc(Long competitionId);
 }
