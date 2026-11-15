@@ -28,8 +28,10 @@ import {
   Lock,
   ArrowRight,
   Sparkles,
+  Code2,
+  Pencil,
 } from 'lucide-react'
-import { adminApi, questionsApi, getStoredUser } from '../api'
+import { adminApi, adminCompetitionsApi, questionsApi, getStoredUser } from '../api'
 import Avatar from '../components/Avatar'
 
 const TABS = [
@@ -74,10 +76,13 @@ export default function AdminDashboard() {
   const [confirmModal, setConfirmModal] = useState(null)
 
   // Challenges tab state
+  const [arenaSubTab, setArenaSubTab] = useState('challenges') // 'challenges' | 'competitions'
   const [challenges, setChallenges] = useState([])
   const [challengesPage, setChallengesPage] = useState(0)
   const [challengesTotalPages, setChallengesTotalPages] = useState(1)
   const [loadingChallenges, setLoadingChallenges] = useState(false)
+  const [adminCompetitions, setAdminCompetitions] = useState([])
+  const [loadingCompetitions, setLoadingCompetitions] = useState(false)
 
   // Load statistics
   const loadStats = useCallback(() => {
@@ -145,6 +150,16 @@ export default function AdminDashboard() {
       .finally(() => setLoadingChallenges(false))
   }, [challengesPage])
 
+  // Load competitions
+  const loadAdminCompetitions = useCallback(() => {
+    setLoadingCompetitions(true)
+    adminCompetitionsApi
+      .lister()
+      .then((data) => setAdminCompetitions(data || []))
+      .catch((err) => console.error('Erreur competitions:', err))
+      .finally(() => setLoadingCompetitions(false))
+  }, [])
+
   useEffect(() => {
     loadStats()
   }, [loadStats])
@@ -156,8 +171,9 @@ export default function AdminDashboard() {
       loadQuestions()
     } else if (activeTab === 'challenges') {
       loadChallenges()
+      loadAdminCompetitions()
     }
-  }, [activeTab, loadUsers, loadQuestions, loadChallenges])
+  }, [activeTab, loadUsers, loadQuestions, loadChallenges, loadAdminCompetitions])
 
   // Toggle user active status
   async function handleToggleUserActif(user) {
@@ -192,6 +208,21 @@ export default function AdminDashboard() {
       loadStats()
     } catch (err) {
       setActionErrorMessage(err.message || 'Impossible de supprimer ce challenge. Les challenges déjà joués sont protégés.')
+    } finally {
+      setDeletingId(null)
+      setConfirmModal(null)
+    }
+  }
+
+  async function handleDeleteCompetition(id, titre) {
+    setDeletingId(id)
+    try {
+      await adminCompetitionsApi.supprimer(id)
+      setActionSuccessMessage(`Compétition « ${titre} » supprimée avec succès.`)
+      setAdminCompetitions((prev) => prev.filter((c) => c.id !== id))
+      loadStats()
+    } catch (err) {
+      setActionErrorMessage(err.message || 'Impossible de supprimer cette compétition.')
     } finally {
       setDeletingId(null)
       setConfirmModal(null)
@@ -844,142 +875,302 @@ export default function AdminDashboard() {
         {/* ========================================================================= */}
         {activeTab === 'challenges' && (
           <div className="mt-8 space-y-6 animate-fadeIn">
-            <div className="flex items-center justify-between">
+            {/* Header section with Sub-tabs */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h3 className="text-lg font-bold text-white font-display">Défis & Compétitions</h3>
-                <p className="text-xs text-white/50">Gestion des challenges avec suivi des participants et taux de réussite</p>
+                <h3 className="text-xl font-bold text-white font-display">L'Arène : Défis & Compétitions</h3>
+                <p className="text-xs text-white/50">Supervisez les mini-quiz et gérez l'ensemble des compétitions GitHub et hackathons.</p>
               </div>
-              <Link
-                to="/admin/challenges/creer"
-                className="inline-flex items-center gap-2 rounded-xl bg-[#C9F06A] text-black px-4 py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-[#D8F87C] transition shadow-lg shadow-[#C9F06A]/20"
-              >
-                <Plus size={16} />
-                <span>Créer un Défi</span>
-              </Link>
-              <Link to="/admin/competitions" className="inline-flex items-center gap-2 rounded-xl border border-[#C9F06A]/30 bg-[#C9F06A]/10 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-[#C9F06A] hover:bg-[#C9F06A]/20 transition">
-                <Trophy size={15} /> Évaluer les compétitions
-              </Link>
-              <Link to="/admin/competitions/creer" className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white/80 hover:bg-white/10 transition">
-                <Award size={15} /> Gérer les compétitions
-              </Link>
+
+              <div className="flex flex-wrap items-center gap-2.5">
+                {arenaSubTab === 'challenges' ? (
+                  <Link
+                    to="/admin/challenges/creer"
+                    className="inline-flex items-center gap-2 rounded-xl bg-[#C9F06A] text-black px-4 py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-[#D8F87C] transition shadow-lg shadow-[#C9F06A]/20"
+                  >
+                    <Plus size={16} />
+                    <span>Créer un Mini-Défi</span>
+                  </Link>
+                ) : (
+                  <>
+                    <Link
+                      to="/admin/competitions/creer"
+                      className="inline-flex items-center gap-2 rounded-xl bg-[#C9F06A] text-black px-4 py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-[#D8F87C] transition shadow-lg shadow-[#C9F06A]/20"
+                    >
+                      <Plus size={16} />
+                      <span>Nouvelle Compétition</span>
+                    </Link>
+                    <Link
+                      to="/admin/competitions"
+                      className="inline-flex items-center gap-2 rounded-xl border border-[#C9F06A]/40 bg-[#C9F06A]/10 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-[#C9F06A] hover:bg-[#C9F06A]/20 transition"
+                    >
+                      <Trophy size={15} />
+                      <span>Évaluer les dépôts</span>
+                    </Link>
+                  </>
+                )}
+              </div>
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-[#16221C]/80 overflow-hidden backdrop-blur-xl shadow-xl">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="border-b border-white/10 bg-white/[0.02] text-[11px] font-mono uppercase tracking-wider text-white/50">
-                      <th className="py-3.5 px-4 sm:px-6">Titre du Défi</th>
-                      <th className="py-3.5 px-4">Type</th>
-                      <th className="py-3.5 px-4">Difficulté</th>
-                      <th className="py-3.5 px-4">Points</th>
-                      <th className="py-3.5 px-4">Participants</th>
-                      <th className="py-3.5 px-4">Réussites</th>
-                      <th className="py-3.5 px-4 sm:px-6 text-right">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/5 text-xs">
-                    {loadingChallenges ? (
-                      <tr>
-                        <td colSpan={7} className="py-12 text-center text-white/50">
-                          <RefreshCw size={20} className="animate-spin mx-auto mb-2 text-[#C9F06A]" />
-                          Chargement des challenges...
-                        </td>
+            {/* Sub-tabs pills */}
+            <div className="flex items-center gap-2 border-b border-white/10 pb-3">
+              <button
+                type="button"
+                onClick={() => setArenaSubTab('challenges')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
+                  arenaSubTab === 'challenges'
+                    ? 'bg-[#C9F06A] text-black shadow-md shadow-[#C9F06A]/20'
+                    : 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white'
+                }`}
+              >
+                <Code2 size={15} />
+                <span>Mini-Challenges ({challenges.length})</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setArenaSubTab('competitions')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
+                  arenaSubTab === 'competitions'
+                    ? 'bg-[#C9F06A] text-black shadow-md shadow-[#C9F06A]/20'
+                    : 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white'
+                }`}
+              >
+                <Trophy size={15} />
+                <span>Compétitions & Hackathons ({adminCompetitions.length})</span>
+              </button>
+            </div>
+
+            {/* VUE 1 : MINI-CHALLENGES */}
+            {arenaSubTab === 'challenges' && (
+              <div className="rounded-2xl border border-white/10 bg-[#16221C]/80 overflow-hidden backdrop-blur-xl shadow-xl">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-white/10 bg-white/[0.02] text-[11px] font-mono uppercase tracking-wider text-white/50">
+                        <th className="py-3.5 px-4 sm:px-6">Titre du Défi</th>
+                        <th className="py-3.5 px-4">Type</th>
+                        <th className="py-3.5 px-4">Difficulté</th>
+                        <th className="py-3.5 px-4">Points</th>
+                        <th className="py-3.5 px-4">Participants</th>
+                        <th className="py-3.5 px-4">Réussites</th>
+                        <th className="py-3.5 px-4 sm:px-6 text-right">Actions</th>
                       </tr>
-                    ) : challenges.length === 0 ? (
-                      <tr>
-                        <td colSpan={7} className="py-12 text-center text-white/40">
-                          Aucun challenge enregistré.
-                        </td>
-                      </tr>
-                    ) : (
-                      challenges.map((c) => (
-                        <tr key={c.id} className="hover:bg-white/[0.02] transition">
-                          <td className="py-3.5 px-4 sm:px-6">
-                            <p className="font-bold text-white line-clamp-1">{c.titre}</p>
-                            <p className="text-[11px] text-white/40 font-mono">
-                              Du {c.dateDebut} au {c.dateFin}
-                            </p>
-                          </td>
-                          <td className="py-3.5 px-4 font-mono text-[11px] text-[#C9F06A]">
-                            {c.type}
-                          </td>
-                          <td className="py-3.5 px-4">
-                            <span
-                              className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                                c.difficulte === 'FACILE'
-                                  ? 'bg-emerald-500/15 text-emerald-400'
-                                  : c.difficulte === 'MOYEN'
-                                  ? 'bg-amber-500/15 text-amber-400'
-                                  : 'bg-rose-500/15 text-rose-400'
-                              }`}
-                            >
-                              {c.difficulte}
-                            </span>
-                          </td>
-                          <td className="py-3.5 px-4 font-mono text-[#C9F06A] font-bold">
-                            +{c.points} pts
-                          </td>
-                          <td className="py-3.5 px-4 text-white/80 font-mono">
-                            {c.nombreParticipants ?? 0}
-                          </td>
-                          <td className="py-3.5 px-4 text-emerald-400 font-mono font-semibold">
-                            {c.nombreReussites ?? 0}
-                          </td>
-                          <td className="py-3.5 px-4 sm:px-6 text-right">
-                            <div className="inline-flex items-center gap-3">
-                              <Link to={`/admin/challenges/${c.id}/modifier`} className="text-xs text-sky-300 hover:underline">Modifier</Link>
-                              <Link
-                                to={`/admin/challenges/${c.id}`}
-                                className="inline-flex items-center gap-1 text-xs text-[#C9F06A] hover:underline"
-                              >
-                                <span>Consulter</span>
-                                <ExternalLink size={12} />
-                              </Link>
-                              <button
-                                type="button"
-                                onClick={() => setConfirmModal({
-                                  id: c.id,
-                                  titre: c.titre,
-                                  action: () => handleDeleteChallenge(c.id),
-                                  challenge: true,
-                                })}
-                                disabled={deletingId === c.id}
-                                title="Supprimer le challenge s'il n'a aucune participation"
-                                className="inline-flex items-center gap-1 text-xs text-rose-400 hover:text-rose-300 disabled:opacity-40"
-                              >
-                                <Trash2 size={13} /> Supprimer
-                              </button>
-                            </div>
+                    </thead>
+                    <tbody className="divide-y divide-white/5 text-xs">
+                      {loadingChallenges ? (
+                        <tr>
+                          <td colSpan={7} className="py-12 text-center text-white/50">
+                            <RefreshCw size={20} className="animate-spin mx-auto mb-2 text-[#C9F06A]" />
+                            Chargement des challenges...
                           </td>
                         </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
+                      ) : challenges.length === 0 ? (
+                        <tr>
+                          <td colSpan={7} className="py-12 text-center text-white/40">
+                            Aucun challenge enregistré.
+                          </td>
+                        </tr>
+                      ) : (
+                        challenges.map((c) => (
+                          <tr key={c.id} className="hover:bg-white/[0.02] transition">
+                            <td className="py-3.5 px-4 sm:px-6">
+                              <p className="font-bold text-white line-clamp-1">{c.titre}</p>
+                              <p className="text-[11px] text-white/40 font-mono">
+                                Du {c.dateDebut} au {c.dateFin}
+                              </p>
+                            </td>
+                            <td className="py-3.5 px-4 font-mono text-[11px] text-[#C9F06A]">
+                              {c.type}
+                            </td>
+                            <td className="py-3.5 px-4">
+                              <span
+                                className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                                  c.difficulte === 'FACILE'
+                                    ? 'bg-emerald-500/15 text-emerald-400'
+                                    : c.difficulte === 'MOYEN'
+                                    ? 'bg-amber-500/15 text-amber-400'
+                                    : 'bg-rose-500/15 text-rose-400'
+                                }`}
+                              >
+                                {c.difficulte}
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-4 font-mono text-[#C9F06A] font-bold">
+                              +{c.points} pts
+                            </td>
+                            <td className="py-3.5 px-4 text-white/80 font-mono">
+                              {c.nombreParticipants ?? 0}
+                            </td>
+                            <td className="py-3.5 px-4 text-emerald-400 font-mono font-semibold">
+                              {c.nombreReussites ?? 0}
+                            </td>
+                            <td className="py-3.5 px-4 sm:px-6 text-right">
+                              <div className="inline-flex items-center gap-3">
+                                <Link to={`/admin/challenges/${c.id}/modifier`} className="text-xs text-sky-300 hover:underline">
+                                  Modifier
+                                </Link>
+                                <Link
+                                  to={`/admin/challenges/${c.id}`}
+                                  className="inline-flex items-center gap-1 text-xs text-[#C9F06A] hover:underline"
+                                >
+                                  <span>Consulter</span>
+                                  <ExternalLink size={12} />
+                                </Link>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setConfirmModal({
+                                      id: c.id,
+                                      titre: c.titre,
+                                      action: () => handleDeleteChallenge(c.id),
+                                      challenge: true,
+                                    })
+                                  }
+                                  disabled={deletingId === c.id}
+                                  title="Supprimer le challenge s'il n'a aucune participation"
+                                  className="inline-flex items-center gap-1 text-xs text-rose-400 hover:text-rose-300 disabled:opacity-40 cursor-pointer"
+                                >
+                                  <Trash2 size={13} /> Supprimer
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
 
-              {/* Challenges pagination */}
-              <div className="p-4 border-t border-white/10 flex items-center justify-between text-xs text-white/50">
-                <span>Page {challengesPage + 1} sur {challengesTotalPages}</span>
-                <div className="flex items-center gap-2">
-                  <button
-                    disabled={challengesPage === 0 || loadingChallenges}
-                    onClick={() => setChallengesPage((p) => Math.max(0, p - 1))}
-                    className="p-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed"
-                  >
-                    <ChevronLeft size={16} />
-                  </button>
-                  <button
-                    disabled={challengesPage >= challengesTotalPages - 1 || loadingChallenges}
-                    onClick={() => setChallengesPage((p) => p + 1)}
-                    className="p-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed"
-                  >
-                    <ChevronRight size={16} />
-                  </button>
+                {/* Challenges pagination */}
+                <div className="p-4 border-t border-white/10 flex items-center justify-between text-xs text-white/50">
+                  <span>Page {challengesPage + 1} sur {challengesTotalPages}</span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      disabled={challengesPage === 0 || loadingChallenges}
+                      onClick={() => setChallengesPage((p) => Math.max(0, p - 1))}
+                      className="p-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                    >
+                      <ChevronLeft size={16} />
+                    </button>
+                    <button
+                      disabled={challengesPage >= challengesTotalPages - 1 || loadingChallenges}
+                      onClick={() => setChallengesPage((p) => p + 1)}
+                      className="p-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                    >
+                      <ChevronRight size={16} />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
+
+            {/* VUE 2 : COMPÉTITIONS & HACKATHONS */}
+            {arenaSubTab === 'competitions' && (
+              <div className="rounded-2xl border border-white/10 bg-[#16221C]/80 overflow-hidden backdrop-blur-xl shadow-xl">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-white/10 bg-white/[0.02] text-[11px] font-mono uppercase tracking-wider text-white/50">
+                        <th className="py-3.5 px-4 sm:px-6">Titre de la Compétition</th>
+                        <th className="py-3.5 px-4">Format</th>
+                        <th className="py-3.5 px-4">Thème</th>
+                        <th className="py-3.5 px-4">Points Max</th>
+                        <th className="py-3.5 px-4">Statut</th>
+                        <th className="py-3.5 px-4 sm:px-6 text-right">Actions de Gestion</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5 text-xs">
+                      {loadingCompetitions ? (
+                        <tr>
+                          <td colSpan={6} className="py-12 text-center text-white/50">
+                            <RefreshCw size={20} className="animate-spin mx-auto mb-2 text-[#C9F06A]" />
+                            Chargement des compétitions...
+                          </td>
+                        </tr>
+                      ) : adminCompetitions.length === 0 ? (
+                        <tr>
+                          <td colSpan={6} className="py-12 text-center text-white/40">
+                            Aucune compétition créée pour le moment.
+                          </td>
+                        </tr>
+                      ) : (
+                        adminCompetitions.map((comp) => (
+                          <tr key={comp.id} className="hover:bg-white/[0.02] transition">
+                            <td className="py-3.5 px-4 sm:px-6">
+                              <p className="font-bold text-white line-clamp-1">{comp.titre}</p>
+                              <p className="text-[11px] text-white/40 font-mono">
+                                Du {new Date(comp.dateDebut).toLocaleDateString('fr-FR')} au{' '}
+                                {new Date(comp.dateFin).toLocaleDateString('fr-FR')}
+                              </p>
+                            </td>
+                            <td className="py-3.5 px-4">
+                              <span className="rounded-md border border-white/10 bg-white/5 px-2 py-0.5 text-[11px] text-white/80 font-semibold">
+                                {comp.type === 'SOLO' ? '⚡ Solo Hebdo' : '👥 Hackathon Équipe'}
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-4">
+                              <span className="text-[#C9F06A] font-semibold">{comp.theme}</span>
+                            </td>
+                            <td className="py-3.5 px-4 font-mono text-[#C9F06A] font-bold">
+                              {comp.pointsMaximum} pts
+                            </td>
+                            <td className="py-3.5 px-4">
+                              <span
+                                className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                                  comp.statut === 'EN_COURS'
+                                    ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                                    : comp.statut === 'A_VENIR'
+                                    ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
+                                    : 'bg-white/5 text-white/50 border border-white/10'
+                                }`}
+                              >
+                                {comp.statut === 'EN_COURS' ? 'En cours' : comp.statut === 'A_VENIR' ? 'À venir' : 'Terminée'}
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-4 sm:px-6 text-right">
+                              <div className="inline-flex items-center gap-2.5">
+                                <Link
+                                  to="/admin/competitions"
+                                  className="inline-flex items-center gap-1 rounded-lg border border-[#C9F06A]/30 bg-[#C9F06A]/10 px-2.5 py-1 text-xs font-bold text-[#C9F06A] hover:bg-[#C9F06A]/20 transition"
+                                  title="Noter et évaluer les dépôts GitHub des participants"
+                                >
+                                  <Trophy size={13} />
+                                  <span>Évaluer</span>
+                                </Link>
+                                <Link
+                                  to="/admin/competitions/creer"
+                                  className="inline-flex items-center gap-1 text-xs text-sky-300 hover:underline"
+                                  title="Modifier les paramètres"
+                                >
+                                  <Pencil size={12} />
+                                  <span>Modifier</span>
+                                </Link>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setConfirmModal({
+                                      id: comp.id,
+                                      titre: comp.titre,
+                                      action: () => handleDeleteCompetition(comp.id, comp.titre),
+                                      challenge: false,
+                                    })
+                                  }
+                                  disabled={deletingId === comp.id}
+                                  className="inline-flex items-center gap-1 text-xs text-rose-400 hover:text-rose-300 disabled:opacity-40 cursor-pointer"
+                                  title="Supprimer la compétition"
+                                >
+                                  <Trash2 size={13} /> Supprimer
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </div>
         )}
         </div>
