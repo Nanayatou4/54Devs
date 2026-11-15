@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams, useLocation } from 'react-router-dom'
-import { ArrowRight, Eye, EyeOff, Loader2, Mail, Lock } from 'lucide-react'
+import { ArrowRight, Eye, EyeOff, Loader2, Mail, Lock, Sparkles } from 'lucide-react'
 import { authApi, buildGitHubAuthUrl, buildGoogleAuthUrl, getHomePath, setAuthSession } from '../api'
 import { styles } from './Login.styles'
 
@@ -28,6 +28,12 @@ export default function Login() {
     } finally {
       setLoading(false)
     }
+  }
+
+  function fillDemo(demoEmail, demoPass) {
+    setEmail(demoEmail)
+    setMotDePasse(demoPass)
+    setErreur('')
   }
 
   function handleOAuth(buildUrl) {
@@ -94,6 +100,42 @@ export default function Login() {
               </div>
             )}
 
+            {/* Quick Demo Accès Jury CADEV */}
+            <div className="mb-6 rounded-2xl border border-[#C9F06A]/30 bg-gradient-to-r from-[#C9F06A]/10 via-[#18251E] to-[#C9F06A]/10 p-4 shadow-xl">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#C9F06A] font-mono flex items-center gap-1.5">
+                  <Sparkles size={13} /> Accès Rapide Démo (Jury CADEV)
+                </span>
+                <span className="text-[10px] text-white/50 font-mono">1-Clic</span>
+              </div>
+              <p className="text-[11px] text-white/70 mb-3">
+                Cliquez sur un profil pour pré-remplir les accès de test :
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => fillDemo('awafall@gmail.com', 'awafall1')}
+                  className="rounded-xl border border-[#C9F06A]/40 bg-[#C9F06A]/15 hover:bg-[#C9F06A]/25 p-2.5 text-xs font-bold text-white transition flex flex-col items-start cursor-pointer group text-left"
+                >
+                  <span className="text-[#C9F06A] group-hover:underline text-[11px]">
+                    👤 Développeur
+                  </span>
+                  <span className="text-[10px] text-white/60 font-mono truncate w-full">Awa Fall</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => fillDemo('adminmaya@gmail.com', 'adminmaya')}
+                  className="rounded-xl border border-white/20 bg-white/5 hover:bg-white/10 p-2.5 text-xs font-bold text-white transition flex flex-col items-start cursor-pointer group text-left"
+                >
+                  <span className="text-white group-hover:underline text-[11px]">
+                    🛡️ Administrateur
+                  </span>
+                  <span className="text-[10px] text-white/60 font-mono truncate w-full">Console Admin</span>
+                </button>
+              </div>
+            </div>
+
             <form onSubmit={handleSubmit} className={styles.form}>
               <div className={styles.field}>
                 <label htmlFor="email" className={styles.label}>Work Email</label>
@@ -105,7 +147,7 @@ export default function Login() {
                     required
                     value={email}
                     onChange={e => setEmail(e.target.value)}
-                    placeholder="anna503@gmail.com"
+                    placeholder="awafall@gmail.com"
                     className={styles.input}
                   />
                 </div>
