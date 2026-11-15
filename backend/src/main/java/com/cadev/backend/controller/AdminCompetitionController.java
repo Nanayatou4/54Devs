@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -28,6 +29,17 @@ public class AdminCompetitionController {
     @ResponseStatus(HttpStatus.CREATED)
     public CompetitionDto creer(Authentication auth, @Valid @RequestBody CompetitionRequete requete) {
         return service.creer(auth.getName(), requete);
+    }
+
+    @PutMapping("/{id}")
+    public CompetitionDto modifier(@PathVariable Long id, @Valid @RequestBody CompetitionRequete requete) {
+        return service.modifier(id, requete);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> supprimer(@PathVariable Long id) {
+        service.supprimer(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}/soumissions")
