@@ -20,6 +20,7 @@ export const appNavItems = [
   { key: 'questions', label: 'Questions & Entraide', icon: HelpCircle, path: '/questions' },
   { key: 'mentorship', label: 'Mentorat', icon: GraduationCap, path: '/mentorship' },
   { key: 'challenges', label: 'Défis & Compétitions', icon: Trophy, path: '/challenges' },
+  { key: 'competitions', label: 'Compétitions Solo', icon: Trophy, path: '/competitions' },
   { key: 'profile', label: 'Mon Profil & Compétences', icon: User, path: '/profile' },
 ]
 
