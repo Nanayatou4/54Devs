@@ -928,6 +928,7 @@ export default function AdminDashboard() {
                           </td>
                           <td className="py-3.5 px-4 sm:px-6 text-right">
                             <div className="inline-flex items-center gap-3">
+                              <Link to={`/admin/challenges/${c.id}/modifier`} className="text-xs text-sky-300 hover:underline">Modifier</Link>
                               <Link
                                 to={`/admin/challenges/${c.id}`}
                                 className="inline-flex items-center gap-1 text-xs text-[#C9F06A] hover:underline"
