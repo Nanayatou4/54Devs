@@ -7,7 +7,7 @@
 Projet développé dans le cadre de la **Coupe d'Afrique des Développeurs (CADEV)** — *Systalink Challenge 2026*  
 **Équipe : Soumy Devs** 🇸🇳 (*Anna Soumayatou Diena & Oumy Dieng*)
 
-[![Démo en ligne](https://img.shields.io/badge/Démo%20en%20ligne-Render-C9F06A?style=for-the-badge&logo=render&logoColor=black)](https://five4devs-frontend.onrender.com)
+[![Démo en ligne](https://img.shields.io/badge/Démo%20en%20ligne-Render-C9F06A?style=for-the-badge&logo=render&logoColor=black)](https://54devs.site)
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github)](https://github.com/Nanayatou4/54Devs)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/)
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
@@ -85,7 +85,7 @@ Les développeurs africains regorgent de talents et d'idées novatrices, mais so
 
 ## 🚀 Accès & Démo
 
-- 🌐 **Application déployée** : [https://five4devs-frontend.onrender.com](https://five4devs-frontend.onrender.com)
+- 🌐 **Application déployée** : [https://54devs.site](https://54devs.site)
 - 📂 **Dépôt GitHub** : [https://github.com/Nanayatou4/54Devs](https://github.com/Nanayatou4/54Devs)
 
 ### 🔑 Comptes Démo pour l'Évaluation du Jury :
