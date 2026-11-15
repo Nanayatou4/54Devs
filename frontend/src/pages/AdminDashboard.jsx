@@ -834,6 +834,9 @@ export default function AdminDashboard() {
                 <Plus size={16} />
                 <span>Créer un Défi</span>
               </Link>
+              <Link to="/admin/competitions" className="inline-flex items-center gap-2 rounded-xl border border-[#C9F06A]/30 bg-[#C9F06A]/10 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-[#C9F06A] hover:bg-[#C9F06A]/20 transition">
+                <Trophy size={15} /> Évaluer les compétitions
+              </Link>
             </div>
 
             <div className="rounded-2xl border border-white/10 bg-[#16221C]/80 overflow-hidden backdrop-blur-xl shadow-xl">
