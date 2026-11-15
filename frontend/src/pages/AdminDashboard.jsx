@@ -183,6 +183,21 @@ export default function AdminDashboard() {
     }
   }
 
+  async function handleDeleteChallenge(id) {
+    setDeletingId(id)
+    try {
+      await adminApi.supprimerChallenge(id)
+      setActionSuccessMessage('Challenge supprimé.')
+      setChallenges((prev) => prev.filter((challenge) => challenge.id !== id))
+      loadStats()
+    } catch (err) {
+      setActionErrorMessage(err.message || 'Impossible de supprimer ce challenge. Les challenges déjà joués sont protégés.')
+    } finally {
+      setDeletingId(null)
+      setConfirmModal(null)
+    }
+  }
+
   // Delete question
   async function handleDeleteQuestion(id) {
     setDeletingId(id)
@@ -912,13 +927,29 @@ export default function AdminDashboard() {
                             {c.nombreReussites ?? 0}
                           </td>
                           <td className="py-3.5 px-4 sm:px-6 text-right">
-                            <Link
-                              to={`/admin/challenges/${c.id}`}
-                              className="inline-flex items-center gap-1 text-xs text-[#C9F06A] hover:underline"
-                            >
-                              <span>Consulter</span>
-                              <ExternalLink size={12} />
-                            </Link>
+                            <div className="inline-flex items-center gap-3">
+                              <Link
+                                to={`/admin/challenges/${c.id}`}
+                                className="inline-flex items-center gap-1 text-xs text-[#C9F06A] hover:underline"
+                              >
+                                <span>Consulter</span>
+                                <ExternalLink size={12} />
+                              </Link>
+                              <button
+                                type="button"
+                                onClick={() => setConfirmModal({
+                                  id: c.id,
+                                  titre: c.titre,
+                                  action: () => handleDeleteChallenge(c.id),
+                                  challenge: true,
+                                })}
+                                disabled={deletingId === c.id}
+                                title="Supprimer le challenge s'il n'a aucune participation"
+                                className="inline-flex items-center gap-1 text-xs text-rose-400 hover:text-rose-300 disabled:opacity-40"
+                              >
+                                <Trash2 size={13} /> Supprimer
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))
@@ -962,9 +993,9 @@ export default function AdminDashboard() {
             </div>
             <h3 className="text-lg font-bold text-white font-display">Confirmation de suppression</h3>
             <p className="text-sm text-white/70 mt-2 leading-relaxed">
-              Êtes-vous sûr de vouloir supprimer définitivement la question :
+              Êtes-vous sûr de vouloir supprimer définitivement cet élément :
               <strong className="block text-white mt-1">« {confirmModal.titre} »</strong>
-              Toutes les réponses associées seront également supprimées.
+              {confirmModal.challenge ? 'Un challenge ne peut être supprimé que s’il n’a aucune participation.' : 'Toutes les réponses associées seront également supprimées.'}
             </p>
             <div className="mt-6 flex items-center justify-end gap-3">
               <button
