@@ -62,7 +62,13 @@ public class BadgeService {
                     3, Statistiques::joursChallenge),
             new DefinitionBadge("MENTOR", "Mentor",
                     "Vous avez animé 2 séances de mentorat avec compte rendu.",
-                    2, Statistiques::seancesAnimees)
+                    2, Statistiques::seancesAnimees),
+            new DefinitionBadge("WEEKLY_CHAMPION", "Champion hebdomadaire",
+                    "Vous avez terminé premier d’une compétition hebdomadaire.", 1, s -> 0),
+            new DefinitionBadge("WEEKLY_RUNNER_UP", "Vice-champion hebdomadaire",
+                    "Vous avez terminé deuxième d’une compétition hebdomadaire.", 1, s -> 0),
+            new DefinitionBadge("WEEKLY_FINALIST", "Finaliste hebdomadaire",
+                    "Vous avez terminé troisième d’une compétition hebdomadaire.", 1, s -> 0)
     );
 
     /** Crée ou met à jour le catalogue en base (appelé au démarrage). */
@@ -98,6 +104,24 @@ public class BadgeService {
     }
 
     /** Les 6 badges, obtenus ou non, avec la progression de l'utilisateur connecté. */
+    /** Attribue le badge correspondant au podium d'une compétition, une seule fois par utilisateur. */
+    @Transactional
+    public void attribuerBadgePodium(Long utilisateurId, int position) {
+        String code = switch (position) {
+            case 1 -> "WEEKLY_CHAMPION";
+            case 2 -> "WEEKLY_RUNNER_UP";
+            case 3 -> "WEEKLY_FINALIST";
+            default -> null;
+        };
+        if (code == null || badgesUtilisateur.existsByUtilisateurIdAndBadgeCode(utilisateurId, code)) return;
+        Badge badge = badges.findByCode(code)
+                .orElseThrow(() -> new IllegalStateException("Badge absent du catalogue : " + code));
+        BadgeUtilisateur bu = new BadgeUtilisateur();
+        bu.setUtilisateur(utilisateurs.getReferenceById(utilisateurId));
+        bu.setBadge(badge);
+        badgesUtilisateur.save(bu);
+    }
+
     @Transactional(readOnly = true)
     public List<BadgeDto> catalogue(String email) {
         Utilisateur moi = utilisateurs.findByEmail(email)
