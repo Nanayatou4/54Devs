@@ -88,7 +88,15 @@ Les développeurs africains regorgent de talents et d'idées novatrices, mais so
 - 🌐 **Application déployée** : [https://five4devs-frontend.onrender.com](https://five4devs-frontend.onrender.com)
 - 📂 **Dépôt GitHub** : [https://github.com/Nanayatou4/54Devs](https://github.com/Nanayatou4/54Devs)
 
-> **Note pour l'évaluation :** Vous pouvez explorer la plateforme librement, créer un compte ou vous connecter pour tester le Smart Match, postuler à des projets et résoudre des défis.
+### 🔑 Comptes Démo pour l'Évaluation du Jury :
+Pour tester directement l'application sans inscription, des boutons d'accès rapide **« 1-Clic »** sont disponibles sur la page de connexion, ou vous pouvez utiliser les identifiants suivants :
+
+| Profil / Rôle | Identifiant (Email) | Mot de passe | Rôle & Périmètre |
+|---|---|---|---|
+| **Développeur (Candidat)** | `awafall@gmail.com` | `awafall1` | Profil membre, Smart Match, postulation aux projets, soumission aux sprints |
+| **Administrateur (Jury)** | `adminmaya@gmail.com` | `adminmaya` | Panneau d'administration, création de défis, évaluation des dépôts GitHub |
+
+> **Note :** Vous pouvez également créer un nouveau compte développeur ou explorer librement la plateforme.
 
 ---
 
