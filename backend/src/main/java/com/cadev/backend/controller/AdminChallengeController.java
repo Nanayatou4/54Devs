@@ -25,6 +25,18 @@ public class AdminChallengeController {
                                              @RequestParam(defaultValue = "10") int taille) {
         return adminService.challenges(page, taille);
     }
+    @PutMapping("/{id}")
+    public ChallengeDetailDto modifier(Authentication auth, @PathVariable Long id,
+                                       @Valid @RequestBody ChallengeRequete requete) {
+        return service.modifier(id, auth.getName(), requete);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void supprimer(@PathVariable Long id) {
+        service.supprimer(id);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ChallengeDetailDto creer(Authentication auth, @Valid @RequestBody ChallengeRequete requete) {
