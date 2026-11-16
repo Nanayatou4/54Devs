@@ -88,13 +88,15 @@ Les développeurs africains regorgent de talents et d'idées novatrices, mais so
 - 🌐 **Application déployée** : [https://54devs.site](https://54devs.site)
 - 📂 **Dépôt GitHub** : [https://github.com/Nanayatou4/54Devs](https://github.com/Nanayatou4/54Devs)
 
-### 🔑 Comptes Démo pour l'Évaluation du Jury :
-Pour tester directement l'application sans inscription, des boutons d'accès rapide **« 1-Clic »** sont disponibles sur la page de connexion, ou vous pouvez utiliser les identifiants suivants :
+### 🔑 Comptes de démonstration
+
+Pour tester l'application sans inscription, un bouton permet de préremplir l'adresse e-mail du compte développeur de démonstration sur la page de connexion.
 
 | Profil / Rôle | Identifiant (Email) | Mot de passe | Rôle & Périmètre |
 |---|---|---|---|
-| **Développeur (Candidat)** | `awafall@gmail.com` | `awafall1` | Profil membre, Smart Match, postulation aux projets, soumission aux sprints |
-| **Administrateur (Jury)** | `adminmaya@gmail.com` | `adminmaya` | Panneau d'administration, création de défis, évaluation des dépôts GitHub |
+| **Développeur (Candidat)** | `awafall@gmail.com` | `awafall1` | Profil membre, Smart Match, demandes d'adhésion aux projets et participation aux sprints |
+
+**Accès administrateur / jury :** le compte existe toujours dans l'application. Ses identifiants sont communiqués séparément aux évaluateurs autorisés et ne sont pas publiés dans ce README.
 
 > **Note :** Vous pouvez également créer un nouveau compte développeur ou explorer librement la plateforme.
 
